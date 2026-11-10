@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +12,7 @@ h2{text-align:center;color:#075b3c}
 input,button{box-sizing:border-box;width:100%;padding:13px;margin:8px 0}
 input{border:1px solid #ccc;border-radius:6px}
 button{background:#075b3c;color:white;border:0;border-radius:6px;font-size:16px}
+.secondary{background:white;color:#075b3c}
 #msg{text-align:center;color:#b00020}
 </style>
 </head>
@@ -21,6 +23,12 @@ button{background:#075b3c;color:white;border:0;border-radius:6px;font-size:16px}
 <input type="email" id="email" placeholder="Admin Email" required>
 <input type="password" id="password" placeholder="Password" required>
 <button type="submit">Login</button>
+</form>
+<button type="button" class="secondary" id="forgotBtn">Forgot Password?</button>
+<form id="resetForm" hidden>
+<h2>Set New Password</h2>
+<input type="password" id="newPassword" placeholder="New Password (min 8 characters)" minlength="8" required>
+<button type="submit">Save New Password</button>
 </form>
 <p id="msg"></p>
 </div>
@@ -33,36 +41,69 @@ const supabase = createClient(
 'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
 );
 
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-e.preventDefault();
-
 const msg = document.getElementById('msg');
-msg.textContent = 'Checking login...';
+const loginForm = document.getElementById('loginForm');
+const resetForm = document.getElementById('resetForm');
+const forgotBtn = document.getElementById('forgotBtn');
 
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
-
-const { data, error } = await supabase.auth.signInWithPassword({
-email, password
+forgotBtn.addEventListener('click', async () => {
+const email = document.getElementById('email').value.trim();
+if (!email) {
+msg.textContent = 'Enter your admin email first.';
+return;
+}
+msg.textContent = 'Sending reset link...';
+const { error } = await supabase.auth.resetPasswordForEmail(email, {
+redirectTo: 'https://tycf-food-donation.pages.dev/admin.html'
+});
+msg.textContent = error ? error.message : 'Reset link sent. Check your email.';
 });
 
+supabase.auth.onAuthStateChange((event) => {
+if (event === 'PASSWORD_RECOVERY') {
+loginForm.hidden = true;
+forgotBtn.hidden = true;
+resetForm.hidden = false;
+msg.textContent = 'Enter your new password.';
+}
+});
+
+resetForm.addEventListener('submit', async (e) => {
+e.preventDefault();
+msg.textContent = 'Saving password...';
+const password = document.getElementById('newPassword').value;
+const { error } = await supabase.auth.updateUser({ password });
 if (error) {
 msg.textContent = error.message;
 return;
 }
+await supabase.auth.signOut();
+resetForm.hidden = true;
+loginForm.hidden = false;
+forgotBtn.hidden = false;
+msg.textContent = 'Password updated. Please log in.';
+});
 
+loginForm.addEventListener('submit', async (e) => {
+e.preventDefault();
+msg.textContent = 'Checking login...';
+const email = document.getElementById('email').value.trim();
+const password = document.getElementById('password').value;
+const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+if (error) {
+msg.textContent = error.message;
+return;
+}
 const { data: admin, error: adminError } = await supabase
 .from('tycf_admins')
 .select('user_id')
 .eq('user_id', data.user.id)
 .maybeSingle();
-
 if (adminError || !admin) {
 await supabase.auth.signOut();
 msg.textContent = 'Admin access not allowed';
 return;
 }
-
 window.location.href = 'dashboard.html';
 });
 </script>
