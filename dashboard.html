@@ -225,11 +225,13 @@ async function loadOrderImages(list){
 await Promise.all(list.map(async order=>{
 order.stickerPhotoUrl=null;
 order.stickerDesignUrl=null;
+
 if(order.sticker_photo_path){
 const {data,error}=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(order.sticker_photo_path,3600);
 if(!error&&data?.signedUrl)order.stickerPhotoUrl=data.signedUrl;
 else console.warn('Customer photo URL error:',order.id,error);
 }
+
 if(order.sticker_design_path){
 const {data,error}=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(order.sticker_design_path,3600);
 if(!error&&data?.signedUrl)order.stickerDesignUrl=data.signedUrl;
@@ -240,6 +242,7 @@ else console.warn('Final design URL error:',order.id,error);
 
 async function loadAll(){
 say('Loading bookings and settings…');
+
 const [orderResult,settingsResult]=await Promise.all([
 supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
 supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
@@ -250,6 +253,7 @@ if(settingsResult.error){say('Settings error: '+settingsResult.error.message);re
 
 orders=orderResult.data||[];
 settings=settingsResult.data;
+
 if(!settings){say('No settings row found in tycf_settings.');return;}
 
 await loadOrderImages(orders);
@@ -270,6 +274,7 @@ $('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
 function orderMarkup(order){
 const paid=order.payment_status==='Paid';
 const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
+
 const statusOptions=statuses.map(status=>{
 const blocked=status==='Confirmed'&&!paid;
 return `<option value="${status}" ${order.status===status?'selected':''} ${blocked?'disabled':''}>${status}${blocked?' (Verify payment first)':''}</option>`;
@@ -284,6 +289,7 @@ const design=order.stickerDesignUrl
 :(order.sticker_design_path?'<p class="image-missing">Final design is saved, but preview is unavailable. Check Storage read permission.</p>':'');
 
 const link=paid?whatsappLink(order):'';
+
 return `
 <article class="order">
 <h3>${esc(order.customer_name)} <span class="tag">${esc(order.status)}</span></h3>
@@ -311,22 +317,27 @@ ${paid&&!link?'<span class="muted">Invalid WhatsApp number. Please check it.</sp
 function renderOrders(){
 const query=$('search').value.toLowerCase();
 const filter=$('statusFilter').value;
+
 const filtered=orders.filter(order=>
 (!filter||order.status===filter)&&
 [order.customer_name,order.customer_mobile,order.package_name,order.whatsapp_recipient]
 .some(value=>String(value||'').toLowerCase().includes(query))
 );
+
 $('ordersList').innerHTML=filtered.length?filtered.map(orderMarkup).join(''):'<p>No matching bookings.</p>';
 
 document.querySelectorAll('[data-save]').forEach(button=>{
 button.addEventListener('click',()=>saveStatus(button.dataset.save));
 });
+
 document.querySelectorAll('[data-verify]').forEach(button=>{
 button.addEventListener('click',()=>verifyPayment(button.dataset.verify));
 });
+
 document.querySelectorAll('[data-save-wa]').forEach(button=>{
 button.addEventListener('click',()=>saveWhatsAppNumber(button.dataset.saveWa));
 });
+
 document.querySelectorAll('[data-download-design]').forEach(button=>{
 button.addEventListener('click',()=>downloadStickerDesign(button.dataset.downloadDesign));
 });
@@ -335,6 +346,7 @@ button.addEventListener('click',()=>downloadStickerDesign(button.dataset.downloa
 /* DOWNLOAD FINAL STICKER DESIGN FOR PRINTING */
 async function downloadStickerDesign(id){
 const order=orders.find(o=>String(o.id)===String(id));
+
 if(!order||!order.stickerDesignUrl){
 say('Final sticker design is not available for download.');
 return;
@@ -384,10 +396,19 @@ button.textContent='Download Sticker for Printing';
 
 async function saveWhatsAppNumber(id){
 const phone=validWhatsApp($('wa-'+id)?.value);
-if(!phone){say('Enter a valid WhatsApp number with country code. Example: 919876543210');return;}
+
+if(!phone){
+say('Enter a valid WhatsApp number with country code. Example: 919876543210');
+return;
+}
+
 say('Saving WhatsApp number…');
-const {error}=await supabase.from('tycf_orders').update({whatsapp_recipient:phone}).eq('id',id);
+
+const {error}=await supabase.from('tycf_orders')
+.update({whatsapp_recipient:phone}).eq('id',id);
+
 if(error){say('WhatsApp number save failed: '+error.message);return;}
+
 await loadAll();
 say('WhatsApp number saved.');
 }
@@ -395,11 +416,21 @@ say('WhatsApp number saved.');
 async function verifyPayment(id){
 const order=orders.find(o=>String(o.id)===String(id));
 if(!order)return;
-if(order.payment_status==='Paid'){say('This booking is already marked Paid.');return;}
+
+if(order.payment_status==='Paid'){
+say('This booking is already marked Paid.');
+return;
+}
+
 if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?'))return;
+
 say('Updating payment status…');
-const {error}=await supabase.from('tycf_orders').update({payment_status:'Paid',status:'Confirmed'}).eq('id',id);
+
+const {error}=await supabase.from('tycf_orders')
+.update({payment_status:'Paid',status:'Confirmed'}).eq('id',id);
+
 if(error){say('Payment update failed: '+error.message);return;}
+
 await loadAll();
 say('Payment marked Paid and booking Confirmed. You can now send WhatsApp confirmation.');
 }
@@ -407,20 +438,30 @@ say('Payment marked Paid and booking Confirmed. You can now send WhatsApp confir
 async function saveStatus(id){
 const status=$('st-'+id).value;
 const order=orders.find(o=>String(o.id)===String(id));
-if(status==='Confirmed'&&order?.payment_status!=='Paid'){say('Verify payment before confirming this booking.');return;}
+
+if(status==='Confirmed'&&order?.payment_status!=='Paid'){
+say('Verify payment before confirming this booking.');
+return;
+}
+
 say('Saving booking status…');
+
 const {error}=await supabase.from('tycf_orders').update({status}).eq('id',id);
+
 if(error){say('Status update failed: '+error.message);return;}
+
 await loadAll();
 say('Booking status updated.');
 }
 
 function renderReminders(){
 const days=Number(settings.reminder_days||1);
+
 const due=orders.filter(order=>
 order.donation_date===datePlus(days)&&
 !['Delivered','Cancelled'].includes(order.status)
 );
+
 $('reminderList').innerHTML=due.length
 ?due.map(order=>`<div class="order"><b>${esc(order.customer_name)}</b> — ${esc(order.package_name)}<p class="muted">${esc(order.customer_mobile)} · ${esc(order.donation_date)} · ${esc(order.status)}</p></div>`).join('')
 :'<p>No donations due on the reminder date.</p>';
@@ -435,23 +476,38 @@ $('cakePrice').value=settings.cake_price??1500;
 $('reminderDays').value=settings.reminder_days??1;
 }
 
+/* ADMIN PROFILE */
 $('profileForm').addEventListener('submit',async event=>{
 event.preventDefault();
+
 const displayName=$('displayName').value.trim();
 const newEmail=$('newAdminEmail').value.trim();
+
 if(!displayName){say('Enter a display name.');return;}
+
 say('Saving admin profile…');
+
 const update={data:{display_name:displayName}};
 if(newEmail&&newEmail!==currentEmail)update.email=newEmail;
+
 const {error}=await supabase.auth.updateUser(update);
+
 if(error){say('Profile update failed: '+error.message);return;}
+
 $('adminDisplayName').textContent=displayName;
-if(update.email){currentEmail=newEmail;say('Profile saved. Check your email inbox to confirm the email change.');}
-else say('Admin display name saved.');
+
+if(update.email){
+currentEmail=newEmail;
+say('Profile saved. Check your email inbox to confirm the email change.');
+}else{
+say('Admin display name saved.');
+}
 });
 
+/* PACKAGE AND WHATSAPP SETTINGS */
 $('settingsForm').addEventListener('submit',async event=>{
 event.preventDefault();
+
 const update={
 whatsapp_number:$('waNumber').value.replace(/\D/g,''),
 veg_price:Number($('vegPrice').value),
@@ -460,28 +516,160 @@ chicken_price:Number($('chickenPrice').value),
 cake_price:Number($('cakePrice').value),
 reminder_days:Number($('reminderDays').value)
 };
-if(!/^\d{10,15}$/.test(update.whatsapp_number)){say('Enter Foundation WhatsApp number with country code.');return;}
-if(update.veg_price<1||update.egg_price<1||update.chicken_price<1||update.cake_price<1||update.reminder_days<1||update.reminder_days>30){say('Please check all settings fields.');return;}
+
+if(!/^\d{10,15}$/.test(update.whatsapp_number)){
+say('Enter Foundation WhatsApp number with country code.');
+return;
+}
+
+if(update.veg_price<1||update.egg_price<1||update.chicken_price<1||update.cake_price<1||update.reminder_days<1||update.reminder_days>30){
+say('Please check all settings fields.');
+return;
+}
+
 say('Saving settings…');
-const {error}=await supabase.from('tycf_settings').update(update).not('id','is',null);
+
+const {error}=await supabase.from('tycf_settings')
+.update(update).not('id','is',null);
+
 if(error){say('Settings save failed: '+error.message);return;}
+
 await loadAll();
 say('Package and WhatsApp settings saved.');
 });
 
+/* UPI QR SETTINGS */
 const QR_PATH='current/payment-qr';
 
 async function loadQr(){
 const {data}=supabase.storage.from('tycf-payment-qr').getPublicUrl(QR_PATH);
 const url=data.publicUrl+'?v='+Date.now();
+
 $('qrPreviewWrap').innerHTML='<p class="muted">Checking current QR…</p>';
+
 try{
 const response=await fetch(url,{method:'HEAD'});
-$('qrPreviewWrap').innerHTML=response.ok?`<img src="${url}" alt="Current UPI QR">`:'<p class="muted">No QR uploaded yet.</p>';
+
+$('qrPreviewWrap').innerHTML=response.ok
+?`<img src="${url}" alt="Current UPI QR">`
+:'<p class="muted">No QR uploaded yet.</p>';
 }catch(error){
 $('qrPreviewWrap').innerHTML='<p class="muted">Could not load QR preview.</p>';
 }
 }
 
 $('qrForm').addEventListener('submit',async event=>{
-event.preventDef
+event.preventDefault();
+
+const file=$('qrFile').files[0];
+
+if(!file){say('Please choose a QR image.');return;}
+
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+say('Only JPG, PNG or WebP images are allowed.');
+return;
+}
+
+if(file.size>5*1024*1024){
+say('QR image must be smaller than 5 MB.');
+return;
+}
+
+const button=$('qrForm').querySelector('button[type="submit"]');
+button.disabled=true;
+say('Uploading UPI QR…');
+
+try{
+const {error}=await supabase.storage
+.from('tycf-payment-qr')
+.upload(QR_PATH,file,{
+upsert:true,
+contentType:file.type,
+cacheControl:'3600'
+});
+
+if(error)throw error;
+
+$('qrFile').value='';
+await loadQr();
+say('UPI QR uploaded successfully.');
+}catch(error){
+console.error(error);
+say('QR upload failed: '+error.message);
+}finally{
+button.disabled=false;
+}
+});
+
+$('deleteQrBtn').addEventListener('click',async()=>{
+if(!confirm('Are you sure you want to delete the current UPI QR?'))return;
+
+const button=$('deleteQrBtn');
+button.disabled=true;
+say('Deleting current UPI QR…');
+
+try{
+const {error}=await supabase.storage
+.from('tycf-payment-qr')
+.remove([QR_PATH]);
+
+if(error)throw error;
+
+await loadQr();
+say('Current UPI QR deleted.');
+}catch(error){
+console.error(error);
+say('QR delete failed: '+error.message);
+}finally{
+button.disabled=false;
+}
+});
+
+/* TAB NAVIGATION */
+function showTab(tab){
+const tabs=['bookings','reminders','settings','qr'];
+
+tabs.forEach(name=>{
+$(name+'Tab').hidden=name!==tab;
+});
+
+if(tab==='qr')loadQr();
+}
+
+document.querySelectorAll('[data-tab]').forEach(button=>{
+button.addEventListener('click',()=>{
+showTab(button.dataset.tab);
+});
+});
+
+/* SEARCH AND FILTER */
+$('search').addEventListener('input',renderOrders);
+$('statusFilter').addEventListener('change',renderOrders);
+
+/* REFRESH */
+$('refreshBtn').addEventListener('click',async()=>{
+await loadAll();
+if(!$('qrTab').hidden)await loadQr();
+});
+
+/* LOGOUT */
+$('logoutBtn').addEventListener('click',async()=>{
+if(!confirm('Do you want to logout from TYCF Admin?'))return;
+
+say('Logging out…');
+
+const {error}=await supabase.auth.signOut();
+
+if(error){
+say('Logout failed: '+error.message);
+return;
+}
+
+location.href='admin.html';
+});
+
+/* START DASHBOARD */
+init();
+</script>
+</body>
+</html>
