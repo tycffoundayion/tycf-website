@@ -32,6 +32,9 @@ label{font-weight:600;font-size:13px}
 .tag.pending{background:#fff0ce;color:#805500}
 #message{padding:10px;color:#8a2b22;white-space:pre-wrap}
 #qrPreviewWrap img{display:block;max-width:280px;width:100%;height:auto;border:1px solid #dce9e0;border-radius:10px;padding:8px;margin:12px 0}
+.wa-box{background:#f2f8f3;border:1px solid #dce9e0;padding:10px;border-radius:8px;margin:12px 0}
+.wa-box label{display:block}
+.wa-box input{margin-bottom:8px}
 @media(max-width:600px){main{padding:10px}.panel{padding:12px}}
 </style>
 </head>
@@ -101,8 +104,12 @@ label{font-weight:600;font-size:13px}
 
 <h2>Package & WhatsApp Settings</h2>
 <form id="settingsForm">
-<label>Admin WhatsApp Number (country code + number, digits only)</label>
+<label>TYCF Foundation WhatsApp Contact Number (country code + number)</label>
 <input id="waNumber" placeholder="Example: 919876543210" required>
+<p class="muted">
+This saves the Foundation contact number. It does not select the WhatsApp account used to send messages. WhatsApp uses the account currently logged in on your device.
+</p>
+
 <div class="row">
 <div>
 <label>Veg meals price (₹)</label>
@@ -121,11 +128,11 @@ label{font-weight:600;font-size:13px}
 <input id="cakePrice" type="number" min="1" required>
 </div>
 </div>
+
 <label>Reminder days before donation</label>
 <input id="reminderDays" type="number" min="1" max="30" value="1">
 <button type="submit">Save Settings</button>
 </form>
-<p class="muted">Customer confirmation opens the customer's WhatsApp chat. Admin must press Send in WhatsApp.</p>
 </section>
 
 <section id="qrTab" class="panel" hidden>
@@ -201,8 +208,11 @@ return [
 }
 
 function whatsappUrl(order) {
-const phone = customerWhatsAppNumber(order.customer_mobile);
+const selectedNumber = order.whatsapp_recipient || order.customer_mobile;
+const phone = customerWhatsAppNumber(selectedNumber);
+
 if(!phone) return '';
+
 return 'https://wa.me/' + phone + '?text=' +
 encodeURIComponent(confirmationMessage(order));
 }
@@ -292,30 +302,49 @@ const blocked = status === 'Confirmed' && !paid;
 return `<option value="${status}" ${order.status===status?'selected':''} ${blocked?'disabled':''}>${status}${blocked?' (Verify payment first)':''}</option>`;
 }).join('');
 
+const savedRecipient = order.whatsapp_recipient || order.customer_mobile || '';
 const waLink = paid ? whatsappUrl(order) : '';
 
 return `
 <article class="order">
 <h3>${esc(order.customer_name)} <span class="tag">${esc(order.status)}</span></h3>
 <div>${esc(order.package_name)} — ₹${esc(order.package_price)}</div>
+
 <div class="muted">
-Phone: ${esc(order.customer_mobile)} ·
+Booking Mobile: ${esc(order.customer_mobile)} ·
 Occasion: ${esc(order.occasion)} ·
 Donation date: ${esc(order.donation_date)}
 </div>
+
 <div class="muted">
 Sticker name: ${esc(order.sticker_name)} ·
 Message: ${esc(order.customer_message)}
 </div>
+
 <p><strong>Payment Status:</strong>
 <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span>
 </p>
+
+<div class="wa-box">
+<label for="wa-${esc(order.id)}">Customer WhatsApp Number</label>
+<input
+id="wa-${esc(order.id)}"
+type="tel"
+inputmode="numeric"
+maxlength="15"
+value="${esc(savedRecipient)}"
+placeholder="Example: 919876543210"
+>
+<button type="button" data-save-wa="${esc(order.id)}">Save WhatsApp Number</button>
+<p class="muted">You can change the WhatsApp number without changing the original booking mobile number.</p>
+</div>
+
 <div class="actions">
 ${!paid ? `<button data-verify="${esc(order.id)}">Verify Payment / Mark Paid</button>` : ''}
 <select aria-label="Booking status" id="st-${esc(order.id)}">${statuses}</select>
 <button data-save="${esc(order.id)}">Save status</button>
 ${waLink ? `<a class="btn" href="${waLink}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>` : ''}
-${paid && !waLink ? '<span class="muted">Customer mobile number is invalid. Check the number.</span>' : ''}
+${paid && !waLink ? '<span class="muted">WhatsApp number is invalid. Check the number.</span>' : ''}
 </div>
 </article>`;
 }
@@ -326,7 +355,7 @@ const filter = $('statusFilter').value;
 
 const filtered = orders.filter(order =>
 (!filter || order.status === filter) &&
-[order.customer_name,order.customer_mobile,order.package_name]
+[order.customer_name,order.customer_mobile,order.package_name,order.whatsapp_recipient]
 .some(value => String(value || '').toLowerCase().includes(query))
 );
 
@@ -341,6 +370,37 @@ button.addEventListener('click',() => saveStatus(button.dataset.save));
 document.querySelectorAll('[data-verify]').forEach(button => {
 button.addEventListener('click',() => verifyPayment(button.dataset.verify));
 });
+
+document.querySelectorAll('[data-save-wa]').forEach(button => {
+button.addEventListener('click',() => saveWhatsAppNumber(button.dataset.saveWa));
+});
+}
+
+async function saveWhatsAppNumber(id) {
+const input = $('wa-' + id);
+if(!input) return;
+
+const number = input.value.trim();
+const normalized = customerWhatsAppNumber(number);
+
+if(!normalized) {
+say('Enter a valid customer WhatsApp number with country code. Example: 919876543210');
+return;
+}
+
+say('Saving customer WhatsApp number…');
+
+const {error} = await supabase.from('tycf_orders')
+.update({whatsapp_recipient:normalized})
+.eq('id',id);
+
+if(error) {
+say('Could not save WhatsApp number: ' + error.message);
+return;
+}
+
+say('Customer WhatsApp number saved successfully.');
+await loadAll();
 }
 
 async function verifyPayment(id) {
@@ -369,7 +429,7 @@ return;
 }
 
 await loadAll();
-say('Payment marked Paid and booking Confirmed. Click Send WhatsApp Confirmation to message the customer.');
+say('Payment marked Paid and booking Confirmed. Check the WhatsApp number and click Send WhatsApp Confirmation.');
 }
 
 async function saveStatus(id) {
@@ -459,12 +519,12 @@ say('Admin display name saved.');
 }
 });
 
-/* PACKAGE AND ADMIN WHATSAPP SETTINGS */
+/* FOUNDATION WHATSAPP CONTACT AND PACKAGE SETTINGS */
 $('settingsForm').addEventListener('submit',async event => {
 event.preventDefault();
 
 const update = {
-whatsapp_number:$('waNumber').value.trim(),
+whatsapp_number:$('waNumber').value.replace(/\D/g,''),
 veg_price:Number($('vegPrice').value),
 egg_price:Number($('eggPrice').value),
 chicken_price:Number($('chickenPrice').value),
@@ -473,11 +533,18 @@ reminder_days:Number($('reminderDays').value)
 };
 
 if(!/^\d{10,15}$/.test(update.whatsapp_number)) {
-say('Enter WhatsApp number with country code, digits only.');
+say('Enter Foundation WhatsApp number with country code, digits only.');
 return;
 }
 
-if(Object.values(update).some(value => value === '' || value === null || Number.isNaN(value))) {
+if(
+update.veg_price < 1 ||
+update.egg_price < 1 ||
+update.chicken_price < 1 ||
+update.cake_price < 1 ||
+update.reminder_days < 1 ||
+update.reminder_days > 30
+) {
 say('Please check all settings fields.');
 return;
 }
@@ -493,7 +560,7 @@ say('Settings save failed: ' + error.message);
 return;
 }
 
-say('Settings saved.');
+say('Foundation WhatsApp contact and package settings saved.');
 await loadAll();
 });
 
