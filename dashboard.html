@@ -34,6 +34,7 @@ label{font-weight:600;font-size:13px}
 .order-image-card{background:#f5faf6;border:1px solid #dce9e0;border-radius:9px;padding:10px}
 .order-image-card strong{display:block;margin-bottom:8px}
 .order-image-card img{display:block;width:100%;max-height:260px;object-fit:contain;background:white;border-radius:7px}
+.order-image-card button{width:100%;margin-top:10px}
 .image-missing{font-size:13px;color:#805500}
 .wa-box{background:#f2f8f3;border:1px solid #dce9e0;padding:10px;border-radius:8px;margin:12px 0}
 #qrPreviewWrap img{display:block;width:100%;max-width:280px;margin:12px 0;border:1px solid #ddd;padding:8px;border-radius:10px}
@@ -279,7 +280,7 @@ const photo=order.stickerPhotoUrl
 :(order.sticker_photo_path?'<p class="image-missing">Customer photo is saved, but preview is unavailable. Check Storage read permission.</p>':'');
 
 const design=order.stickerDesignUrl
-?`<div class="order-image-card"><strong>Final Sticker Design</strong><a href="${esc(order.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(order.stickerDesignUrl)}" alt="Final sticker design" loading="lazy"></a></div>`
+?`<div class="order-image-card"><strong>Final Sticker Design</strong><a href="${esc(order.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(order.stickerDesignUrl)}" alt="Final sticker design" loading="lazy"></a><button type="button" data-download-design="${esc(order.id)}">Download Sticker for Printing</button></div>`
 :(order.sticker_design_path?'<p class="image-missing">Final design is saved, but preview is unavailable. Check Storage read permission.</p>':'');
 
 const link=paid?whatsappLink(order):'';
@@ -326,6 +327,59 @@ button.addEventListener('click',()=>verifyPayment(button.dataset.verify));
 document.querySelectorAll('[data-save-wa]').forEach(button=>{
 button.addEventListener('click',()=>saveWhatsAppNumber(button.dataset.saveWa));
 });
+document.querySelectorAll('[data-download-design]').forEach(button=>{
+button.addEventListener('click',()=>downloadStickerDesign(button.dataset.downloadDesign));
+});
+}
+
+/* DOWNLOAD FINAL STICKER DESIGN FOR PRINTING */
+async function downloadStickerDesign(id){
+const order=orders.find(o=>String(o.id)===String(id));
+if(!order||!order.stickerDesignUrl){
+say('Final sticker design is not available for download.');
+return;
+}
+
+const button=[...document.querySelectorAll('[data-download-design]')]
+.find(b=>b.dataset.downloadDesign===String(id));
+
+if(button){
+button.disabled=true;
+button.textContent='Preparing download…';
+}
+
+say('Preparing sticker design for download…');
+
+try{
+const response=await fetch(order.stickerDesignUrl);
+if(!response.ok)throw new Error('Could not fetch the sticker design.');
+
+const blob=await response.blob();
+const objectUrl=URL.createObjectURL(blob);
+const link=document.createElement('a');
+
+const safeName=String(order.sticker_name||order.customer_name||'TYCF-Sticker')
+.replace(/[^a-z0-9_-]+/gi,'-')
+.replace(/^-+|-+$/g,'');
+
+link.href=objectUrl;
+link.download='TYCF-'+(safeName||'Sticker')+'.png';
+document.body.appendChild(link);
+link.click();
+link.remove();
+
+setTimeout(()=>URL.revokeObjectURL(objectUrl),2000);
+
+say('Sticker design downloaded. Find it in your phone Downloads folder for printing.');
+}catch(error){
+console.error('Sticker download error:',error);
+say('Download failed: '+error.message);
+}finally{
+if(button){
+button.disabled=false;
+button.textContent='Download Sticker for Printing';
+}
+}
 }
 
 async function saveWhatsAppNumber(id){
@@ -430,50 +484,4 @@ $('qrPreviewWrap').innerHTML='<p class="muted">Could not load QR preview.</p>';
 }
 
 $('qrForm').addEventListener('submit',async event=>{
-event.preventDefault();
-const file=$('qrFile').files[0];
-if(!file){say('Choose a QR image first.');return;}
-if(!['image/jpeg','image/png','image/webp'].includes(file.type)){say('Use JPG, PNG or WebP image.');return;}
-if(file.size>5*1024*1024){say('Image must be 5 MB or smaller.');return;}
-say('Uploading QR…');
-const {error}=await supabase.storage.from('tycf-payment-qr').upload(QR_PATH,file,{upsert:true,contentType:file.type,cacheControl:'0'});
-if(error){say('QR upload failed: '+error.message);return;}
-$('qrFile').value='';
-await loadQr();
-say('UPI QR uploaded successfully.');
-});
-
-$('deleteQrBtn').addEventListener('click',async()=>{
-if(!confirm('Delete the current TYCF payment QR?'))return;
-say('Deleting current QR…');
-const {error}=await supabase.storage.from('tycf-payment-qr').remove([QR_PATH]);
-if(error){say('QR delete failed: '+error.message);return;}
-$('qrPreviewWrap').innerHTML='<p class="muted">No QR uploaded yet.</p>';
-$('qrFile').value='';
-say('Current payment QR deleted.');
-});
-
-function showTab(name){
-['bookings','reminders','settings','qr'].forEach(tab=>{
-$(tab+'Tab').hidden=tab!==name;
-});
-if(name==='qr')loadQr();
-}
-
-document.querySelectorAll('[data-tab]').forEach(button=>{
-button.addEventListener('click',()=>showTab(button.dataset.tab));
-});
-
-$('refreshBtn').addEventListener('click',loadAll);
-$('logoutBtn').addEventListener('click',async()=>{
-say('Signing out…');
-await supabase.auth.signOut();
-location.href='admin.html';
-});
-$('search').addEventListener('input',renderOrders);
-$('statusFilter').addEventListener('change',renderOrders);
-
-init();
-</script>
-</body>
-</html>
+event.preventDef
