@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,7 @@ nav a{color:white;margin:10px;text-decoration:none}
 .hero h2{font-size:34px;color:#075b3c}
 .hero p{font-size:18px}
 button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;text-decoration:none;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
 section{padding:35px 18px;text-align:center}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
 .card{background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
@@ -27,6 +29,9 @@ label{text-align:left;display:block;font-weight:bold}
 footer{background:#06452f;color:white;text-align:center;padding:25px}
 footer a{color:#ffda83}
 #formMsg{padding:10px;white-space:pre-wrap}
+#paymentQr{display:none;width:100%;max-width:320px;height:auto;margin:15px auto;border:1px solid #ddd;border-radius:10px;padding:8px;background:white}
+.payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
+.payment-note{font-size:14px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -41,6 +46,7 @@ footer a{color:#ffda83}
 <a href="#home">Home</a>
 <a href="#packages">Packages</a>
 <a href="#booking">Book Donation</a>
+<a href="#payment">UPI Payment</a>
 </nav>
 
 <div class="hero" id="home">
@@ -128,6 +134,23 @@ footer a{color:#ffda83}
 </form>
 </section>
 
+<section id="payment">
+<h2>UPI Donation Payment</h2>
+<div class="payment-card">
+<p>Thank you for supporting TYCF Food Donation.</p>
+<p>Scan the official TYCF Foundation QR below to make your donation.</p>
+
+<img id="paymentQr" alt="TYCF Foundation UPI payment QR">
+
+<p id="qrMsg" role="status">Loading payment QR...</p>
+
+<div class="payment-note">
+<strong>Important:</strong>
+<p>Please verify the recipient name shown in your UPI app before making payment. Your booking will be confirmed only after the TYCF team verifies the payment.</p>
+</div>
+</div>
+</section>
+
 <footer>
 <h3>TYCF Foundation</h3>
 <p>Food Donation • Sharing Happiness</p>
@@ -175,7 +198,31 @@ async function loadPrices(){
   $('cakePrice').textContent = format(p.cake_price);
 }
 
+/* LOAD THE LATEST QR UPLOADED FROM ADMIN DASHBOARD */
+
+async function loadPaymentQr(){
+  const qrImage = $('paymentQr');
+  const qrMessage = $('qrMsg');
+
+  const {data} = supabase.storage
+    .from('tycf-payment-qr')
+    .getPublicUrl('current/payment-qr');
+
+  qrImage.onload = () => {
+    qrImage.style.display = 'block';
+    qrMessage.textContent = 'Scan this QR using your UPI app.';
+  };
+
+  qrImage.onerror = () => {
+    qrImage.style.display = 'none';
+    qrMessage.textContent = 'Payment QR is temporarily unavailable. Please contact TYCF Foundation.';
+  };
+
+  qrImage.src = data.publicUrl + '?v=' + Date.now();
+}
+
 loadPrices();
+loadPaymentQr();
 
 $('bookingForm').addEventListener('submit',async e=>{
   e.preventDefault();
