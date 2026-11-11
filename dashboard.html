@@ -17,6 +17,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
 button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:#fff;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
 button.light{background:#fff;color:#075b3c;border:1px solid #b7d4c3}
 button.warn{background:#8a3b25}
+button:disabled{opacity:.5;cursor:not-allowed}
 .panel,.stat{background:#fff;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .stat strong{display:block;font-size:25px;margin-top:8px}
@@ -27,6 +28,8 @@ label{font-weight:600;font-size:13px}
 .order h3{margin:0 0 8px}
 .muted{color:#557064;font-size:13px}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
+.tag.paid{background:#d8f4df;color:#12612c}
+.tag.pending{background:#fff0ce;color:#805500}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 #message{padding:10px;color:#8a2b22}
 #qrPreviewWrap img{display:block;max-width:280px;width:100%;height:auto;border:1px solid #dce9e0;border-radius:10px;padding:8px;margin:12px 0}
@@ -36,7 +39,7 @@ label{font-weight:600;font-size:13px}
 <body>
 <header>
   <h1>TYCF Food Donation — Admin</h1>
-  <p>Bookings, reminders, package settings and UPI QR</p>
+  <p>Bookings, payment verification, reminders, package settings and UPI QR</p>
 </header>
 
 <main>
@@ -132,7 +135,7 @@ label{font-weight:600;font-size:13px}
         <button type="button" class="warn" id="deleteQrBtn">Delete current QR</button>
       </div>
 
-      <p class="muted">After uploading, the customer website payment section must also be connected to this QR image to show the latest QR to donors.</p>
+      <p class="muted">The customer website displays the QR stored here.</p>
     </section>
   </section>
 </main>
@@ -238,9 +241,13 @@ function renderStats() {
 }
 
 function orderMarkup(order) {
+  const paid = order.payment_status === 'Paid';
+
   const statuses = ['Received','Confirmed','Preparing','Delivered','Cancelled']
-    .map(status => `<option ${order.status===status?'selected':''}>${status}</option>`)
-    .join('');
+    .map(status => {
+      const blocked = status === 'Confirmed' && !paid;
+      return `<option value="${status}" ${order.status===status?'selected':''} ${blocked?'disabled':''}>${status}${blocked?' (Verify payment first)':''}</option>`;
+    }).join('');
 
   const phone = String(order.customer_mobile || '').replace(/\D/g,'');
   const message = encodeURIComponent(
@@ -264,7 +271,13 @@ function orderMarkup(order) {
         Sticker name: ${esc(order.sticker_name)} ·
         Message: ${esc(order.customer_message)}
       </div>
+
+      <p><strong>Payment Status:</strong>
+        <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span>
+      </p>
+
       <div class="actions">
+        ${!paid ? `<button data-verify="${esc(order.id)}">Verify Payment / Mark Paid</button>` : ''}
         <select aria-label="Booking status" id="st-${esc(order.id)}">${statuses}</select>
         <button data-save="${esc(order.id)}">Save status</button>
         ${whatsappLink ? `<a class="btn" href="${whatsappLink}" target="_blank" rel="noopener">WhatsApp customer</a>` : ''}
@@ -290,10 +303,51 @@ function renderOrders() {
   document.querySelectorAll('[data-save]').forEach(button => {
     button.addEventListener('click',() => saveStatus(button.dataset.save));
   });
+
+  document.querySelectorAll('[data-verify]').forEach(button => {
+    button.addEventListener('click',() => verifyPayment(button.dataset.verify));
+  });
+}
+
+/* PAYMENT VERIFICATION */
+async function verifyPayment(id) {
+  const order = orders.find(item => String(item.id) === String(id));
+  if(!order) return;
+
+  if(order.payment_status === 'Paid') {
+    say('This booking is already marked Paid.');
+    return;
+  }
+
+  if(!confirm('Has a responsible TYCF adult verified that the donation has actually reached the foundation account?')) {
+    return;
+  }
+
+  say('Updating payment status…');
+
+  const {error} = await supabase
+    .from('tycf_orders')
+    .update({payment_status:'Paid'})
+    .eq('id',id);
+
+  if(error) {
+    say('Payment update failed: ' + error.message);
+    return;
+  }
+
+  say('Payment marked Paid. You can now confirm this booking.');
+  await loadAll();
 }
 
 async function saveStatus(id) {
   const status = $('st-' + id).value;
+  const order = orders.find(item => String(item.id) === String(id));
+
+  if(status === 'Confirmed' && order?.payment_status !== 'Paid') {
+    say('Verify payment before confirming this booking.');
+    return;
+  }
+
   say('Saving status…');
 
   const {error} = await supabase
@@ -375,7 +429,6 @@ $('settingsForm').addEventListener('submit',async event => {
 });
 
 /* UPI QR SETTINGS */
-
 const QR_PATH = 'current/payment-qr';
 
 async function loadQr() {
@@ -457,7 +510,6 @@ $('deleteQrBtn').addEventListener('click',async () => {
 });
 
 /* TAB SWITCHING */
-
 document.querySelectorAll('[data-tab]').forEach(button => {
   button.addEventListener('click',() => {
     ['bookings','reminders','settings','qr'].forEach(tab => {
