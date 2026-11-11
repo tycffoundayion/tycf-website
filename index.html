@@ -12,6 +12,7 @@ header{background:#075b3c;color:white;padding:22px;text-align:center}
 header h1{margin:0;font-size:27px}
 nav{background:#06452f;padding:13px;text-align:center}
 nav a{color:white;margin:10px;text-decoration:none}
+nav a:hover{color:#ffda83;text-decoration:underline}
 .hero{padding:65px 20px;text-align:center;background:#e2f2e5}
 .hero h2{font-size:34px;color:#075b3c}
 .hero p{font-size:18px}
@@ -32,6 +33,10 @@ footer a{color:#ffda83}
 #paymentQr{display:none;width:100%;max-width:320px;height:auto;margin:15px auto;border:1px solid #ddd;border-radius:10px;padding:8px;background:white}
 .payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
 .payment-note{font-size:14px;line-height:1.6}
+@media(max-width:600px){
+ nav a{display:inline-block;margin:7px;font-size:14px}
+ .hero h2{font-size:27px}
+}
 </style>
 </head>
 <body>
@@ -47,6 +52,7 @@ footer a{color:#ffda83}
 <a href="#packages">Packages</a>
 <a href="#booking">Book Donation</a>
 <a href="#payment">UPI Payment</a>
+<a href="admin.html">Admin Login</a>
 </nav>
 
 <div class="hero" id="home">
