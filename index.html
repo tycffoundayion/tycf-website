@@ -31,7 +31,7 @@ label{text-align:left;display:block;font-weight:bold}
 .consent input{width:auto}
 footer{background:#06452f;color:white;text-align:center;padding:25px}
 footer a{color:#ffda83}
-#formMsg{padding:10px;white-space:pre-wrap}
+#formMsg{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
 .payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
 #paymentQr{display:none;width:100%;max-width:320px;margin:15px auto}
 .editor{max-width:550px;margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px}
@@ -71,35 +71,30 @@ style="width:150px;display:block;margin:auto auto 12px">
 <section id="packages">
 <h2>Donation Packages</h2>
 <div class="cards">
-
 <div class="card">
 <h3>🍛 Veg Meals</h3>
 <div class="price" id="vegPrice">₹1,500</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
-
 <div class="card">
 <h3>🥚 Egg Meals</h3>
 <div class="price" id="eggPrice">₹1,800</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
-
 <div class="card">
 <h3>🍗 Chicken Meals</h3>
 <div class="price" id="chickenPrice">₹2,500</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
-
 <div class="card">
 <h3>🎂 Cake Celebration</h3>
 <div class="price" id="cakePrice">₹1,500</div>
 <p>Cake Cutting + Egg Puffs</p>
 <p>Children's Celebration</p>
 </div>
-
 </div>
 </section>
 
@@ -133,16 +128,13 @@ style="width:150px;display:block;margin:auto auto 12px">
 <input id="donationDate" type="date" required>
 
 <label>Upload Your Photo</label>
-<input id="stickerPhoto" type="file"
-accept="image/jpeg,image/png,image/webp">
+<input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
 
 <label>Name on Design</label>
-<input id="stickerName" maxlength="100"
-placeholder="Birthday person name">
+<input id="stickerName" maxlength="100" placeholder="Birthday person name">
 
 <label>Best Wishes From</label>
-<input id="bestWishesFrom" maxlength="80"
-placeholder="Enter your name">
+<input id="bestWishesFrom" maxlength="80" placeholder="Enter your name">
 
 <label>Happy Birthday Font Style</label>
 <select id="birthdayFont">
@@ -152,30 +144,16 @@ placeholder="Enter your name">
 <option value="Pacifico">Style 4 - Creative</option>
 </select>
 
-<p class="font-samples">
-Select a font and see your design preview below.
-</p>
+<p class="font-samples">Select a font and see your design preview below.</p>
 
 <div class="editor" id="photoEditor" hidden>
-
 <h3>Customize Your Photo</h3>
-
-<p class="editor-note">
-Drag the photo to move it. Use Zoom to adjust the photo.
-</p>
-
+<p class="editor-note">Drag the photo to move it. Use Zoom to adjust the photo.</p>
 <canvas id="designCanvas" width="1200" height="675"></canvas>
-
 <label>Photo Zoom</label>
-<input id="photoZoom" type="range"
-min="1" max="2.5" step="0.01" value="1">
-
+<input id="photoZoom" type="range" min="1" max="2.5" step="0.01" value="1">
 <p><strong>Final Design Preview</strong></p>
-
-<p class="editor-note">
-TYCF Footer, logo and contact details are fixed.
-</p>
-
+<p class="editor-note">TYCF Footer, logo and contact details are fixed.</p>
 </div>
 
 <label>Message</label>
@@ -186,18 +164,13 @@ TYCF Footer, logo and contact details are fixed.
 <span>I agree that TYCF Foundation may use these details to process this donation booking.</span>
 </label>
 
-<button id="submitBtn" type="submit">
-Submit Donation Request
-</button>
-
-<p id="formMsg" role="status"></p>
-
+<button id="submitBtn" type="submit">Submit Donation Request</button>
+<p id="formMsg" role="status" aria-live="polite"></p>
 </form>
 </section>
 
 <section id="payment">
 <h2>UPI Donation Payment</h2>
-
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <img id="paymentQr" alt="TYCF Payment QR">
@@ -236,52 +209,43 @@ let prices={
 const format=n=>'₹'+Number(n).toLocaleString('en-IN');
 
 async function loadPrices(){
-
+try{
 const {data,error}=await supabase.rpc('get_tycf_public_prices');
-
 if(error||!data?.length)return;
-
 const p=data[0];
-
 prices={
 'Veg Meals':p.veg_price,
 'Egg Meals':p.egg_price,
 'Chicken Meals':p.chicken_price,
 'Cake Celebration':p.cake_price
 };
-
 $('vegPrice').textContent=format(p.veg_price);
 $('eggPrice').textContent=format(p.egg_price);
 $('chickenPrice').textContent=format(p.chicken_price);
 $('cakePrice').textContent=format(p.cake_price);
-
+}catch(err){
+console.error('Price loading error:',err);
+}
 }
 
 async function loadPaymentQr(){
-
-const {data}=supabase.storage
-.from('tycf-payment-qr')
+const {data}=supabase.storage.from('tycf-payment-qr')
 .getPublicUrl('current/payment-qr');
-
 const img=$('paymentQr');
-
 img.onload=()=>{
 img.style.display='block';
 $('qrMsg').textContent='Scan this QR using your UPI app.';
 };
-
 img.onerror=()=>{
 $('qrMsg').textContent='Payment QR unavailable. Contact TYCF Foundation.';
 };
-
 img.src=data.publicUrl+'?v='+Date.now();
-
 }
 
 loadPrices();
 loadPaymentQr();
 
-/* PHOTO DESIGN EDITOR */
+/* PHOTO EDITOR */
 
 let stickerImage=null;
 let objectUrl=null;
@@ -290,12 +254,7 @@ let offsetX=0;
 let offsetY=0;
 let drag=null;
 
-const W=1200;
-const H=675;
-const PHOTO_W=455;
-const FOOTER_H=130;
-
-/* LOAD TYCF LOGO */
+const W=1200,H=675,PHOTO_W=455,FOOTER_H=130;
 
 const logoImage=new Image();
 let logoLoaded=false;
@@ -304,60 +263,27 @@ logoImage.onload=()=>{
 logoLoaded=true;
 drawDesign();
 };
-
 logoImage.src='tycf-logo-cropped-1.png';
 
-/* FONT STYLE SETTINGS */
-
 const fontSettings={
-'Dancing Script':{
-font:'Dancing Script',
-size:82,
-color:'#075b3c'
-},
-'Lobster':{
-font:'Lobster',
-size:76,
-color:'#075b3c'
-},
-'Playfair Display':{
-font:'Playfair Display',
-size:68,
-color:'#075b3c'
-},
-'Pacifico':{
-font:'Pacifico',
-size:72,
-color:'#075b3c'
-}
+'Dancing Script':{font:'Dancing Script',size:82,color:'#075b3c'},
+'Lobster':{font:'Lobster',size:76,color:'#075b3c'},
+'Playfair Display':{font:'Playfair Display',size:68,color:'#075b3c'},
+'Pacifico':{font:'Pacifico',size:72,color:'#075b3c'}
 };
 
-/* DRAW FINAL DESIGN */
-
 function drawDesign(){
-
 if(!stickerImage)return;
 
-const canvas=$('designCanvas');
-const ctx=canvas.getContext('2d');
-
+const ctx=$('designCanvas').getContext('2d');
 ctx.clearRect(0,0,W,H);
-
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(0,0,W,H);
 
 const boxH=H-FOOTER_H;
-
-/* CUSTOMER PHOTO LEFT */
-
-const scale=Math.max(
-PHOTO_W/stickerImage.width,
-boxH/stickerImage.height
-)*zoom;
-
+const scale=Math.max(PHOTO_W/stickerImage.width,boxH/stickerImage.height)*zoom;
 const dw=stickerImage.width*scale;
 const dh=stickerImage.height*scale;
-
 const cx=PHOTO_W/2+offsetX;
 const cy=boxH/2+offsetY;
 
@@ -365,41 +291,20 @@ ctx.save();
 ctx.beginPath();
 ctx.rect(0,0,PHOTO_W,boxH);
 ctx.clip();
-
-ctx.drawImage(
-stickerImage,
-cx-dw/2,
-cy-dh/2,
-dw,
-dh
-);
-
+ctx.drawImage(stickerImage,cx-dw/2,cy-dh/2,dw,dh);
 ctx.restore();
-
-/* RIGHT DESIGN AREA */
 
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(PHOTO_W,0,W-PHOTO_W,boxH);
-
 ctx.textAlign='center';
 ctx.textBaseline='alphabetic';
-
-/* HAPPY BIRTHDAY FONT */
 
 const selectedFont=$('birthdayFont').value;
 const settings=fontSettings[selectedFont];
 
 ctx.fillStyle=settings.color;
 ctx.font=`bold ${settings.size}px "${settings.font}"`;
-
-ctx.fillText(
-'Happy Birthday',
-825,
-145,
-710
-);
-
-/* DECORATIVE GOLD LINE */
+ctx.fillText('Happy Birthday',825,145,710);
 
 ctx.strokeStyle='#d49a00';
 ctx.lineWidth=5;
@@ -408,73 +313,35 @@ ctx.moveTo(590,175);
 ctx.quadraticCurveTo(825,205,1060,175);
 ctx.stroke();
 
-/* FOUNDATION NAME BOX */
-
 ctx.strokeStyle='#d49a00';
 ctx.lineWidth=4;
 ctx.strokeRect(560,225,530,125);
 
 ctx.fillStyle='#e52d48';
 ctx.font='bold 65px Georgia';
-
-const name=$('stickerName').value.trim()||'YOUR NAME';
-
-ctx.fillText(
-name.slice(0,18),
-825,
-310,
-500
-);
-
-/* BEST WISHES */
+ctx.fillText(($('stickerName').value.trim()||'YOUR NAME').slice(0,18),825,310,500);
 
 ctx.fillStyle='#8b36a5';
 ctx.font='bold 35px Georgia';
-
-ctx.fillText(
-'Best Wishes From',
-825,
-425
-);
+ctx.fillText('Best Wishes From',825,425);
 
 ctx.fillStyle='#075b3c';
 ctx.font='bold 46px Arial';
+ctx.fillText(($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),825,485,500);
 
-const from=$('bestWishesFrom').value.trim()||'YOUR NAME';
-
-ctx.fillText(
-from.slice(0,18),
-825,
-485,
-500
-);
-
-/* WHITE FOOTER WITH GREEN BORDER */
-
-ctx.fillStyle='#ffffff';
+/* WHITE FOOTER */
+ctx.fillStyle='#fff';
 ctx.fillRect(0,H-FOOTER_H,W,FOOTER_H);
-
 ctx.strokeStyle='#075b3c';
 ctx.lineWidth=5;
 ctx.strokeRect(3,H-FOOTER_H+3,W-6,FOOTER_H-6);
 
-/* TYCF LOGO */
-
 if(logoLoaded){
-ctx.drawImage(
-logoImage,
-15,
-H-FOOTER_H+12,
-105,
-105
-);
+ctx.drawImage(logoImage,15,H-FOOTER_H+12,105,105);
 }
-
-/* SEPARATOR LINES */
 
 ctx.strokeStyle='#08733f';
 ctx.lineWidth=3;
-
 ctx.beginPath();
 ctx.moveTo(135,H-FOOTER_H+12);
 ctx.lineTo(135,H-12);
@@ -482,65 +349,26 @@ ctx.moveTo(900,H-FOOTER_H+12);
 ctx.lineTo(900,H-12);
 ctx.stroke();
 
-/* ORGANIZATION NAME - ONE ROW */
-
 ctx.textAlign='center';
 ctx.fillStyle='#075b3c';
 ctx.font='bold 43px Arial';
-
-ctx.fillText(
-'TYCF FOOD DONATION',
-515,
-H-78,
-745
-);
-
-/* WEBSITE */
+ctx.fillText('TYCF FOOD DONATION',515,H-78,745);
 
 ctx.textAlign='left';
 ctx.fillStyle='#222';
 ctx.font='bold 19px Arial';
-
-ctx.fillText(
-'www.tycf-food-donation.pages.dev',
-155,
-H-42,
-400
-);
-
-/* INSTAGRAM */
-
-ctx.fillText(
-'@tycf_fooddonation',
-575,
-H-42,
-300
-);
-
-/* CONTACT NUMBERS - RIGHT SIDE */
+ctx.fillText('www.tycf-food-donation.pages.dev',155,H-42,400);
+ctx.fillText('@tycf_fooddonation',575,H-42,300);
 
 ctx.textAlign='right';
 ctx.fillStyle='#111';
 ctx.font='bold 27px Arial';
-
-ctx.fillText(
-'8340834108',
-1170,
-H-73
-);
-
-ctx.fillText(
-'8340834107',
-1170,
-H-28
-);
-
+ctx.fillText('8340834108',1170,H-73);
+ctx.fillText('8340834107',1170,H-28);
 }
 
 /* PHOTO UPLOAD */
-
 $('stickerPhoto').addEventListener('change',()=>{
-
 const file=$('stickerPhoto').files[0];
 
 if(objectUrl){
@@ -552,7 +380,6 @@ stickerImage=null;
 zoom=1;
 offsetX=0;
 offsetY=0;
-
 $('photoZoom').value=1;
 
 if(!file){
@@ -561,31 +388,24 @@ return;
 }
 
 if(file.size>5*1024*1024){
-
 alert('Photo must be 5 MB or smaller.');
 $('stickerPhoto').value='';
 return;
-
 }
 
 if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
-
 alert('Choose JPG, PNG or WebP photo.');
 $('stickerPhoto').value='';
 return;
-
 }
 
 objectUrl=URL.createObjectURL(file);
-
 const img=new Image();
 
 img.onload=()=>{
-
 stickerImage=img;
 $('photoEditor').hidden=false;
 drawDesign();
-
 };
 
 img.onerror=()=>{
@@ -593,100 +413,67 @@ alert('Unable to open this photo.');
 };
 
 img.src=objectUrl;
-
 });
 
 /* FONT CHANGE */
-
 $('birthdayFont').addEventListener('change',async()=>{
-
-const selectedFont=$('birthdayFont').value;
-const settings=fontSettings[selectedFont];
-
+const settings=fontSettings[$('birthdayFont').value];
 try{
 await document.fonts.load(`bold ${settings.size}px "${settings.font}"`);
-}catch(error){
-console.warn('Font loading issue:',error);
+}catch(err){
+console.warn('Font loading issue:',err);
 }
-
 drawDesign();
-
 });
 
-/* ZOOM */
-
+/* ZOOM AND TEXT */
 $('photoZoom').addEventListener('input',e=>{
-
 zoom=Number(e.target.value);
 drawDesign();
-
 });
-
-/* LIVE TEXT PREVIEW */
-
 $('stickerName').addEventListener('input',drawDesign);
 $('bestWishesFrom').addEventListener('input',drawDesign);
 
 /* DRAG PHOTO */
-
 $('designCanvas').addEventListener('pointerdown',e=>{
-
 if(!stickerImage)return;
-
 const r=e.currentTarget.getBoundingClientRect();
-
 drag={
-x:e.clientX,
-y:e.clientY,
-ox:offsetX,
-oy:offsetY,
-sx:W/r.width,
-sy:H/r.height
+x:e.clientX,y:e.clientY,
+ox:offsetX,oy:offsetY,
+sx:W/r.width,sy:H/r.height
 };
-
 e.currentTarget.setPointerCapture(e.pointerId);
-
 });
 
 $('designCanvas').addEventListener('pointermove',e=>{
-
 if(!drag)return;
-
 offsetX=drag.ox+(e.clientX-drag.x)*drag.sx;
 offsetY=drag.oy+(e.clientY-drag.y)*drag.sy;
-
 drawDesign();
-
 });
 
 $('designCanvas').addEventListener('pointerup',()=>drag=null);
 $('designCanvas').addEventListener('pointercancel',()=>drag=null);
 
-/* CREATE FINAL DESIGN IMAGE */
-
+/* CREATE FINAL DESIGN */
 async function makeDesignBlob(){
-
 if(!stickerImage)return null;
 
-const selectedFont=$('birthdayFont').value;
-const settings=fontSettings[selectedFont];
-
-try{
+const settings=fontSettings[$('birthdayFont').value];
 await document.fonts.load(`bold ${settings.size}px "${settings.font}"`);
-}catch(error){}
-
 drawDesign();
 
-return await new Promise(resolve=>{
-$('designCanvas').toBlob(resolve,'image/png');
+return await new Promise((resolve,reject)=>{
+$('designCanvas').toBlob(blob=>{
+if(blob)resolve(blob);
+else reject(new Error('Could not create design image.'));
+},'image/png');
 });
-
 }
 
-/* SUBMIT BOOKING */
-
+/* BOOKING SUBMISSION */
 $('bookingForm').addEventListener('submit',async e=>{
-
 e.preventDefault();
 
 const btn=$('submitBtn');
@@ -697,6 +484,7 @@ msg.textContent='Submitting your booking...';
 
 let photoPath=null;
 let designPath=null;
+let currentStep='Validating booking';
 
 try{
 
@@ -715,8 +503,9 @@ throw new Error('Choose today or a future donation date.');
 }
 
 /* ORIGINAL PHOTO UPLOAD */
-
 if(file){
+
+currentStep='Original photo upload';
 
 const originalPath='incoming/'+crypto.randomUUID()+'.'+
 (file.type==='image/png'?'png':
@@ -729,15 +518,19 @@ contentType:file.type,
 upsert:false
 });
 
-if(uploadError)throw uploadError;
+if(uploadError){
+throw new Error('Original photo upload failed: '+uploadError.message);
+}
 
 photoPath=originalPath;
 
 /* FINAL DESIGN UPLOAD */
+currentStep='Final design creation';
 
 const blob=await makeDesignBlob();
-
 if(!blob)throw new Error('Design creation failed.');
+
+currentStep='Final design upload';
 
 const finalPath='designs/'+crypto.randomUUID()+'.png';
 
@@ -748,43 +541,42 @@ contentType:'image/png',
 upsert:false
 });
 
-if(designError)throw designError;
-
-designPath=finalPath;
-
+if(designError){
+throw new Error('Final design upload failed: '+designError.message);
 }
 
-/* SAVE BOOKING */
+designPath=finalPath;
+}
+
+/* DATABASE INSERT */
+currentStep='Saving booking to database';
 
 const row={
-
 customer_name:name,
 customer_mobile:mobile,
 occasion:$('occasion').value,
 package_name:pack,
 package_price:Number(prices[pack]),
-
-/* REQUIRED BY SUPABASE RESTRICTIVE POLICY */
 payment_status:'Pending',
-
 donation_date:date,
 sticker_name:$('stickerName').value.trim(),
 customer_message:$('customerMessage').value.trim(),
 sticker_photo_path:photoPath,
 sticker_design_path:designPath,
 consent:$('consent').checked
-
 };
 
 const {error}=await supabase
 .from('tycf_orders')
 .insert(row);
 
-if(error)throw error;
+if(error){
+throw new Error('Database insert failed: '+error.message);
+}
 
+/* SUCCESS */
 $('bookingForm').reset();
 $('photoEditor').hidden=true;
-
 stickerImage=null;
 
 if(objectUrl){
@@ -792,18 +584,19 @@ URL.revokeObjectURL(objectUrl);
 objectUrl=null;
 }
 
-msg.textContent=
-'Thank you! Your donation booking has been received. TYCF team will contact you.';
+msg.textContent='Booking submitted successfully! Thank you for supporting TYCF Food Donation.';
 
 }catch(err){
 
-console.error('TYCF booking submission error:',err);
-msg.textContent='Could not submit: '+err.message;
+console.error('TYCF booking error:',currentStep,err);
+
+msg.textContent=
+'FAILED AT: '+currentStep+
+'\nERROR: '+err.message+
+'\nPlease share this message with TYCF support.';
 
 }finally{
-
 btn.disabled=false;
-
 }
 
 });
