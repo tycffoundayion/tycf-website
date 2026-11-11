@@ -4,10 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>TYCF Food Donation</title>
 
-<!-- PWA SETTINGS -->
 <meta name="theme-color" content="#075b3c">
 <meta name="description" content="Celebrate special occasions by donating food through Telangana Yuva Chaithanya Foundation.">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -50,7 +48,25 @@ footer a{color:#ffda83}
 .editor-note{font-size:13px;color:#526b5d}
 .font-samples{font-size:14px;color:#526b5d;margin-top:-8px;margin-bottom:12px}
 .replace-btn{background:#075b3c;color:white;width:100%;margin:5px 0 10px}
-@media(max-width:600px){nav a{display:inline-block;margin:7px;font-size:14px}}
+
+.install-app-btn{
+display:inline-block;
+background:#075b3c;
+color:#fff;
+border:2px solid #075b3c;
+padding:13px 22px;
+border-radius:7px;
+font-weight:bold;
+cursor:pointer;
+margin:10px 6px;
+text-decoration:none
+}
+.install-app-btn:disabled{opacity:.7;cursor:default}
+.install-help{font-size:14px;color:#315b47;margin:8px auto;max-width:520px}
+
+@media(max-width:600px){
+nav a{display:inline-block;margin:7px;font-size:14px}
+}
 </style>
 </head>
 
@@ -73,12 +89,22 @@ footer a{color:#ffda83}
 <div class="hero" id="home">
 <h2>Celebrate by Sharing Food ❤️</h2>
 <p>Make your Birthday and Anniversary special by donating food.</p>
+
 <a class="btn" href="#booking">Donate Now</a>
+
+<button class="install-app-btn" id="installAppBtn" type="button">
+📲 Install TYCF App
+</button>
+
+<p class="install-help" id="installAppHelp" aria-live="polite">
+Install the TYCF app on your phone for quick access.
+</p>
 </div>
 
 <section id="packages">
 <h2>Donation Packages</h2>
 <div class="cards">
+
 <div class="card">
 <h3>🍛 Veg Meals</h3>
 <div class="price" id="vegPrice">₹1,500</div>
@@ -106,6 +132,7 @@ footer a{color:#ffda83}
 <p>Cake Cutting + Egg Puffs</p>
 <p>Children's Celebration</p>
 </div>
+
 </div>
 </section>
 
@@ -141,7 +168,9 @@ footer a{color:#ffda83}
 <label>Upload Your Photo</label>
 <input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
 
-<button type="button" id="replacePhotoBtn" class="replace-btn" hidden>🔄 Replace Photo</button>
+<button type="button" id="replacePhotoBtn" class="replace-btn" hidden>
+🔄 Replace Photo
+</button>
 
 <p id="selectedPhotoName" class="editor-note" aria-live="polite"></p>
 
@@ -190,7 +219,6 @@ footer a{color:#ffda83}
 
 <section id="payment">
 <h2>UPI Donation Payment</h2>
-
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <img id="paymentQr" alt="TYCF Payment QR">
@@ -480,8 +508,6 @@ $('stickerPhoto').addEventListener('change',()=>{
 const file=$('stickerPhoto').files[0];
 
 if(!file)return;
-
-/* Validate the new photo before replacing the current preview */
 
 if(file.size>5*1024*1024){
 alert('Photo must be 5 MB or smaller.');
@@ -812,6 +838,70 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+</script>
+
+<!-- TYCF APP INSTALL BUTTON SCRIPT -->
+<script>
+(() => {
+  const installBtn = document.getElementById("installAppBtn");
+  const installHelp = document.getElementById("installAppHelp");
+
+  if (!installBtn || !installHelp) return;
+
+  let deferredPrompt = null;
+
+  function isInstalled() {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+  }
+
+  function showInstalled() {
+    installBtn.textContent = "✓ TYCF App Installed";
+    installBtn.disabled = true;
+    installHelp.textContent = "TYCF app is already installed on this device.";
+  }
+
+  if (isInstalled()) showInstalled();
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    installHelp.textContent = "Tap Install TYCF App to install it on your phone.";
+  });
+
+  installBtn.addEventListener("click", async () => {
+
+    if (isInstalled()) {
+      showInstalled();
+      return;
+    }
+
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+
+      if (choice && choice.outcome === "accepted") {
+        installHelp.textContent = "TYCF app installation started.";
+      } else {
+        installHelp.textContent = "Installation was not completed. You can try again.";
+      }
+
+      return;
+    }
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    if (isIOS) {
+      installHelp.textContent = "In Safari, tap Share, then choose Add to Home Screen.";
+    } else {
+      installHelp.textContent = "In Chrome, tap ⋮ menu, then choose Install app or Add to Home screen.";
+    }
+  });
+
+  window.addEventListener("appinstalled", showInstalled);
+})();
 </script>
 
 </body>
