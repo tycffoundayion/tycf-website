@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -532,7 +531,8 @@ if(!blob)throw new Error('Design creation failed.');
 
 currentStep='Final design upload';
 
-const finalPath='designs/'+crypto.randomUUID()+'.png';
+/* UPDATED PATH: designs folder -> incoming folder */
+const finalPath='incoming/design-'+crypto.randomUUID()+'.png';
 
 const {error:designError}=await supabase.storage
 .from('tycf-sticker-photos')
