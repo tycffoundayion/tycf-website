@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "TYCF Food Donation",
+  "short_name": "TYCF Donation",
+  "description": "Celebrate special occasions by sharing food through Telangana Yuva Chaithanya Foundation.",
+  "lang": "en-IN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fbf7",
+  "theme_color": "#075b3c",
+  "icons": [
+    {
+      "src": "/tycf-logo-cropped-1.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
