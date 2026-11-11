@@ -1,12 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>TYCF Food Donation</title>
+
+<!-- PWA SETTINGS -->
+<meta name="theme-color" content="#075b3c">
+<meta name="description" content="Celebrate special occasions by donating food through Telangana Yuva Chaithanya Foundation.">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TYCF Donation">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lobster&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f8fbf7;color:#173c2d}
@@ -40,6 +53,7 @@ footer a{color:#ffda83}
 @media(max-width:600px){nav a{display:inline-block;margin:7px;font-size:14px}}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -65,16 +79,41 @@ footer a{color:#ffda83}
 <section id="packages">
 <h2>Donation Packages</h2>
 <div class="cards">
-<div class="card"><h3>🍛 Veg Meals</h3><div class="price" id="vegPrice">₹1,500</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
-<div class="card"><h3>🥚 Egg Meals</h3><div class="price" id="eggPrice">₹1,800</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
-<div class="card"><h3>🍗 Chicken Meals</h3><div class="price" id="chickenPrice">₹2,500</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
-<div class="card"><h3>🎂 Cake Celebration</h3><div class="price" id="cakePrice">₹1,500</div><p>Cake Cutting + Egg Puffs</p><p>Children's Celebration</p></div>
+<div class="card">
+<h3>🍛 Veg Meals</h3>
+<div class="price" id="vegPrice">₹1,500</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+
+<div class="card">
+<h3>🥚 Egg Meals</h3>
+<div class="price" id="eggPrice">₹1,800</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+
+<div class="card">
+<h3>🍗 Chicken Meals</h3>
+<div class="price" id="chickenPrice">₹2,500</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+
+<div class="card">
+<h3>🎂 Cake Celebration</h3>
+<div class="price" id="cakePrice">₹1,500</div>
+<p>Cake Cutting + Egg Puffs</p>
+<p>Children's Celebration</p>
+</div>
 </div>
 </section>
 
 <section id="booking">
 <h2>Donation Booking</h2>
+
 <form id="bookingForm">
+
 <label>Your Name</label>
 <input id="customerName" required maxlength="100">
 
@@ -82,11 +121,18 @@ footer a{color:#ffda83}
 <input id="mobile" required type="tel" minlength="10" maxlength="15">
 
 <label>Occasion</label>
-<select id="occasion"><option>Birthday</option><option>Anniversary</option><option>Other</option></select>
+<select id="occasion">
+<option>Birthday</option>
+<option>Anniversary</option>
+<option>Other</option>
+</select>
 
 <label>Select Package</label>
 <select id="package">
-<option>Veg Meals</option><option>Egg Meals</option><option>Chicken Meals</option><option>Cake Celebration</option>
+<option>Veg Meals</option>
+<option>Egg Meals</option>
+<option>Chicken Meals</option>
+<option>Cake Celebration</option>
 </select>
 
 <label>Donation Date</label>
@@ -94,7 +140,9 @@ footer a{color:#ffda83}
 
 <label>Upload Your Photo</label>
 <input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+
 <button type="button" id="replacePhotoBtn" class="replace-btn" hidden>🔄 Replace Photo</button>
+
 <p id="selectedPhotoName" class="editor-note" aria-live="polite"></p>
 
 <label>Name on Design</label>
@@ -116,9 +164,12 @@ footer a{color:#ffda83}
 <div class="editor" id="photoEditor" hidden>
 <h3>Customize Your Photo</h3>
 <p class="editor-note">Drag the photo to move it. Use Zoom to adjust the photo.</p>
+
 <canvas id="designCanvas" width="1200" height="675"></canvas>
+
 <label>Photo Zoom</label>
 <input id="photoZoom" type="range" min="1" max="2.5" step="0.01" value="1">
+
 <p><strong>Final Design Preview</strong></p>
 <p class="editor-note">TYCF Footer, logo and contact details are fixed.</p>
 </div>
@@ -133,11 +184,13 @@ footer a{color:#ffda83}
 
 <button id="submitBtn" type="submit">Submit Donation Request</button>
 <p id="formMsg" role="status" aria-live="polite"></p>
+
 </form>
 </section>
 
 <section id="payment">
 <h2>UPI Donation Payment</h2>
+
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <img id="paymentQr" alt="TYCF Payment QR">
@@ -161,75 +214,159 @@ const supabase=createClient(
 'https://mswgamusywvqxscfcyff.supabase.co',
 'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
 );
+
 const $=id=>document.getElementById(id);
 
-let prices={'Veg Meals':1500,'Egg Meals':1800,'Chicken Meals':2500,'Cake Celebration':1500};
+let prices={
+'Veg Meals':1500,
+'Egg Meals':1800,
+'Chicken Meals':2500,
+'Cake Celebration':1500
+};
+
 const format=n=>'₹'+Number(n).toLocaleString('en-IN');
 
 async function loadPrices(){
 try{
 const {data,error}=await supabase.rpc('get_tycf_public_prices');
+
 if(error||!data?.length)return;
+
 const p=data[0];
-prices={'Veg Meals':p.veg_price,'Egg Meals':p.egg_price,'Chicken Meals':p.chicken_price,'Cake Celebration':p.cake_price};
+
+prices={
+'Veg Meals':p.veg_price,
+'Egg Meals':p.egg_price,
+'Chicken Meals':p.chicken_price,
+'Cake Celebration':p.cake_price
+};
+
 $('vegPrice').textContent=format(p.veg_price);
 $('eggPrice').textContent=format(p.egg_price);
 $('chickenPrice').textContent=format(p.chicken_price);
 $('cakePrice').textContent=format(p.cake_price);
-}catch(err){console.error('Price loading error:',err);}
+
+}catch(err){
+console.error('Price loading error:',err);
+}
 }
 
 async function loadPaymentQr(){
-const {data}=supabase.storage.from('tycf-payment-qr').getPublicUrl('current/payment-qr');
+const {data}=supabase.storage
+.from('tycf-payment-qr')
+.getPublicUrl('current/payment-qr');
+
 const img=$('paymentQr');
-img.onload=()=>{img.style.display='block';$('qrMsg').textContent='Scan this QR using your UPI app.';};
-img.onerror=()=>{$('qrMsg').textContent='Payment QR unavailable. Contact TYCF Foundation.';};
+
+img.onload=()=>{
+img.style.display='block';
+$('qrMsg').textContent='Scan this QR using your UPI app.';
+};
+
+img.onerror=()=>{
+$('qrMsg').textContent='Payment QR unavailable. Contact TYCF Foundation.';
+};
+
 img.src=data.publicUrl+'?v='+Date.now();
 }
+
 loadPrices();
 loadPaymentQr();
 
 /* PHOTO EDITOR */
-let stickerImage=null,objectUrl=null,zoom=1,offsetX=0,offsetY=0,drag=null;
-const W=1200,H=675,PHOTO_W=455,FOOTER_H=130;
+
+let stickerImage=null;
+let objectUrl=null;
+let zoom=1;
+let offsetX=0;
+let offsetY=0;
+let drag=null;
+
+const W=1200;
+const H=675;
+const PHOTO_W=455;
+const FOOTER_H=130;
 
 const logoImage=new Image();
 let logoLoaded=false;
-logoImage.onload=()=>{logoLoaded=true;drawDesign();};
+
+logoImage.onload=()=>{
+logoLoaded=true;
+drawDesign();
+};
+
 logoImage.src='tycf-logo-cropped-1.png';
 
 const fontSettings={
-'Dancing Script':{font:'Dancing Script',size:82,color:'#075b3c'},
-'Lobster':{font:'Lobster',size:76,color:'#075b3c'},
-'Playfair Display':{font:'Playfair Display',size:68,color:'#075b3c'},
-'Pacifico':{font:'Pacifico',size:72,color:'#075b3c'}
+'Dancing Script':{
+font:'Dancing Script',
+size:82,
+color:'#075b3c'
+},
+'Lobster':{
+font:'Lobster',
+size:76,
+color:'#075b3c'
+},
+'Playfair Display':{
+font:'Playfair Display',
+size:68,
+color:'#075b3c'
+},
+'Pacifico':{
+font:'Pacifico',
+size:72,
+color:'#075b3c'
+}
 };
 
 function drawDesign(){
+
 if(!stickerImage)return;
+
 const ctx=$('designCanvas').getContext('2d');
+
 ctx.clearRect(0,0,W,H);
+
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(0,0,W,H);
 
 const boxH=H-FOOTER_H;
-const scale=Math.max(PHOTO_W/stickerImage.width,boxH/stickerImage.height)*zoom;
-const dw=stickerImage.width*scale,dh=stickerImage.height*scale;
-const cx=PHOTO_W/2+offsetX,cy=boxH/2+offsetY;
+
+const scale=Math.max(
+PHOTO_W/stickerImage.width,
+boxH/stickerImage.height
+)*zoom;
+
+const dw=stickerImage.width*scale;
+const dh=stickerImage.height*scale;
+
+const cx=PHOTO_W/2+offsetX;
+const cy=boxH/2+offsetY;
 
 ctx.save();
 ctx.beginPath();
 ctx.rect(0,0,PHOTO_W,boxH);
 ctx.clip();
-ctx.drawImage(stickerImage,cx-dw/2,cy-dh/2,dw,dh);
+
+ctx.drawImage(
+stickerImage,
+cx-dw/2,
+cy-dh/2,
+dw,
+dh
+);
+
 ctx.restore();
 
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(PHOTO_W,0,W-PHOTO_W,boxH);
+
 ctx.textAlign='center';
 ctx.textBaseline='alphabetic';
 
 const settings=fontSettings[$('birthdayFont').value];
+
 ctx.fillStyle=settings.color;
 ctx.font=`bold ${settings.size}px "${settings.font}"`;
 ctx.fillText('Happy Birthday',825,145,710);
@@ -247,7 +384,13 @@ ctx.strokeRect(560,225,530,125);
 
 ctx.fillStyle='#e52d48';
 ctx.font='bold 65px Georgia';
-ctx.fillText(($('stickerName').value.trim()||'YOUR NAME').slice(0,18),825,310,500);
+
+ctx.fillText(
+($('stickerName').value.trim()||'YOUR NAME').slice(0,18),
+825,
+310,
+500
+);
 
 ctx.fillStyle='#8b36a5';
 ctx.font='bold 35px Georgia';
@@ -255,24 +398,43 @@ ctx.fillText('Best Wishes From',825,425);
 
 ctx.fillStyle='#075b3c';
 ctx.font='bold 46px Arial';
-ctx.fillText(($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),825,485,500);
+
+ctx.fillText(
+($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),
+825,
+485,
+500
+);
 
 /* WHITE FOOTER */
+
 ctx.fillStyle='#fff';
 ctx.fillRect(0,H-FOOTER_H,W,FOOTER_H);
+
 ctx.strokeStyle='#075b3c';
 ctx.lineWidth=5;
 ctx.strokeRect(3,H-FOOTER_H+3,W-6,FOOTER_H-6);
 
-if(logoLoaded)ctx.drawImage(logoImage,15,H-FOOTER_H+12,105,105);
+if(logoLoaded){
+ctx.drawImage(
+logoImage,
+15,
+H-FOOTER_H+12,
+105,
+105
+);
+}
 
 ctx.strokeStyle='#08733f';
 ctx.lineWidth=3;
 ctx.beginPath();
+
 ctx.moveTo(135,H-FOOTER_H+12);
 ctx.lineTo(135,H-12);
+
 ctx.moveTo(900,H-FOOTER_H+12);
 ctx.lineTo(900,H-12);
+
 ctx.stroke();
 
 ctx.textAlign='center';
@@ -283,31 +445,50 @@ ctx.fillText('TYCF FOOD DONATION',515,H-78,745);
 ctx.textAlign='left';
 ctx.fillStyle='#222';
 ctx.font='bold 19px Arial';
-ctx.fillText('www.tycf-food-donation.pages.dev',155,H-42,400);
-ctx.fillText('@tycf_fooddonation',575,H-42,300);
+
+ctx.fillText(
+'www.tycf-food-donation.pages.dev',
+155,
+H-42,
+400
+);
+
+ctx.fillText(
+'@tycf_fooddonation',
+575,
+H-42,
+300
+);
 
 ctx.textAlign='right';
 ctx.fillStyle='#111';
 ctx.font='bold 27px Arial';
+
 ctx.fillText('8340834108',1170,H-73);
 ctx.fillText('8340834107',1170,H-28);
+
 }
 
 /* PHOTO SELECT AND REPLACE */
+
 $('replacePhotoBtn').addEventListener('click',()=>{
 $('stickerPhoto').click();
 });
 
 $('stickerPhoto').addEventListener('change',()=>{
+
 const file=$('stickerPhoto').files[0];
+
 if(!file)return;
 
 /* Validate the new photo before replacing the current preview */
+
 if(file.size>5*1024*1024){
 alert('Photo must be 5 MB or smaller.');
 $('stickerPhoto').value='';
 return;
 }
+
 if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
 alert('Choose JPG, PNG or WebP photo.');
 $('stickerPhoto').value='';
@@ -318,152 +499,320 @@ const newUrl=URL.createObjectURL(file);
 const img=new Image();
 
 img.onload=()=>{
-if(objectUrl)URL.revokeObjectURL(objectUrl);
+
+if(objectUrl){
+URL.revokeObjectURL(objectUrl);
+}
+
 objectUrl=newUrl;
 stickerImage=img;
+
 zoom=1;
 offsetX=0;
 offsetY=0;
+
 $('photoZoom').value=1;
 $('photoEditor').hidden=false;
 $('replacePhotoBtn').hidden=false;
+
 $('selectedPhotoName').textContent='Selected Photo: '+file.name;
+
 drawDesign();
+
 };
 
 img.onerror=()=>{
+
 URL.revokeObjectURL(newUrl);
+
 alert('Unable to open this photo.');
+
 $('stickerPhoto').value='';
+
 };
+
 img.src=newUrl;
+
 });
 
 /* FONT CHANGE */
+
 $('birthdayFont').addEventListener('change',async()=>{
+
 const settings=fontSettings[$('birthdayFont').value];
-try{await document.fonts.load(`bold ${settings.size}px "${settings.font}"`);}
-catch(err){console.warn('Font loading issue:',err);}
+
+try{
+await document.fonts.load(
+`bold ${settings.size}px "${settings.font}"`
+);
+}catch(err){
+console.warn('Font loading issue:',err);
+}
+
 drawDesign();
+
 });
 
 /* ZOOM AND TEXT */
-$('photoZoom').addEventListener('input',e=>{zoom=Number(e.target.value);drawDesign();});
+
+$('photoZoom').addEventListener('input',e=>{
+zoom=Number(e.target.value);
+drawDesign();
+});
+
 $('stickerName').addEventListener('input',drawDesign);
 $('bestWishesFrom').addEventListener('input',drawDesign);
 
 /* DRAG PHOTO */
+
 $('designCanvas').addEventListener('pointerdown',e=>{
+
 if(!stickerImage)return;
+
 const r=e.currentTarget.getBoundingClientRect();
-drag={x:e.clientX,y:e.clientY,ox:offsetX,oy:offsetY,sx:W/r.width,sy:H/r.height};
+
+drag={
+x:e.clientX,
+y:e.clientY,
+ox:offsetX,
+oy:offsetY,
+sx:W/r.width,
+sy:H/r.height
+};
+
 e.currentTarget.setPointerCapture(e.pointerId);
+
 });
+
 $('designCanvas').addEventListener('pointermove',e=>{
+
 if(!drag)return;
+
 offsetX=drag.ox+(e.clientX-drag.x)*drag.sx;
 offsetY=drag.oy+(e.clientY-drag.y)*drag.sy;
+
 drawDesign();
+
 });
-$('designCanvas').addEventListener('pointerup',()=>drag=null);
-$('designCanvas').addEventListener('pointercancel',()=>drag=null);
+
+$('designCanvas').addEventListener('pointerup',()=>{
+drag=null;
+});
+
+$('designCanvas').addEventListener('pointercancel',()=>{
+drag=null;
+});
 
 /* CREATE FINAL DESIGN */
+
 async function makeDesignBlob(){
+
 if(!stickerImage)return null;
+
 const settings=fontSettings[$('birthdayFont').value];
-await document.fonts.load(`bold ${settings.size}px "${settings.font}"`);
+
+await document.fonts.load(
+`bold ${settings.size}px "${settings.font}"`
+);
+
 drawDesign();
+
 return await new Promise((resolve,reject)=>{
+
 $('designCanvas').toBlob(blob=>{
-if(blob)resolve(blob);
-else reject(new Error('Could not create design image.'));
+
+if(blob){
+resolve(blob);
+}else{
+reject(new Error('Could not create design image.'));
+}
+
 },'image/png');
+
 });
+
 }
 
 /* BOOKING SUBMISSION */
+
 $('bookingForm').addEventListener('submit',async e=>{
+
 e.preventDefault();
-const btn=$('submitBtn'),msg=$('formMsg');
+
+const btn=$('submitBtn');
+const msg=$('formMsg');
+
 btn.disabled=true;
 msg.textContent='Submitting your booking...';
 
-let photoPath=null,designPath=null;
+let photoPath=null;
+let designPath=null;
+
 let currentStep='Validating booking';
 
 try{
+
 const name=$('customerName').value.trim();
+
 const mobile=$('mobile').value.replace(/\s+/g,'');
+
 const pack=$('package').value;
+
 const date=$('donationDate').value;
+
 const file=$('stickerPhoto').files[0];
 
-if(!/^\+?[0-9]{10,15}$/.test(mobile))throw new Error('Enter a valid mobile number.');
-if(date<new Date().toISOString().slice(0,10))throw new Error('Choose today or a future donation date.');
+if(!/^\+?[0-9]{10,15}$/.test(mobile)){
+throw new Error('Enter a valid mobile number.');
+}
+
+if(date<new Date().toISOString().slice(0,10)){
+throw new Error('Choose today or a future donation date.');
+}
 
 if(file){
+
 currentStep='Original photo upload';
+
 const originalPath='incoming/'+crypto.randomUUID()+'.'+
 (file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg');
 
 const {error:uploadError}=await supabase.storage
 .from('tycf-sticker-photos')
-.upload(originalPath,file,{contentType:file.type,upsert:false});
+.upload(originalPath,file,{
+contentType:file.type,
+upsert:false
+});
 
-if(uploadError)throw new Error('Original photo upload failed: '+uploadError.message);
+if(uploadError){
+throw new Error('Original photo upload failed: '+uploadError.message);
+}
+
 photoPath=originalPath;
 
 currentStep='Final design creation';
+
 const blob=await makeDesignBlob();
-if(!blob)throw new Error('Design creation failed.');
+
+if(!blob){
+throw new Error('Design creation failed.');
+}
 
 currentStep='Final design upload';
+
 const finalPath='incoming/design-'+crypto.randomUUID()+'.png';
 
 const {error:designError}=await supabase.storage
 .from('tycf-sticker-photos')
-.upload(finalPath,blob,{contentType:'image/png',upsert:false});
+.upload(finalPath,blob,{
+contentType:'image/png',
+upsert:false
+});
 
-if(designError)throw new Error('Final design upload failed: '+designError.message);
+if(designError){
+throw new Error('Final design upload failed: '+designError.message);
+}
+
 designPath=finalPath;
+
 }
 
 currentStep='Saving booking to database';
+
 const row={
+
 customer_name:name,
+
 customer_mobile:mobile,
+
 occasion:$('occasion').value,
+
 package_name:pack,
+
 package_price:Number(prices[pack]),
+
 payment_status:'Pending',
+
 donation_date:date,
+
 sticker_name:$('stickerName').value.trim(),
+
 customer_message:$('customerMessage').value.trim(),
+
 sticker_photo_path:photoPath,
+
 sticker_design_path:designPath,
+
 consent:$('consent').checked
+
 };
 
-const {error}=await supabase.from('tycf_orders').insert(row);
-if(error)throw new Error('Database insert failed: '+error.message);
+const {error}=await supabase
+.from('tycf_orders')
+.insert(row);
+
+if(error){
+throw new Error('Database insert failed: '+error.message);
+}
 
 /* SUCCESS */
+
 $('bookingForm').reset();
+
 $('photoEditor').hidden=true;
+
 $('replacePhotoBtn').hidden=true;
+
 $('selectedPhotoName').textContent='';
+
 stickerImage=null;
-if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}
+
+if(objectUrl){
+URL.revokeObjectURL(objectUrl);
+objectUrl=null;
+}
+
 msg.textContent='Booking submitted successfully! Thank you for supporting TYCF Food Donation.';
 
 }catch(err){
+
 console.error('TYCF booking error:',currentStep,err);
-msg.textContent='FAILED AT: '+currentStep+'\nERROR: '+err.message+'\nPlease share this message with TYCF support.';
+
+msg.textContent=
+'FAILED AT: '+currentStep+
+'\nERROR: '+err.message+
+'\nPlease share this message with TYCF support.';
+
 }finally{
+
 btn.disabled=false;
+
 }
+
 });
+
 </script>
+
+<!-- PWA SERVICE WORKER REGISTRATION -->
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(registration => {
+        console.log(
+          "TYCF Service Worker registered:",
+          registration.scope
+        );
+      })
+      .catch(error => {
+        console.warn(
+          "TYCF Service Worker registration failed:",
+          error
+        );
+      });
+  });
+}
+</script>
+
 </body>
 </html>
