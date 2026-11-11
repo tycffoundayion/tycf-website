@@ -20,64 +20,285 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f8fbf7;color:#173c2d}
-header{background:#075b3c;color:white;padding:22px;text-align:center}
-header h1{margin:0;font-size:27px}
-nav{background:#06452f;padding:13px;text-align:center}
-nav a{color:white;margin:10px;text-decoration:none}
-.hero{padding:45px 20px;text-align:center;background:#e2f2e5}
-button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;cursor:pointer;text-decoration:none}
-button:disabled{opacity:.6}
-section{padding:30px 15px;text-align:center}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
-.card{background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
-.price{font-size:27px;color:#08734f;font-weight:bold}
-form{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
-input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #bbb;border-radius:6px}
-label{text-align:left;display:block;font-weight:bold}
-.consent{display:flex;gap:10px;text-align:left;align-items:flex-start;font-weight:normal}
-.consent input{width:auto}
-footer{background:#06452f;color:white;text-align:center;padding:25px}
-footer a{color:#ffda83}
-#formMsg{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
-.payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
-#paymentQr{display:none;width:100%;max-width:320px;margin:15px auto}
-.editor{max-width:550px;margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px}
-.editor canvas{width:100%;height:auto;border:1px solid #ccc;background:white;touch-action:none}
-.editor input[type=range]{padding:0}
-.editor-note{font-size:13px;color:#526b5d}
-.font-samples{font-size:14px;color:#526b5d;margin-top:-8px;margin-bottom:12px}
-.replace-btn{background:#075b3c;color:white;width:100%;margin:5px 0 10px}
 
-.install-app-btn{
-display:inline-block;
-background:#075b3c;
-color:#fff;
-border:2px solid #075b3c;
-padding:13px 22px;
-border-radius:7px;
-font-weight:bold;
-cursor:pointer;
-margin:10px 6px;
-text-decoration:none
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f8fbf7;
+  color:#173c2d;
 }
-.install-app-btn:disabled{opacity:.7;cursor:default}
-.install-help{font-size:14px;color:#315b47;margin:8px auto;max-width:520px}
 
+/* HEADER DESIGN */
+header{
+  color:white;
+  padding:22px clamp(16px,4vw,48px);
+  text-align:left;
+  background:
+    linear-gradient(90deg,rgba(0,45,27,.88),rgba(0,65,38,.58)),
+    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=85") center 45%/cover no-repeat;
+  min-height:190px;
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+.header-logo{
+  width:138px;
+  height:138px;
+  object-fit:contain;
+  flex:0 0 auto;
+  background:#fff;
+  padding:8px;
+  border-radius:10px;
+  box-shadow:0 3px 14px #0004;
+}
+
+.header-copy{min-width:0}
+
+header h1{
+  margin:0;
+  font-size:clamp(22px,3vw,34px);
+  letter-spacing:.3px;
+}
+
+header p{
+  margin:8px 0 0;
+  font-size:16px;
+}
+
+/* NAVIGATION */
+nav{
+  background:#06452f;
+  padding:13px;
+  text-align:center;
+}
+
+nav a{
+  color:white;
+  margin:10px;
+  text-decoration:none;
+}
+
+/* HERO */
+.hero{
+  padding:45px 20px;
+  text-align:center;
+  background:#e2f2e5;
+}
+
+button,.btn{
+  background:#e9ad36;
+  color:#222;
+  border:0;
+  padding:13px 22px;
+  border-radius:7px;
+  font-weight:bold;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+button:disabled{opacity:.6}
+
+/* SECTIONS */
+section{
+  padding:30px 15px;
+  text-align:center;
+}
+
+/* PACKAGES */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:15px;
+  max-width:1000px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:22px;
+  border-radius:12px;
+  box-shadow:0 2px 12px #0001;
+}
+
+.price{
+  font-size:27px;
+  color:#08734f;
+  font-weight:bold;
+}
+
+/* BOOKING FORM */
+form{
+  max-width:550px;
+  margin:auto;
+  background:white;
+  padding:22px;
+  border-radius:12px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  margin:8px 0 15px;
+  border:1px solid #bbb;
+  border-radius:6px;
+}
+
+label{
+  text-align:left;
+  display:block;
+  font-weight:bold;
+}
+
+.consent{
+  display:flex;
+  gap:10px;
+  text-align:left;
+  align-items:flex-start;
+  font-weight:normal;
+}
+
+.consent input{width:auto}
+
+/* FOOTER */
+footer{
+  background:#06452f;
+  color:white;
+  text-align:center;
+  padding:25px;
+}
+
+footer a{color:#ffda83}
+
+#formMsg{
+  padding:10px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+/* PAYMENT */
+.payment-card{
+  max-width:550px;
+  margin:auto;
+  background:white;
+  padding:22px;
+  border-radius:12px;
+}
+
+#paymentQr{
+  display:none;
+  width:100%;
+  max-width:320px;
+  margin:15px auto;
+}
+
+/* PHOTO EDITOR */
+.editor{
+  max-width:550px;
+  margin:15px auto;
+  background:#f1f8f2;
+  padding:12px;
+  border-radius:10px;
+}
+
+.editor canvas{
+  width:100%;
+  height:auto;
+  border:1px solid #ccc;
+  background:white;
+  touch-action:none;
+}
+
+.editor input[type=range]{padding:0}
+
+.editor-note{
+  font-size:13px;
+  color:#526b5d;
+}
+
+.font-samples{
+  font-size:14px;
+  color:#526b5d;
+  margin-top:-8px;
+  margin-bottom:12px;
+}
+
+.replace-btn{
+  background:#075b3c;
+  color:white;
+  width:100%;
+  margin:5px 0 10px;
+}
+
+/* APP INSTALL */
+.install-app-btn{
+  display:inline-block;
+  background:#075b3c;
+  color:#fff;
+  border:2px solid #075b3c;
+  padding:13px 22px;
+  border-radius:7px;
+  font-weight:bold;
+  cursor:pointer;
+  margin:10px 6px;
+  text-decoration:none;
+}
+
+.install-app-btn:disabled{
+  opacity:.7;
+  cursor:default;
+}
+
+.install-help{
+  font-size:14px;
+  color:#315b47;
+  margin:8px auto;
+  max-width:520px;
+}
+
+/* MOBILE HEADER */
 @media(max-width:600px){
-nav a{display:inline-block;margin:7px;font-size:14px}
+  header{
+    min-height:145px;
+    padding:16px;
+    gap:14px;
+  }
+
+  .header-logo{
+    width:88px;
+    height:88px;
+    padding:5px;
+  }
+
+  header h1{font-size:20px}
+  header p{font-size:12px}
+
+  nav a{
+    display:inline-block;
+    margin:7px;
+    font-size:14px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<img src="tycf-logo-cropped-1.png" alt="TYCF Logo" style="width:150px;display:block;margin:auto auto 12px">
-<h1>TYCF FOOD DONATION</h1>
-<p>Telangana Yuva Chaithanya Foundation</p>
+<!-- TYCF HEADER -->
+<header class="site-header">
+  <img
+    class="header-logo"
+    src="tycf-logo-cropped-1.png"
+    alt="TYCF Logo"
+  >
+
+  <div class="header-copy">
+    <h1>TYCF FOOD DONATION</h1>
+    <p>Telangana Yuva Chaithanya Foundation</p>
+  </div>
 </header>
 
+<!-- NAVIGATION -->
 <nav>
 <a href="#home">Home</a>
 <a href="#packages">Packages</a>
@@ -86,6 +307,7 @@ nav a{display:inline-block;margin:7px;font-size:14px}
 <a href="admin.html">Admin Login</a>
 </nav>
 
+<!-- HERO -->
 <div class="hero" id="home">
 <h2>Celebrate by Sharing Food ❤️</h2>
 <p>Make your Birthday and Anniversary special by donating food.</p>
@@ -101,8 +323,10 @@ Install the TYCF app on your phone for quick access.
 </p>
 </div>
 
+<!-- DONATION PACKAGES -->
 <section id="packages">
 <h2>Donation Packages</h2>
+
 <div class="cards">
 
 <div class="card">
@@ -136,6 +360,7 @@ Install the TYCF app on your phone for quick access.
 </div>
 </section>
 
+<!-- DONATION BOOKING -->
 <section id="booking">
 <h2>Donation Booking</h2>
 
@@ -217,8 +442,10 @@ Install the TYCF app on your phone for quick access.
 </form>
 </section>
 
+<!-- UPI PAYMENT -->
 <section id="payment">
 <h2>UPI Donation Payment</h2>
+
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <img id="paymentQr" alt="TYCF Payment QR">
@@ -227,14 +454,17 @@ Install the TYCF app on your phone for quick access.
 </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
 <h3>TYCF FOUNDATION</h3>
 <p>TYCF FOOD DONATION</p>
+
 <a href="https://www.instagram.com/tycf_foundation/">TYCF Foundation Instagram</a>
 <br><br>
 <a href="https://www.instagram.com/tycf_fooddonation/">TYCF Food Donation Instagram</a>
 </footer>
 
+<!-- SUPABASE AND PHOTO EDITOR -->
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -852,57 +1082,4 @@ if ("serviceWorker" in navigator) {
 
   function isInstalled() {
     return window.matchMedia("(display-mode: standalone)").matches ||
-      window.navigator.standalone === true;
-  }
-
-  function showInstalled() {
-    installBtn.textContent = "✓ TYCF App Installed";
-    installBtn.disabled = true;
-    installHelp.textContent = "TYCF app is already installed on this device.";
-  }
-
-  if (isInstalled()) showInstalled();
-
-  window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredPrompt = event;
-    installHelp.textContent = "Tap Install TYCF App to install it on your phone.";
-  });
-
-  installBtn.addEventListener("click", async () => {
-
-    if (isInstalled()) {
-      showInstalled();
-      return;
-    }
-
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-
-      const choice = await deferredPrompt.userChoice;
-      deferredPrompt = null;
-
-      if (choice && choice.outcome === "accepted") {
-        installHelp.textContent = "TYCF app installation started.";
-      } else {
-        installHelp.textContent = "Installation was not completed. You can try again.";
-      }
-
-      return;
-    }
-
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-    if (isIOS) {
-      installHelp.textContent = "In Safari, tap Share, then choose Add to Home Screen.";
-    } else {
-      installHelp.textContent = "In Chrome, tap ⋮ menu, then choose Install app or Add to Home screen.";
-    }
-  });
-
-  window.addEventListener("appinstalled", showInstalled);
-})();
-</script>
-
-</body>
-</html>
+      window.navigator.standalone === true
