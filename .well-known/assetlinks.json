@@ -1,0 +1,15 @@
+
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "org.tycf.fooddonation",
+      "sha256_cert_fingerprints": [
+        "02:8F:5C:19:17:D6:98:B6:E5:D3:49:05:64:A3:C5:83:FB:48:E1:26:FB:15:38:BC:71:8E:C6:B9:20:BE:CF:43"
+      ]
+    }
+  }
+]
