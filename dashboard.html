@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,11 +7,14 @@
 <title>TYCF Admin Dashboard</title>
 <style>
 :root{font-family:Arial,sans-serif;color:#173b2d;background:#e8f5ec}
-*{box-sizing:border-box}body{margin:0}header{background:#075b3c;color:#fff;padding:18px}
-header h1{margin:0;font-size:23px}header p{margin:6px 0 0}
+*{box-sizing:border-box}
+body{margin:0}
+header{background:#075b3c;color:#fff;padding:18px}
+header h1{margin:0;font-size:23px}
+header p{margin:6px 0 0}
 main{max-width:1100px;margin:auto;padding:16px}
 nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
-button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:#fff;font-size:14px;cursor:pointer}
+button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:#fff;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
 button.light{background:#fff;color:#075b3c;border:1px solid #b7d4c3}
 button.warn{background:#8a3b25}
 .panel,.stat{background:#fff;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
@@ -20,25 +24,29 @@ input,select{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;
 label{font-weight:600;font-size:13px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .order{border:1px solid #dce9e0;border-radius:10px;padding:13px;margin:10px 0}
-.order h3{margin:0 0 8px}.muted{color:#557064;font-size:13px}
+.order h3{margin:0 0 8px}
+.muted{color:#557064;font-size:13px}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 #message{padding:10px;color:#8a2b22}
-table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid #e5eee8;font-size:13px}
+#qrPreviewWrap img{display:block;max-width:280px;width:100%;height:auto;border:1px solid #dce9e0;border-radius:10px;padding:8px;margin:12px 0}
 @media(max-width:600px){main{padding:10px}.panel{padding:12px}}
 </style>
 </head>
 <body>
 <header>
   <h1>TYCF Food Donation — Admin</h1>
-  <p>Bookings, donation status and package settings</p>
+  <p>Bookings, reminders, package settings and UPI QR</p>
 </header>
+
 <main>
   <div class="actions">
     <button class="light" id="refreshBtn">Refresh</button>
     <button class="light" id="logoutBtn">Logout</button>
   </div>
+
   <div id="message">Checking admin access…</div>
+
   <section id="app" hidden>
     <div class="grid">
       <div class="stat">Total bookings<strong id="total">0</strong></div>
@@ -46,140 +54,431 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;bord
       <div class="stat">Confirmed<strong id="confirmed">0</strong></div>
       <div class="stat">Delivered<strong id="delivered">0</strong></div>
     </div>
+
     <nav>
       <button data-tab="bookings">Bookings</button>
       <button data-tab="reminders">Tomorrow reminders</button>
       <button data-tab="settings">Package settings</button>
+      <button data-tab="qr">UPI QR Settings</button>
     </nav>
+
     <section id="bookingsTab" class="panel">
       <h2>Donation bookings</h2>
       <input id="search" placeholder="Search name, phone or package">
-      <div class="row">
-        <div><label for="statusFilter">Filter status</label>
-          <select id="statusFilter"><option value="">All statuses</option><option>Received</option><option>Confirmed</option><option>Preparing</option><option>Delivered</option><option>Cancelled</option></select>
-        </div>
-      </div>
+      <label for="statusFilter">Filter status</label>
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option>Received</option>
+        <option>Confirmed</option>
+        <option>Preparing</option>
+        <option>Delivered</option>
+        <option>Cancelled</option>
+      </select>
       <div id="ordersList"></div>
     </section>
+
     <section id="remindersTab" class="panel" hidden>
       <h2>Donations due tomorrow</h2>
       <p class="muted">This is a dashboard reminder list. It does not send WhatsApp messages automatically.</p>
       <div id="reminderList"></div>
     </section>
+
     <section id="settingsTab" class="panel" hidden>
       <h2>Package settings</h2>
       <form id="settingsForm">
         <label>WhatsApp number (country code + number, digits only)</label>
         <input id="waNumber" placeholder="Example: 91XXXXXXXXXX">
+
         <div class="row">
-          <div><label>Veg meals price (₹)</label><input id="vegPrice" type="number" min="1" required></div>
-          <div><label>Egg meals price (₹)</label><input id="eggPrice" type="number" min="1" required></div>
-          <div><label>Chicken meals price (₹)</label><input id="chickenPrice" type="number" min="1" required></div>
-          <div><label>Cake celebration price (₹)</label><input id="cakePrice" type="number" min="1" required></div>
+          <div>
+            <label>Veg meals price (₹)</label>
+            <input id="vegPrice" type="number" min="1" required>
+          </div>
+          <div>
+            <label>Egg meals price (₹)</label>
+            <input id="eggPrice" type="number" min="1" required>
+          </div>
+          <div>
+            <label>Chicken meals price (₹)</label>
+            <input id="chickenPrice" type="number" min="1" required>
+          </div>
+          <div>
+            <label>Cake celebration price (₹)</label>
+            <input id="cakePrice" type="number" min="1" required>
+          </div>
         </div>
+
         <label>Reminder days before donation</label>
         <input id="reminderDays" type="number" min="1" max="30" value="1">
         <button type="submit">Save settings</button>
       </form>
     </section>
+
+    <section id="qrTab" class="panel" hidden>
+      <h2>UPI Payment QR Settings</h2>
+      <p class="muted">Upload a new QR image to replace the current one. Only TYCF admins can change it.</p>
+
+      <div id="qrPreviewWrap">
+        <p class="muted">Open this tab to load the current QR.</p>
+      </div>
+
+      <form id="qrForm">
+        <label for="qrFile">Choose new UPI QR image (JPG, PNG or WebP; max 5 MB)</label>
+        <input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <button type="submit">Upload / Replace QR</button>
+      </form>
+
+      <div class="actions">
+        <button type="button" class="warn" id="deleteQrBtn">Delete current QR</button>
+      </div>
+
+      <p class="muted">After uploading, the customer website payment section must also be connected to this QR image to show the latest QR to donors.</p>
+    </section>
   </section>
 </main>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
 const supabase = createClient(
   'https://mswgamusywvqxscfcyff.supabase.co',
   'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
 );
+
 const $ = id => document.getElementById(id);
 let orders = [];
 let settings = null;
-const say = t => $('message').textContent = t;
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const todayPlus = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
 
-async function init(){
-  const {data:{session}} = await supabase.auth.getSession();
-  if(!session){ location.href='admin.html'; return; }
-  const {data:admin,error:ae} = await supabase.from('tycf_admins').select('user_id').eq('user_id',session.user.id).maybeSingle();
-  if(ae || !admin){ await supabase.auth.signOut(); location.href='admin.html'; return; }
-  $('app').hidden=false;
+const say = text => $('message').textContent = text;
+
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+}[char]));
+
+const todayPlus = days => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0,10);
+};
+
+async function init() {
+  const {data:{session},error} = await supabase.auth.getSession();
+
+  if(error || !session) {
+    location.href = 'admin.html';
+    return;
+  }
+
+  const {data:admin,error:adminError} = await supabase
+    .from('tycf_admins')
+    .select('user_id')
+    .eq('user_id',session.user.id)
+    .maybeSingle();
+
+  if(adminError || !admin) {
+    await supabase.auth.signOut();
+    location.href = 'admin.html';
+    return;
+  }
+
+  $('app').hidden = false;
   await loadAll();
 }
-async function loadAll(){
+
+async function loadAll() {
   say('Loading bookings and settings…');
-  const [o,s] = await Promise.all([
-    supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
-    supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
+
+  const [ordersResult,settingsResult] = await Promise.all([
+    supabase.from('tycf_orders')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(500),
+
+    supabase.from('tycf_settings')
+      .select('*')
+      .limit(1)
+      .maybeSingle()
   ]);
-  if(o.error){say('Bookings error: '+o.error.message);return;}
-  if(s.error){say('Settings error: '+s.error.message);return;}
-  orders=o.data||[]; settings=s.data;
-  if(!settings){say('No settings row found in tycf_settings. Ask the project administrator to check setup.');return;}
-  renderOrders(); renderStats(); fillSettings(); renderReminders();
+
+  if(ordersResult.error) {
+    say('Bookings error: ' + ordersResult.error.message);
+    return;
+  }
+
+  if(settingsResult.error) {
+    say('Settings error: ' + settingsResult.error.message);
+    return;
+  }
+
+  orders = ordersResult.data || [];
+  settings = settingsResult.data;
+
+  if(!settings) {
+    say('No settings row found in tycf_settings. Please check setup.');
+    return;
+  }
+
+  renderOrders();
+  renderStats();
+  fillSettings();
+  renderReminders();
+
   say('Dashboard loaded.');
 }
-function renderStats(){
-  $('total').textContent=orders.length;
-  $('received').textContent=orders.filter(x=>x.status==='Received').length;
-  $('confirmed').textContent=orders.filter(x=>x.status==='Confirmed').length;
-  $('delivered').textContent=orders.filter(x=>x.status==='Delivered').length;
+
+function renderStats() {
+  $('total').textContent = orders.length;
+  $('received').textContent = orders.filter(x => x.status === 'Received').length;
+  $('confirmed').textContent = orders.filter(x => x.status === 'Confirmed').length;
+  $('delivered').textContent = orders.filter(x => x.status === 'Delivered').length;
 }
-function orderMarkup(o){
-  const status=['Received','Confirmed','Preparing','Delivered','Cancelled'].map(v=>`<option ${o.status===v?'selected':''}>${v}</option>`).join('');
-  const phone=String(o.customer_mobile||'').replace(/\D/g,'');
-  const msg=encodeURIComponent(`Hello ${o.customer_name||''}, update about your TYCF food donation booking: ${o.status||'Received'}.`);
-  const wa=phone?`https://wa.me/${phone}?text=${msg}`:'';
-  return `<article class="order">
-    <h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
-    <div>${esc(o.package_name)} — ₹${esc(o.package_price)}</div>
-    <div class="muted">Phone: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</div>
-    <div class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</div>
-    <div class="actions"><select aria-label="Status for booking ${esc(o.id)}" id="st-${esc(o.id)}">${status}</select>
-    <button data-save="${esc(o.id)}">Save status</button>
-    ${wa?`<a class="btn" href="${wa}" target="_blank" rel="noopener">WhatsApp customer</a>`:''}</div>
-  </article>`;
+
+function orderMarkup(order) {
+  const statuses = ['Received','Confirmed','Preparing','Delivered','Cancelled']
+    .map(status => `<option ${order.status===status?'selected':''}>${status}</option>`)
+    .join('');
+
+  const phone = String(order.customer_mobile || '').replace(/\D/g,'');
+  const message = encodeURIComponent(
+    `Hello ${order.customer_name || ''}, update about your TYCF food donation booking: ${order.status || 'Received'}.`
+  );
+
+  const whatsappLink = phone
+    ? `https://wa.me/${phone}?text=${message}`
+    : '';
+
+  return `
+    <article class="order">
+      <h3>${esc(order.customer_name)} <span class="tag">${esc(order.status)}</span></h3>
+      <div>${esc(order.package_name)} — ₹${esc(order.package_price)}</div>
+      <div class="muted">
+        Phone: ${esc(order.customer_mobile)} ·
+        Occasion: ${esc(order.occasion)} ·
+        Donation date: ${esc(order.donation_date)}
+      </div>
+      <div class="muted">
+        Sticker name: ${esc(order.sticker_name)} ·
+        Message: ${esc(order.customer_message)}
+      </div>
+      <div class="actions">
+        <select aria-label="Booking status" id="st-${esc(order.id)}">${statuses}</select>
+        <button data-save="${esc(order.id)}">Save status</button>
+        ${whatsappLink ? `<a class="btn" href="${whatsappLink}" target="_blank" rel="noopener">WhatsApp customer</a>` : ''}
+      </div>
+    </article>
+  `;
 }
-function renderOrders(){
-  const q=$('search').value.toLowerCase(), f=$('statusFilter').value;
-  const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name].some(v=>String(v||'').toLowerCase().includes(q)));
-  $('ordersList').innerHTML=list.length?list.map(orderMarkup).join(''):'<p>No matching bookings.</p>';
-  document.querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',()=>saveStatus(b.dataset.save)));
+
+function renderOrders() {
+  const query = $('search').value.toLowerCase();
+  const filter = $('statusFilter').value;
+
+  const filtered = orders.filter(order =>
+    (!filter || order.status === filter) &&
+    [order.customer_name,order.customer_mobile,order.package_name]
+      .some(value => String(value || '').toLowerCase().includes(query))
+  );
+
+  $('ordersList').innerHTML = filtered.length
+    ? filtered.map(orderMarkup).join('')
+    : '<p>No matching bookings.</p>';
+
+  document.querySelectorAll('[data-save]').forEach(button => {
+    button.addEventListener('click',() => saveStatus(button.dataset.save));
+  });
 }
-async function saveStatus(id){
-  const status=$('st-'+id).value;
+
+async function saveStatus(id) {
+  const status = $('st-' + id).value;
   say('Saving status…');
-  const {error}=await supabase.from('tycf_orders').update({status}).eq('id',id);
-  if(error){say('Could not update: '+error.message);return;}
-  say('Status updated.'); await loadAll();
+
+  const {error} = await supabase
+    .from('tycf_orders')
+    .update({status})
+    .eq('id',id);
+
+  if(error) {
+    say('Could not update: ' + error.message);
+    return;
+  }
+
+  say('Status updated.');
+  await loadAll();
 }
-function renderReminders(){
-  const due=orders.filter(o=>o.donation_date===todayPlus(Number(settings.reminder_days||1))&&!['Delivered','Cancelled'].includes(o.status));
-  $('reminderList').innerHTML=due.length?due.map(o=>`<div class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<div class="muted">${esc(o.customer_mobile)} · ${esc(o.donation_date)} · ${esc(o.status)}</div></div>`).join(''):'<p>No donations due on the reminder date.</p>';
+
+function renderReminders() {
+  const days = Number(settings.reminder_days || 1);
+
+  const due = orders.filter(order =>
+    order.donation_date === todayPlus(days) &&
+    !['Delivered','Cancelled'].includes(order.status)
+  );
+
+  $('reminderList').innerHTML = due.length
+    ? due.map(order => `
+        <div class="order">
+          <b>${esc(order.customer_name)}</b> — ${esc(order.package_name)}
+          <div class="muted">
+            ${esc(order.customer_mobile)} ·
+            ${esc(order.donation_date)} ·
+            ${esc(order.status)}
+          </div>
+        </div>
+      `).join('')
+    : '<p>No donations due on the reminder date.</p>';
 }
-function fillSettings(){
-  $('waNumber').value=settings.whatsapp_number||'';
-  $('vegPrice').value=settings.veg_price??1500;
-  $('eggPrice').value=settings.egg_price??1800;
-  $('chickenPrice').value=settings.chicken_price??2500;
-  $('cakePrice').value=settings.cake_price??1500;
-  $('reminderDays').value=settings.reminder_days??1;
+
+function fillSettings() {
+  $('waNumber').value = settings.whatsapp_number || '';
+  $('vegPrice').value = settings.veg_price ?? 1500;
+  $('eggPrice').value = settings.egg_price ?? 1800;
+  $('chickenPrice').value = settings.chicken_price ?? 2500;
+  $('cakePrice').value = settings.cake_price ?? 1500;
+  $('reminderDays').value = settings.reminder_days ?? 1;
 }
-$('settingsForm').addEventListener('submit',async e=>{
-  e.preventDefault();
-  const update={whatsapp_number:$('waNumber').value.trim(),veg_price:Number($('vegPrice').value),egg_price:Number($('eggPrice').value),chicken_price:Number($('chickenPrice').value),cake_price:Number($('cakePrice').value),reminder_days:Number($('reminderDays').value)};
-  if(!/^\d{10,15}$/.test(update.whatsapp_number)){say('Enter WhatsApp number with country code, digits only.');return;}
+
+$('settingsForm').addEventListener('submit',async event => {
+  event.preventDefault();
+
+  const update = {
+    whatsapp_number: $('waNumber').value.trim(),
+    veg_price: Number($('vegPrice').value),
+    egg_price: Number($('eggPrice').value),
+    chicken_price: Number($('chickenPrice').value),
+    cake_price: Number($('cakePrice').value),
+    reminder_days: Number($('reminderDays').value)
+  };
+
+  if(!/^\d{10,15}$/.test(update.whatsapp_number)) {
+    say('Enter WhatsApp number with country code, digits only.');
+    return;
+  }
+
   say('Saving settings…');
-  const {error}=await supabase.from('tycf_settings').update(update).not('whatsapp_number','is',null);
-  if(error){say('Settings save failed: '+error.message);return;}
-  say('Settings saved.'); await loadAll();
+
+  const {error} = await supabase
+    .from('tycf_settings')
+    .update(update)
+    .not('whatsapp_number','is',null);
+
+  if(error) {
+    say('Settings save failed: ' + error.message);
+    return;
+  }
+
+  say('Settings saved.');
+  await loadAll();
 });
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
-  ['bookings','reminders','settings'].forEach(t=>$(t+'Tab').hidden=t!==b.dataset.tab);
-}));
+
+/* UPI QR SETTINGS */
+
+const QR_PATH = 'current/payment-qr';
+
+async function loadQr() {
+  const {data} = supabase.storage
+    .from('tycf-payment-qr')
+    .getPublicUrl(QR_PATH);
+
+  const url = data.publicUrl + '?v=' + Date.now();
+
+  try {
+    const response = await fetch(url,{method:'HEAD'});
+
+    $('qrPreviewWrap').innerHTML = response.ok
+      ? `<img src="${url}" alt="Current UPI payment QR">`
+      : '<p class="muted">No QR uploaded yet.</p>';
+
+  } catch(error) {
+    $('qrPreviewWrap').innerHTML =
+      '<p class="muted">Could not check the QR image. Try Refresh.</p>';
+  }
+}
+
+$('qrForm').addEventListener('submit',async event => {
+  event.preventDefault();
+
+  const file = $('qrFile').files[0];
+
+  if(!file) {
+    say('Choose a QR image first.');
+    return;
+  }
+
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+    say('Use JPG, PNG or WebP image.');
+    return;
+  }
+
+  if(file.size > 5 * 1024 * 1024) {
+    say('Image must be 5 MB or smaller.');
+    return;
+  }
+
+  say('Uploading QR…');
+
+  const {error} = await supabase.storage
+    .from('tycf-payment-qr')
+    .upload(QR_PATH,file,{
+      upsert:true,
+      contentType:file.type,
+      cacheControl:'0'
+    });
+
+  if(error) {
+    say('QR upload failed: ' + error.message);
+    return;
+  }
+
+  $('qrFile').value = '';
+  await loadQr();
+  say('UPI QR uploaded / replaced successfully.');
+});
+
+$('deleteQrBtn').addEventListener('click',async () => {
+  if(!confirm('Delete the current UPI QR?')) return;
+
+  say('Deleting QR…');
+
+  const {error} = await supabase.storage
+    .from('tycf-payment-qr')
+    .remove([QR_PATH]);
+
+  if(error) {
+    say('QR delete failed: ' + error.message);
+    return;
+  }
+
+  await loadQr();
+  say('Current UPI QR deleted.');
+});
+
+/* TAB SWITCHING */
+
+document.querySelectorAll('[data-tab]').forEach(button => {
+  button.addEventListener('click',() => {
+    ['bookings','reminders','settings','qr'].forEach(tab => {
+      $(tab + 'Tab').hidden = tab !== button.dataset.tab;
+    });
+
+    if(button.dataset.tab === 'qr') {
+      loadQr();
+    }
+  });
+});
+
 $('search').addEventListener('input',renderOrders);
 $('statusFilter').addEventListener('change',renderOrders);
 $('refreshBtn').addEventListener('click',loadAll);
-$('logoutBtn').addEventListener('click',async()=>{await supabase.auth.signOut();location.href='admin.html';});
+
+$('logoutBtn').addEventListener('click',async () => {
+  await supabase.auth.signOut();
+  location.href = 'admin.html';
+});
+
 init();
 </script>
 </body>
