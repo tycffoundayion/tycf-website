@@ -763,6 +763,10 @@ customer_mobile:mobile,
 occasion:$('occasion').value,
 package_name:pack,
 package_price:Number(prices[pack]),
+
+/* REQUIRED BY SUPABASE RESTRICTIVE POLICY */
+payment_status:'Pending',
+
 donation_date:date,
 sticker_name:$('stickerName').value.trim(),
 customer_message:$('customerMessage').value.trim(),
@@ -793,6 +797,7 @@ msg.textContent=
 
 }catch(err){
 
+console.error('TYCF booking submission error:',err);
 msg.textContent='Could not submit: '+err.message;
 
 }finally{
