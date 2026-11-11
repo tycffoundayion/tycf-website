@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TYCF Food Donation</title>
-
 <meta name="theme-color" content="#075b3c">
 <meta name="description" content="Celebrate special occasions by donating food through Telangana Yuva Chaithanya Foundation.">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -20,311 +19,70 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f8fbf7;
-  color:#173c2d;
-}
-
-header{
-  color:white;
-  padding:22px clamp(16px,4vw,48px);
-  text-align:left;
-  background:
-    linear-gradient(90deg,rgba(0,45,27,.88),rgba(0,65,38,.58)),
-    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=85") center 45%/cover no-repeat;
-  min-height:190px;
-  display:flex;
-  align-items:center;
-  gap:24px;
-}
-
-.header-logo{
-  width:138px;
-  height:138px;
-  object-fit:contain;
-  flex:0 0 auto;
-  background:#fff;
-  padding:8px;
-  border-radius:10px;
-  box-shadow:0 3px 14px #0004;
-}
-
+body{margin:0;font-family:Arial,sans-serif;background:#f8fbf7;color:#173c2d}
+header{color:white;padding:22px clamp(16px,4vw,48px);background:linear-gradient(90deg,rgba(0,45,27,.88),rgba(0,65,38,.58)),url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1800&q=85") center 45%/cover no-repeat;min-height:190px;display:flex;align-items:center;gap:24px}
+.header-logo{width:138px;height:138px;object-fit:contain;flex:0 0 auto;background:#fff;padding:8px;border-radius:10px;box-shadow:0 3px 14px #0004}
 .header-copy{min-width:0}
-header h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:.3px}
+header h1{margin:0;font-size:clamp(22px,3vw,34px)}
 header p{margin:8px 0 0;font-size:16px}
-
-nav{
-  background:#06452f;
-  padding:13px;
-  text-align:center;
-}
-
-nav a{
-  color:white;
-  margin:10px;
-  text-decoration:none;
-}
-
-.hero{
-  padding:45px 20px;
-  text-align:center;
-  background:#e2f2e5;
-}
-
-button,.btn{
-  background:#e9ad36;
-  color:#222;
-  border:0;
-  padding:13px 22px;
-  border-radius:7px;
-  font-weight:bold;
-  cursor:pointer;
-  text-decoration:none;
-}
-
+nav{background:#06452f;padding:13px;text-align:center}
+nav a{color:white;margin:10px;text-decoration:none}
+.hero{padding:45px 20px;text-align:center;background:#e2f2e5}
+button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;cursor:pointer;text-decoration:none}
 button:disabled{opacity:.6;cursor:not-allowed}
-
 section{padding:30px 15px;text-align:center}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:15px;
-  max-width:1000px;
-  margin:auto;
-}
-
-.card{
-  background:white;
-  padding:22px;
-  border-radius:12px;
-  box-shadow:0 2px 12px #0001;
-}
-
-.price{
-  font-size:27px;
-  color:#08734f;
-  font-weight:bold;
-}
-
-form{
-  max-width:600px;
-  margin:auto;
-  background:white;
-  padding:22px;
-  border-radius:12px;
-}
-
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  margin:8px 0 15px;
-  border:1px solid #bbb;
-  border-radius:6px;
-}
-
-label{
-  text-align:left;
-  display:block;
-  font-weight:bold;
-}
-
-.consent{
-  display:flex;
-  gap:10px;
-  text-align:left;
-  align-items:flex-start;
-  font-weight:normal;
-}
-
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
+.card{background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
+.price{font-size:27px;color:#08734f;font-weight:bold}
+form{max-width:600px;margin:auto;background:white;padding:22px;border-radius:12px}
+input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #bbb;border-radius:6px}
+label{text-align:left;display:block;font-weight:bold}
+.consent{display:flex;gap:10px;text-align:left;align-items:flex-start;font-weight:normal}
 .consent input{width:auto}
-
-footer{
-  background:#06452f;
-  color:white;
-  text-align:center;
-  padding:25px;
-}
-
+footer{background:#06452f;color:white;text-align:center;padding:25px}
 footer a{color:#ffda83}
-
-#formMsg{
-  padding:10px;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-}
-
-.payment-card{
-  max-width:550px;
-  margin:auto;
-  background:white;
-  padding:22px;
-  border-radius:12px;
-}
-
-#paymentQr{
-  display:none;
-  width:100%;
-  max-width:320px;
-  min-height:20px;
-  margin:15px auto;
-}
-
-#paymentQr img{
-  display:block;
-  width:100%;
-  max-width:280px;
-  height:auto;
-  margin:auto;
-}
-
-.payment-total{
-  font-size:27px;
-  font-weight:bold;
-  color:#08734f;
-}
-
-.package-selection{
-  text-align:left;
-  background:#f5faf5;
-  border:1px solid #d7e8da;
-  border-radius:10px;
-  padding:14px;
-  margin:10px 0 18px;
-}
-
-.package-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  align-items:center;
-  padding:13px 0;
-  border-bottom:1px solid #dce9df;
-}
-
+#formMsg{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
+#paymentQr{display:none;width:100%;max-width:320px;min-height:20px;margin:15px auto}
+#paymentQr img{display:block;width:100%;max-width:280px;height:auto;margin:auto}
+.payment-total{font-size:27px;font-weight:bold;color:#08734f}
+.package-selection{text-align:left;background:#f5faf5;border:1px solid #d7e8da;border-radius:10px;padding:14px;margin:10px 0 18px}
+.package-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid #dce9df}
 .package-row:last-child{border-bottom:0}
-
 .package-name{font-weight:bold}
 .package-unit-price{font-size:13px;color:#526b5d;margin-top:4px}
-
-.quantity-controls{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.quantity-controls button{
-  width:38px;
-  height:38px;
-  padding:0;
-  font-size:22px;
-  background:#075b3c;
-  color:white;
-}
-
-.quantity-controls input{
-  width:55px;
-  height:38px;
-  text-align:center;
-  margin:0;
-  padding:5px;
-}
-
-.total-box{
-  background:#e2f2e5;
-  padding:16px;
-  border-radius:10px;
-  margin:15px 0;
-  text-align:center;
-}
-
-.total-box strong{
-  font-size:26px;
-  color:#075b3c;
-}
-
-.editor{
-  max-width:550px;
-  margin:15px auto;
-  background:#f1f8f2;
-  padding:12px;
-  border-radius:10px;
-}
-
-.editor canvas{
-  width:100%;
-  height:auto;
-  border:1px solid #ccc;
-  background:white;
-  touch-action:none;
-}
-
+.quantity-controls{display:flex;align-items:center;gap:8px}
+.quantity-controls button{width:38px;height:38px;padding:0;font-size:22px;background:#075b3c;color:white}
+.quantity-controls input{width:55px;height:38px;text-align:center;margin:0;padding:5px}
+.total-box{background:#e2f2e5;padding:16px;border-radius:10px;margin:15px 0;text-align:center}
+.total-box strong{font-size:26px;color:#075b3c}
+.editor{max-width:550px;margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px}
+.editor canvas{width:100%;height:auto;border:1px solid #ccc;background:white;touch-action:none}
 .editor input[type=range]{padding:0}
-
-.editor-note{
-  font-size:13px;
-  color:#526b5d;
-}
-
-.font-samples{
-  font-size:14px;
-  color:#526b5d;
-  margin-top:-8px;
-  margin-bottom:12px;
-}
-
-.replace-btn{
-  background:#075b3c;
-  color:white;
-  width:100%;
-  margin:5px 0 10px;
-}
-
-.install-app-btn{
-  display:inline-block;
-  background:#075b3c;
-  color:#fff;
-  border:2px solid #075b3c;
-  padding:13px 22px;
-  border-radius:7px;
-  font-weight:bold;
-  cursor:pointer;
-  margin:10px 6px;
-  text-decoration:none;
-}
-
-.install-app-btn:disabled{opacity:.7;cursor:default}
-
-.install-help{
-  font-size:14px;
-  color:#315b47;
-  margin:8px auto;
-  max-width:520px;
-}
-
+.editor-note{font-size:13px;color:#526b5d}
+.font-samples{font-size:14px;color:#526b5d;margin-top:-8px;margin-bottom:12px}
+.replace-btn{background:#075b3c;color:white;width:100%;margin:5px 0 10px}
+.install-app-btn{display:inline-block;background:#075b3c;color:#fff;border:2px solid #075b3c;padding:13px 22px;border-radius:7px;font-weight:bold;cursor:pointer;margin:10px 6px}
+.install-help{font-size:14px;color:#315b47;margin:8px auto;max-width:520px}
 @media(max-width:600px){
-  header{min-height:145px;padding:16px;gap:14px}
-  .header-logo{width:88px;height:88px;padding:5px}
-  header h1{font-size:20px}
-  header p{font-size:12px}
-  nav a{display:inline-block;margin:7px;font-size:14px}
-  .package-row{grid-template-columns:1fr auto;gap:5px}
-  .quantity-controls{gap:5px}
+header{min-height:145px;padding:16px;gap:14px}
+.header-logo{width:88px;height:88px;padding:5px}
+header h1{font-size:20px}
+header p{font-size:12px}
+nav a{display:inline-block;margin:7px;font-size:14px}
+.package-row{grid-template-columns:1fr auto;gap:5px}
+.quantity-controls{gap:5px}
 }
 </style>
 </head>
 
 <body>
-
-<header class="site-header">
-  <img class="header-logo" src="tycf-logo-cropped-1.png" alt="TYCF Logo">
-  <div class="header-copy">
-    <h1>TYCF FOOD DONATION</h1>
-    <p>Telangana Yuva Chaithanya Foundation</p>
-  </div>
+<header>
+<img class="header-logo" src="tycf-logo-cropped-1.png" alt="TYCF Logo">
+<div class="header-copy">
+<h1>TYCF FOOD DONATION</h1>
+<p>Telangana Yuva Chaithanya Foundation</p>
+</div>
 </header>
 
 <nav>
@@ -339,60 +97,28 @@ footer a{color:#ffda83}
 <h2>Celebrate by Sharing Food ❤️</h2>
 <p>Make your Birthday and Anniversary special by donating food.</p>
 <a class="btn" href="#booking">Donate Now</a>
-
-<button class="install-app-btn" id="installAppBtn" type="button">
-📲 Install TYCF App
-</button>
-
-<p class="install-help" id="installAppHelp" aria-live="polite">
-Install the TYCF app on your phone for quick access.
-</p>
+<button class="install-app-btn" id="installAppBtn" type="button">📲 Install TYCF App</button>
+<p class="install-help" id="installAppHelp" aria-live="polite">Install the TYCF app on your phone for quick access.</p>
 </div>
 
 <section id="packages">
 <h2>Donation Packages</h2>
-
 <div class="cards">
-<div class="card">
-<h3>🍛 Veg Meals</h3>
-<div class="price" id="vegPrice">₹1,500</div>
-<p>25 People</p>
-<p>Photo Sticker + Water Bottle</p>
-</div>
-
-<div class="card">
-<h3>🥚 Egg Meals</h3>
-<div class="price" id="eggPrice">₹1,800</div>
-<p>25 People</p>
-<p>Photo Sticker + Water Bottle</p>
-</div>
-
-<div class="card">
-<h3>🍗 Chicken Meals</h3>
-<div class="price" id="chickenPrice">₹2,500</div>
-<p>25 People</p>
-<p>Photo Sticker + Water Bottle</p>
-</div>
-
-<div class="card">
-<h3>🎂 Cake Celebration</h3>
-<div class="price" id="cakePrice">₹1,500</div>
-<p>Cake Cutting + Egg Puffs</p>
-<p>Children's Celebration</p>
-</div>
+<div class="card"><h3>🍛 Veg Meals</h3><div class="price" id="vegPrice">₹1,500</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
+<div class="card"><h3>🥚 Egg Meals</h3><div class="price" id="eggPrice">₹1,800</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
+<div class="card"><h3>🍗 Chicken Meals</h3><div class="price" id="chickenPrice">₹2,500</div><p>25 People</p><p>Photo Sticker + Water Bottle</p></div>
+<div class="card"><h3>🎂 Cake Celebration</h3><div class="price" id="cakePrice">₹1,500</div><p>Cake Cutting + Egg Puffs</p><p>Children's Celebration</p></div>
 </div>
 </section>
 
 <section id="booking">
 <h2>Donation Booking</h2>
-
 <form id="bookingForm">
-
 <label>Your Name</label>
-<input id="customerName" required maxlength="100">
+<input id="customerName" required maxlength="100" autocomplete="name">
 
 <label>Mobile Number</label>
-<input id="mobile" required type="tel" minlength="10" maxlength="15">
+<input id="mobile" required type="tel" minlength="10" maxlength="15" inputmode="tel" autocomplete="tel">
 
 <label>Occasion</label>
 <select id="occasion">
@@ -402,14 +128,10 @@ Install the TYCF app on your phone for quick access.
 </select>
 
 <label>Select Donation Packages</label>
-
 <div class="package-selection">
 
 <div class="package-row">
-<div>
-<div class="package-name">🍛 Veg Meals</div>
-<div class="package-unit-price" id="vegUnitPrice">₹1,500 per package</div>
-</div>
+<div><div class="package-name">🍛 Veg Meals</div><div class="package-unit-price" id="vegUnitPrice">₹1,500 per package</div></div>
 <div class="quantity-controls">
 <button type="button" data-package="Veg Meals" data-change="-1">−</button>
 <input type="number" id="qtyVeg" value="0" min="0" max="100" inputmode="numeric" aria-label="Veg Meals quantity">
@@ -418,10 +140,7 @@ Install the TYCF app on your phone for quick access.
 </div>
 
 <div class="package-row">
-<div>
-<div class="package-name">🥚 Egg Meals</div>
-<div class="package-unit-price" id="eggUnitPrice">₹1,800 per package</div>
-</div>
+<div><div class="package-name">🥚 Egg Meals</div><div class="package-unit-price" id="eggUnitPrice">₹1,800 per package</div></div>
 <div class="quantity-controls">
 <button type="button" data-package="Egg Meals" data-change="-1">−</button>
 <input type="number" id="qtyEgg" value="0" min="0" max="100" inputmode="numeric" aria-label="Egg Meals quantity">
@@ -430,10 +149,7 @@ Install the TYCF app on your phone for quick access.
 </div>
 
 <div class="package-row">
-<div>
-<div class="package-name">🍗 Chicken Meals</div>
-<div class="package-unit-price" id="chickenUnitPrice">₹2,500 per package</div>
-</div>
+<div><div class="package-name">🍗 Chicken Meals</div><div class="package-unit-price" id="chickenUnitPrice">₹2,500 per package</div></div>
 <div class="quantity-controls">
 <button type="button" data-package="Chicken Meals" data-change="-1">−</button>
 <input type="number" id="qtyChicken" value="0" min="0" max="100" inputmode="numeric" aria-label="Chicken Meals quantity">
@@ -442,17 +158,13 @@ Install the TYCF app on your phone for quick access.
 </div>
 
 <div class="package-row">
-<div>
-<div class="package-name">🎂 Cake Celebration</div>
-<div class="package-unit-price" id="cakeUnitPrice">₹1,500 per package</div>
-</div>
+<div><div class="package-name">🎂 Cake Celebration</div><div class="package-unit-price" id="cakeUnitPrice">₹1,500 per package</div></div>
 <div class="quantity-controls">
 <button type="button" data-package="Cake Celebration" data-change="-1">−</button>
 <input type="number" id="qtyCake" value="0" min="0" max="100" inputmode="numeric" aria-label="Cake Celebration quantity">
 <button type="button" data-package="Cake Celebration" data-change="1">+</button>
 </div>
 </div>
-
 </div>
 
 <div class="total-box">
@@ -467,10 +179,7 @@ Install the TYCF app on your phone for quick access.
 <label>Upload Your Photo</label>
 <input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
 
-<button type="button" id="replacePhotoBtn" class="replace-btn" hidden>
-🔄 Replace Photo
-</button>
-
+<button type="button" id="replacePhotoBtn" class="replace-btn" hidden>🔄 Replace Photo</button>
 <p id="selectedPhotoName" class="editor-note" aria-live="polite"></p>
 
 <label>Name on Design</label>
@@ -509,13 +218,11 @@ Install the TYCF app on your phone for quick access.
 
 <button id="submitBtn" type="submit">Submit Donation Request</button>
 <p id="formMsg" role="status" aria-live="polite"></p>
-
 </form>
 </section>
 
 <section id="payment">
 <h2>UPI Donation Payment</h2>
-
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <div id="paymentQr"></div>
@@ -535,10 +242,8 @@ Install the TYCF app on your phone for quick access.
 <a href="https://www.instagram.com/tycf_fooddonation/">TYCF Food Donation Instagram</a>
 </footer>
 
-<!-- QR CODE LIBRARY -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-<!-- SUPABASE AND PHOTO EDITOR -->
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -548,7 +253,6 @@ const supabase=createClient(
 );
 
 const $=id=>document.getElementById(id);
-
 const UPI_ID='9177681777-2@ybl';
 
 let prices={
@@ -588,31 +292,20 @@ return Math.max(0,Math.min(100,value));
 }
 
 function getSelectedPackages(){
-return Object.keys(prices)
-.map(name=>{
+return Object.keys(prices).map(name=>{
 const quantity=getQuantity(name);
 const unitPrice=Number(prices[name])||0;
-
-return {
-name,
-quantity,
-unit_price:unitPrice,
-line_total:quantity*unitPrice
-};
-})
-.filter(item=>item.quantity>0);
+return {name,quantity,unit_price:unitPrice,line_total:quantity*unitPrice};
+}).filter(item=>item.quantity>0);
 }
 
 function calculateTotal(){
 const items=getSelectedPackages();
 const total=items.reduce((sum,item)=>sum+item.line_total,0);
-
 $('totalAmount').textContent=format(total);
-
 $('packageSummary').textContent=items.length
 ?items.map(item=>`${item.name} × ${item.quantity}`).join(' | ')
 :'Select at least one package.';
-
 return {items,total};
 }
 
@@ -628,39 +321,30 @@ calculateTotal();
 async function loadPrices(){
 try{
 const {data,error}=await supabase.rpc('get_tycf_public_prices');
-
 if(error||!data?.length){
 console.warn('Using default package prices.',error);
 return;
 }
-
 const p=data[0];
-
 prices={
 'Veg Meals':Number(p.veg_price)||1500,
 'Egg Meals':Number(p.egg_price)||1800,
 'Chicken Meals':Number(p.chicken_price)||2500,
 'Cake Celebration':Number(p.cake_price)||1500
 };
-
 updatePackagePrices();
-
 }catch(err){
 console.error('Price loading error:',err);
 }
 }
 
 /* PACKAGE QUANTITY BUTTONS */
-
 document.querySelectorAll('[data-package][data-change]').forEach(button=>{
 button.addEventListener('click',()=>{
 const name=button.dataset.package;
 const change=Number(button.dataset.change);
 const input=$(quantityInputs[name]);
-
-const current=getQuantity(name);
-input.value=Math.max(0,Math.min(100,current+change));
-
+input.value=Math.max(0,Math.min(100,getQuantity(name)+change));
 calculateTotal();
 });
 });
@@ -669,25 +353,19 @@ Object.values(quantityInputs).forEach(id=>{
 $(id).addEventListener('input',()=>{
 const input=$(id);
 let value=Math.floor(Number(input.value)||0);
-
 if(value<0)value=0;
 if(value>100)value=100;
-
 input.value=value;
 calculateTotal();
 });
-
 $(id).addEventListener('change',()=>{
-const input=$(id);
-input.value=getQuantity(
-Object.keys(quantityInputs).find(name=>quantityInputs[name]===id)
-);
+const name=Object.keys(quantityInputs).find(n=>quantityInputs[n]===id);
+$(id).value=getQuantity(name);
 calculateTotal();
 });
 });
 
 /* PHOTO EDITOR */
-
 let stickerImage=null;
 let objectUrl=null;
 let zoom=1;
@@ -707,52 +385,28 @@ logoImage.onload=()=>{
 logoLoaded=true;
 drawDesign();
 };
-
 logoImage.src='tycf-logo-cropped-1.png';
 
 const fontSettings={
-'Dancing Script':{
-font:'Dancing Script',
-size:82,
-color:'#075b3c'
-},
-'Lobster':{
-font:'Lobster',
-size:76,
-color:'#075b3c'
-},
-'Playfair Display':{
-font:'Playfair Display',
-size:68,
-color:'#075b3c'
-},
-'Pacifico':{
-font:'Pacifico',
-size:72,
-color:'#075b3c'
-}
+'Dancing Script':{font:'Dancing Script',size:82,color:'#075b3c'},
+'Lobster':{font:'Lobster',size:76,color:'#075b3c'},
+'Playfair Display':{font:'Playfair Display',size:68,color:'#075b3c'},
+'Pacifico':{font:'Pacifico',size:72,color:'#075b3c'}
 };
 
 function drawDesign(){
-
 if(!stickerImage)return;
 
-const ctx=$('designCanvas').getContext('2d');
-
+const canvas=$('designCanvas');
+const ctx=canvas.getContext('2d');
 ctx.clearRect(0,0,W,H);
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(0,0,W,H);
 
 const boxH=H-FOOTER_H;
-
-const scale=Math.max(
-PHOTO_W/stickerImage.width,
-boxH/stickerImage.height
-)*zoom;
-
+const scale=Math.max(PHOTO_W/stickerImage.width,boxH/stickerImage.height)*zoom;
 const dw=stickerImage.width*scale;
 const dh=stickerImage.height*scale;
-
 const cx=PHOTO_W/2+offsetX;
 const cy=boxH/2+offsetY;
 
@@ -760,18 +414,14 @@ ctx.save();
 ctx.beginPath();
 ctx.rect(0,0,PHOTO_W,boxH);
 ctx.clip();
-
 ctx.drawImage(stickerImage,cx-dw/2,cy-dh/2,dw,dh);
 ctx.restore();
 
 ctx.fillStyle='#fffaf0';
 ctx.fillRect(PHOTO_W,0,W-PHOTO_W,boxH);
-
 ctx.textAlign='center';
-ctx.textBaseline='alphabetic';
 
 const settings=fontSettings[$('birthdayFont').value];
-
 ctx.fillStyle=settings.color;
 ctx.font=`bold ${settings.size}px "${settings.font}"`;
 ctx.fillText('Happy Birthday',825,145,710);
@@ -783,16 +433,12 @@ ctx.moveTo(590,175);
 ctx.quadraticCurveTo(825,205,1060,175);
 ctx.stroke();
 
-ctx.strokeStyle='#d49a00';
 ctx.lineWidth=4;
 ctx.strokeRect(560,225,530,125);
 
 ctx.fillStyle='#e52d48';
 ctx.font='bold 65px Georgia';
-ctx.fillText(
-($('stickerName').value.trim()||'YOUR NAME').slice(0,18),
-825,310,500
-);
+ctx.fillText(($('stickerName').value.trim()||'YOUR NAME').slice(0,18),825,310,500);
 
 ctx.fillStyle='#8b36a5';
 ctx.font='bold 35px Georgia';
@@ -800,23 +446,16 @@ ctx.fillText('Best Wishes From',825,425);
 
 ctx.fillStyle='#075b3c';
 ctx.font='bold 46px Arial';
-ctx.fillText(
-($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),
-825,485,500
-);
+ctx.fillText(($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),825,485,500);
 
-/* WHITE FOOTER */
-
+/* FOOTER */
 ctx.fillStyle='#fff';
 ctx.fillRect(0,H-FOOTER_H,W,FOOTER_H);
-
 ctx.strokeStyle='#075b3c';
 ctx.lineWidth=5;
 ctx.strokeRect(3,H-FOOTER_H+3,W-6,FOOTER_H-6);
 
-if(logoLoaded){
-ctx.drawImage(logoImage,15,H-FOOTER_H+12,105,105);
-}
+if(logoLoaded)ctx.drawImage(logoImage,15,H-FOOTER_H+12,105,105);
 
 ctx.strokeStyle='#08733f';
 ctx.lineWidth=3;
@@ -846,13 +485,9 @@ ctx.fillText('8340834107',1170,H-28);
 }
 
 /* PHOTO SELECT AND REPLACE */
-
-$('replacePhotoBtn').addEventListener('click',()=>{
-$('stickerPhoto').click();
-});
+$('replacePhotoBtn').addEventListener('click',()=>$('stickerPhoto').click());
 
 $('stickerPhoto').addEventListener('change',()=>{
-
 const file=$('stickerPhoto').files[0];
 if(!file)return;
 
@@ -861,7 +496,6 @@ alert('Photo must be 5 MB or smaller.');
 $('stickerPhoto').value='';
 return;
 }
-
 if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
 alert('Choose JPG, PNG or WebP photo.');
 $('stickerPhoto').value='';
@@ -873,18 +507,15 @@ const img=new Image();
 
 img.onload=()=>{
 if(objectUrl)URL.revokeObjectURL(objectUrl);
-
 objectUrl=newUrl;
 stickerImage=img;
 zoom=1;
 offsetX=0;
 offsetY=0;
-
 $('photoZoom').value=1;
 $('photoEditor').hidden=false;
 $('replacePhotoBtn').hidden=false;
 $('selectedPhotoName').textContent='Selected Photo: '+file.name;
-
 drawDesign();
 };
 
@@ -893,29 +524,58 @@ URL.revokeObjectURL(newUrl);
 alert('Unable to open this photo.');
 $('stickerPhoto').value='';
 };
-
 img.src=newUrl;
 });
 
-/* FONT CHANGE */
-
+/* FONT AND TEXT PREVIEW */
 $('birthdayFont').addEventListener('change',async()=>{
 const settings=fontSettings[$('birthdayFont').value];
-
 try{
 await document.fonts.load(`bold ${settings.size}px "${settings.font}"`);
-}catch(err){
-console.warn('Font loading issue:',err);
-}
-
+}catch(err){console.warn('Font loading issue:',err);}
 drawDesign();
 });
-
-/* ZOOM AND TEXT */
 
 $('photoZoom').addEventListener('input',e=>{
 zoom=Number(e.target.value);
 drawDesign();
 });
 
-$('stickerName').addEventLis
+$('stickerName').addEventListener('input',drawDesign);
+$('bestWishesFrom').addEventListener('input',drawDesign);
+
+/* DRAG PHOTO ON CANVAS */
+const canvas=$('designCanvas');
+
+canvas.addEventListener('pointerdown',e=>{
+if(!stickerImage)return;
+const rect=canvas.getBoundingClientRect();
+drag={
+startX:e.clientX,
+startY:e.clientY,
+offsetX,
+offsetY,
+scaleX:W/rect.width,
+scaleY:H/rect.height
+};
+canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointermove',e=>{
+if(!drag)return;
+offsetX=drag.offsetX+(e.clientX-drag.startX)*drag.scaleX;
+offsetY=drag.offsetY+(e.clientY-drag.startY)*drag.scaleY;
+drawDesign();
+});
+
+function stopDrag(){drag=null;}
+canvas.addEventListener('pointerup',stopDrag);
+canvas.addEventListener('pointercancel',stopDrag);
+canvas.addEventListener('lostpointercapture',stopDrag);
+
+/* CANVAS TO IMAGE FILE */
+function canvasToBlob(canvas){
+return new Promise((resolve,reject)=>{
+canvas.toBlob(blob=>{
+if(blob)resolve(blob);
+else reject(new Error('Could not create sticker desi
