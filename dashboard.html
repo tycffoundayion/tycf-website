@@ -9,19 +9,19 @@
 :root{font-family:Arial,sans-serif;color:#173b2d;background:#e8f5ec}
 *{box-sizing:border-box}
 body{margin:0}
-header{background:#075b3c;color:#fff;padding:18px}
+header{background:#075b3c;color:white;padding:18px}
 header h1{margin:0;font-size:23px}
 header p{margin:6px 0 0}
 main{max-width:1100px;margin:auto;padding:16px}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
-button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:#fff;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
-button.light{background:#fff;color:#075b3c;border:1px solid #b7d4c3}
+nav,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:white;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
+button.light{background:white;color:#075b3c;border:1px solid #b7d4c3}
 button.warn{background:#8a3b25}
 button:disabled{opacity:.5;cursor:not-allowed}
-.panel,.stat{background:#fff;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
+.panel,.stat{background:white;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .stat strong{display:block;font-size:25px;margin-top:8px}
-input,select{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;margin:5px 0 12px;background:#fff}
+input,select{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;margin:5px 0 12px;background:white}
 label{font-weight:600;font-size:13px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .order{border:1px solid #dce9e0;border-radius:10px;padding:13px;margin:10px 0}
@@ -30,13 +30,13 @@ label{font-weight:600;font-size:13px}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
 .tag.paid{background:#d8f4df;color:#12612c}
 .tag.pending{background:#fff0ce;color:#805500}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-#message{padding:10px;color:#8a2b22}
+#message{padding:10px;color:#8a2b22;white-space:pre-wrap}
 #qrPreviewWrap img{display:block;max-width:280px;width:100%;height:auto;border:1px solid #dce9e0;border-radius:10px;padding:8px;margin:12px 0}
 @media(max-width:600px){main{padding:10px}.panel{padding:12px}}
 </style>
 </head>
 <body>
+
 <header>
 <h1>TYCF Food Donation — Admin</h1>
 <p>Bookings, payment verification, reminders, package settings and UPI QR</p>
@@ -69,7 +69,7 @@ label{font-weight:600;font-size:13px}
 <section id="bookingsTab" class="panel">
 <h2>Donation bookings</h2>
 <input id="search" placeholder="Search name, phone or package">
-<label for="statusFilter">Filter status</label>
+<label>Filter status</label>
 <select id="statusFilter">
 <option value="">All statuses</option>
 <option>Received</option>
@@ -83,7 +83,7 @@ label{font-weight:600;font-size:13px}
 
 <section id="remindersTab" class="panel" hidden>
 <h2>Donations due tomorrow</h2>
-<p class="muted">This is a dashboard reminder list. It does not send WhatsApp messages automatically.</p>
+<p class="muted">Reminder list only. WhatsApp messages are not sent automatically.</p>
 <div id="reminderList"></div>
 </section>
 
@@ -91,18 +91,18 @@ label{font-weight:600;font-size:13px}
 <h2>Admin Profile</h2>
 <form id="profileForm">
 <label>Display Name</label>
-<input id="displayName" maxlength="60" placeholder="Enter display name" required>
-<label>New Login Email</label>
-<input id="newAdminEmail" type="email" placeholder="Enter new login email" required>
+<input id="displayName" maxlength="60" required>
+<label>Login Email</label>
+<input id="newAdminEmail" type="email" required>
 <button type="submit">Save Profile</button>
 </form>
-<p class="muted">Login email changes may require confirmation from your email inbox.</p>
+<p class="muted">Email changes may require confirmation from your email inbox.</p>
 <hr>
 
-<h2>Package settings</h2>
+<h2>Package & WhatsApp Settings</h2>
 <form id="settingsForm">
-<label>WhatsApp number (country code + number, digits only)</label>
-<input id="waNumber" placeholder="Example: 91XXXXXXXXXX">
+<label>Admin WhatsApp Number (country code + number, digits only)</label>
+<input id="waNumber" placeholder="Example: 919876543210" required>
 <div class="row">
 <div>
 <label>Veg meals price (₹)</label>
@@ -123,18 +123,19 @@ label{font-weight:600;font-size:13px}
 </div>
 <label>Reminder days before donation</label>
 <input id="reminderDays" type="number" min="1" max="30" value="1">
-<button type="submit">Save settings</button>
+<button type="submit">Save Settings</button>
 </form>
+<p class="muted">Customer confirmation opens the customer's WhatsApp chat. Admin must press Send in WhatsApp.</p>
 </section>
 
 <section id="qrTab" class="panel" hidden>
 <h2>UPI Payment QR Settings</h2>
-<p class="muted">Upload a new QR image to replace the current one. Only TYCF admins can change it.</p>
+<p class="muted">Upload a new QR image to replace the current one.</p>
 <div id="qrPreviewWrap">
 <p class="muted">Open this tab to load the current QR.</p>
 </div>
 <form id="qrForm">
-<label for="qrFile">Choose new UPI QR image (JPG, PNG or WebP; max 5 MB)</label>
+<label>Choose new UPI QR image (JPG, PNG or WebP; max 5 MB)</label>
 <input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required>
 <button type="submit">Upload / Replace QR</button>
 </form>
@@ -157,6 +158,7 @@ const supabase = createClient(
 const $ = id => document.getElementById(id);
 let orders = [];
 let settings = null;
+let currentEmail = '';
 
 const say = text => $('message').textContent = text;
 
@@ -169,6 +171,41 @@ const date = new Date();
 date.setDate(date.getDate() + days);
 return date.toISOString().slice(0,10);
 };
+
+function customerWhatsAppNumber(value) {
+let phone = String(value || '').replace(/\D/g,'');
+if(phone.length === 10) phone = '91' + phone;
+return phone.length >= 11 && phone.length <= 15 ? phone : '';
+}
+
+function confirmationMessage(order) {
+return [
+'TYCF FOOD DONATION',
+'',
+'Dear ' + (order.customer_name || 'Customer') + ',',
+'',
+'Your donation order has been confirmed successfully.',
+'',
+'Order Details:',
+'Package: ' + (order.package_name || ''),
+'Donation Amount: Rs. ' + Number(order.package_price || 0).toLocaleString('en-IN'),
+'Donation Date: ' + (order.donation_date || ''),
+'Occasion: ' + (order.occasion || ''),
+'',
+'Payment Status: PAID',
+'Order Status: CONFIRMED',
+'',
+'Thank you for supporting TYCF Foundation.',
+'Sharing Happiness ❤️'
+].join('\n');
+}
+
+function whatsappUrl(order) {
+const phone = customerWhatsAppNumber(order.customer_mobile);
+if(!phone) return '';
+return 'https://wa.me/' + phone + '?text=' +
+encodeURIComponent(confirmationMessage(order));
+}
 
 async function init() {
 const {data:{session},error} = await supabase.auth.getSession();
@@ -192,9 +229,10 @@ return;
 
 $('app').hidden = false;
 const profileName = session.user.user_metadata?.display_name || 'TYCF Admin';
+currentEmail = session.user.email || '';
 $('adminDisplayName').textContent = profileName;
 $('displayName').value = profileName;
-$('newAdminEmail').value = session.user.email || '';
+$('newAdminEmail').value = currentEmail;
 
 await loadAll();
 }
@@ -207,7 +245,6 @@ supabase.from('tycf_orders')
 .select('*')
 .order('created_at',{ascending:false})
 .limit(500),
-
 supabase.from('tycf_settings')
 .select('*')
 .limit(1)
@@ -255,12 +292,7 @@ const blocked = status === 'Confirmed' && !paid;
 return `<option value="${status}" ${order.status===status?'selected':''} ${blocked?'disabled':''}>${status}${blocked?' (Verify payment first)':''}</option>`;
 }).join('');
 
-const phone = String(order.customer_mobile || '').replace(/\D/g,'');
-const message = encodeURIComponent(
-`Hello ${order.customer_name || ''}, update about your TYCF food donation booking: ${order.status || 'Received'}.`
-);
-
-const whatsappLink = phone ? `https://wa.me/${phone}?text=${message}` : '';
+const waLink = paid ? whatsappUrl(order) : '';
 
 return `
 <article class="order">
@@ -282,7 +314,8 @@ Message: ${esc(order.customer_message)}
 ${!paid ? `<button data-verify="${esc(order.id)}">Verify Payment / Mark Paid</button>` : ''}
 <select aria-label="Booking status" id="st-${esc(order.id)}">${statuses}</select>
 <button data-save="${esc(order.id)}">Save status</button>
-${whatsappLink ? `<a class="btn" href="${whatsappLink}" target="_blank" rel="noopener">WhatsApp customer</a>` : ''}
+${waLink ? `<a class="btn" href="${waLink}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>` : ''}
+${paid && !waLink ? '<span class="muted">Customer mobile number is invalid. Check the number.</span>' : ''}
 </div>
 </article>`;
 }
@@ -319,12 +352,15 @@ say('This booking is already marked Paid.');
 return;
 }
 
-if(!confirm('Has a responsible TYCF adult verified that the donation has actually reached the foundation account?')) return;
+if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?')) return;
 
-say('Updating payment status…');
+say('Approving payment and confirming order…');
 
 const {error} = await supabase.from('tycf_orders')
-.update({payment_status:'Paid'})
+.update({
+payment_status:'Paid',
+status:'Confirmed'
+})
 .eq('id',id);
 
 if(error) {
@@ -332,8 +368,8 @@ say('Payment update failed: ' + error.message);
 return;
 }
 
-say('Payment marked Paid. You can now confirm this booking.');
 await loadAll();
+say('Payment marked Paid and booking Confirmed. Click Send WhatsApp Confirmation to message the customer.');
 }
 
 async function saveStatus(id) {
@@ -403,16 +439,10 @@ return;
 
 say('Saving admin profile…');
 
-const update = {
-data: {display_name:displayName}
-};
+const update = {data:{display_name:displayName}};
+if(newEmail && newEmail !== currentEmail) update.email = newEmail;
 
-const currentEmail = $('newAdminEmail').defaultValue;
-if(newEmail && newEmail !== currentEmail) {
-update.email = newEmail;
-}
-
-const {data,error} = await supabase.auth.updateUser(update);
+const {error} = await supabase.auth.updateUser(update);
 
 if(error) {
 say('Profile update failed: ' + error.message);
@@ -422,13 +452,14 @@ return;
 $('adminDisplayName').textContent = displayName;
 
 if(update.email) {
-$('newAdminEmail').defaultValue = newEmail;
-say('Display name saved. Check your new email inbox to confirm the login email change.');
+currentEmail = newEmail;
+say('Display name saved. Check your email inbox to confirm the login email change.');
 } else {
 say('Admin display name saved.');
 }
 });
 
+/* PACKAGE AND ADMIN WHATSAPP SETTINGS */
 $('settingsForm').addEventListener('submit',async event => {
 event.preventDefault();
 
@@ -446,11 +477,16 @@ say('Enter WhatsApp number with country code, digits only.');
 return;
 }
 
+if(Object.values(update).some(value => value === '' || value === null || Number.isNaN(value))) {
+say('Please check all settings fields.');
+return;
+}
+
 say('Saving settings…');
 
 const {error} = await supabase.from('tycf_settings')
 .update(update)
-.not('whatsapp_number','is',null);
+.not('id','is',null);
 
 if(error) {
 say('Settings save failed: ' + error.message);
