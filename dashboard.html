@@ -988,4 +988,47 @@ let b=e.target.closest('button');
 
 if(!b)return;
 
-if(b.dataset.download)download(b.dataset.do
+if(b.dataset.download)download(b.dataset.download);
+if(b.dataset.savewa)saveWA(b.dataset.savewa);
+if(b.dataset.verify)verify(b.dataset.verify);
+if(b.dataset.status)saveStatus(b.dataset.status);
+
+});
+
+/* EVENT LISTENERS */
+
+$('search').addEventListener('input',renderOrders);
+$('statusFilter').addEventListener('change',renderOrders);
+
+$('reportMonth').addEventListener('change',()=>{
+reportStatusFilter='';
+renderReport();
+});
+
+$('reportDateType').addEventListener('change',()=>{
+reportStatusFilter='';
+renderReport();
+});
+
+$('clearReportStatus').onclick=()=>{
+reportStatusFilter='';
+renderReport();
+};
+
+$('refreshBtn').onclick=loadAll;
+
+$('logoutBtn').onclick=async()=>{
+await supabase.auth.signOut();
+location.href='admin.html';
+};
+
+$('settingsForm').addEventListener('submit',saveSettings);
+$('profileForm').addEventListener('submit',saveProfile);
+$('qrForm').addEventListener('submit',uploadQr);
+$('deleteQrBtn').onclick=deleteQr;
+
+init();
+
+</script>
+</body>
+</html>
