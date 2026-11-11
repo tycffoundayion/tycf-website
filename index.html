@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TYCF Food Donation</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f8fbf7;color:#173c2d}
@@ -12,13 +13,10 @@ header{background:#075b3c;color:white;padding:22px;text-align:center}
 header h1{margin:0;font-size:27px}
 nav{background:#06452f;padding:13px;text-align:center}
 nav a{color:white;margin:10px;text-decoration:none}
-nav a:hover{color:#ffda83;text-decoration:underline}
-.hero{padding:65px 20px;text-align:center;background:#e2f2e5}
-.hero h2{font-size:34px;color:#075b3c}
-.hero p{font-size:18px}
-button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;text-decoration:none;cursor:pointer}
-button:disabled{opacity:.6;cursor:not-allowed}
-section{padding:35px 18px;text-align:center}
+.hero{padding:45px 20px;text-align:center;background:#e2f2e5}
+button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;cursor:pointer;text-decoration:none}
+button:disabled{opacity:.6}
+section{padding:30px 15px;text-align:center}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
 .card{background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
 .price{font-size:27px;color:#08734f;font-weight:bold}
@@ -26,23 +24,27 @@ form{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12p
 input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #bbb;border-radius:6px}
 label{text-align:left;display:block;font-weight:bold}
 .consent{display:flex;gap:10px;text-align:left;align-items:flex-start;font-weight:normal}
-.consent input{width:auto;margin:3px 0}
+.consent input{width:auto}
 footer{background:#06452f;color:white;text-align:center;padding:25px}
 footer a{color:#ffda83}
 #formMsg{padding:10px;white-space:pre-wrap}
-#paymentQr{display:none;width:100%;max-width:320px;height:auto;margin:15px auto;border:1px solid #ddd;border-radius:10px;padding:8px;background:white}
-.payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
-.payment-note{font-size:14px;line-height:1.6}
+.payment-card{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
+#paymentQr{display:none;width:100%;max-width:320px;margin:15px auto}
+.editor{max-width:550px;margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px}
+.editor canvas{width:100%;height:auto;border:1px solid #ccc;background:white;touch-action:none}
+.editor input[type=range]{padding:0}
+.editor-note{font-size:13px;color:#526b5d}
 @media(max-width:600px){
- nav a{display:inline-block;margin:7px;font-size:14px}
- .hero h2{font-size:27px}
+nav a{display:inline-block;margin:7px;font-size:14px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
-<img src="tycf-logo-cropped-1.png" alt="TYCF Official Logo" style="display:block;width:160px;max-width:55%;height:auto;margin:0 auto 12px;">
+<img src="tycf-logo-cropped-1.png" alt="TYCF Logo"
+style="width:150px;display:block;margin:auto auto 12px">
 <h1>TYCF FOOD DONATION</h1>
 <p>Telangana Yuva Chaithanya Foundation</p>
 </header>
@@ -57,7 +59,7 @@ footer a{color:#ffda83}
 
 <div class="hero" id="home">
 <h2>Celebrate by Sharing Food ❤️</h2>
-<p>Make your Birthday and Anniversary special by donating food to people in need.</p>
+<p>Make your Birthday and Anniversary special by donating food.</p>
 <a class="btn" href="#booking">Donate Now</a>
 </div>
 
@@ -97,46 +99,70 @@ footer a{color:#ffda83}
 <form id="bookingForm">
 
 <label>Your Name</label>
-<input id="customerName" required maxlength="100" placeholder="Enter your name">
+<input id="customerName" required maxlength="100">
 
 <label>Mobile Number</label>
-<input id="mobile" required type="tel" minlength="10" maxlength="15" placeholder="Enter mobile number">
+<input id="mobile" required type="tel" minlength="10" maxlength="15">
 
 <label>Occasion</label>
-<select id="occasion" required>
-<option value="Birthday">Birthday</option>
-<option value="Anniversary">Anniversary</option>
-<option value="Other">Other</option>
+<select id="occasion">
+<option>Birthday</option>
+<option>Anniversary</option>
+<option>Other</option>
 </select>
 
 <label>Select Package</label>
-<select id="package" required>
-<option value="Veg Meals">Veg Meals</option>
-<option value="Egg Meals">Egg Meals</option>
-<option value="Chicken Meals">Chicken Meals</option>
-<option value="Cake Celebration">Cake Celebration</option>
+<select id="package">
+<option>Veg Meals</option>
+<option>Egg Meals</option>
+<option>Chicken Meals</option>
+<option>Cake Celebration</option>
 </select>
 
 <label>Donation Date</label>
 <input id="donationDate" type="date" required>
 
-<label>Photo for Sticker (JPG/PNG/WebP, max 5 MB)</label>
-<input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+<label>Upload Your Photo</label>
+<input id="stickerPhoto" type="file"
+accept="image/jpeg,image/png,image/webp">
 
-<label>Name on Sticker</label>
-<input id="stickerName" maxlength="100" placeholder="Enter name">
+<label>Name on Design</label>
+<input id="stickerName" maxlength="100" placeholder="Birthday person name">
+
+<label>Best Wishes From</label>
+<input id="bestWishesFrom" maxlength="80" placeholder="Enter your name">
+
+<div class="editor" id="photoEditor" hidden>
+<h3>Customize Your Photo</h3>
+<p class="editor-note">
+Drag the photo to move it. Use Zoom to adjust the photo.
+</p>
+
+<canvas id="designCanvas" width="1200" height="675"></canvas>
+
+<label>Photo Zoom</label>
+<input id="photoZoom" type="range"
+min="1" max="2.5" step="0.01" value="1">
+
+<p><strong>Final Design Preview</strong></p>
+<p class="editor-note">
+TYCF FOOD DONATION footer is fixed and cannot be removed.
+</p>
+</div>
 
 <label>Message</label>
-<textarea id="customerMessage" maxlength="500" placeholder="Your message"></textarea>
+<textarea id="customerMessage" maxlength="500"></textarea>
 
 <label class="consent">
 <input id="consent" type="checkbox" required>
-<span>I agree that TYCF Foundation may use these details to process this donation booking and contact me about it.</span>
+<span>I agree that TYCF Foundation may use these details to process this donation booking.</span>
 </label>
 
-<button id="submitBtn" type="submit">Submit Donation Request</button>
-<p id="formMsg" role="status"></p>
+<button id="submitBtn" type="submit">
+Submit Donation Request
+</button>
 
+<p id="formMsg" role="status"></p>
 </form>
 </section>
 
@@ -144,176 +170,387 @@ footer a{color:#ffda83}
 <h2>UPI Donation Payment</h2>
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
-<p>Scan the official TYCF Foundation QR below to make your donation.</p>
-
-<img id="paymentQr" alt="TYCF Foundation UPI payment QR">
-
-<p id="qrMsg" role="status">Loading payment QR...</p>
-
-<div class="payment-note">
-<strong>Important:</strong>
-<p>Please verify the recipient name shown in your UPI app before making payment. Your booking will be confirmed only after the TYCF team verifies the payment.</p>
-</div>
+<img id="paymentQr" alt="TYCF Payment QR">
+<p id="qrMsg">Loading payment QR...</p>
+<p>Please verify the recipient name in your UPI app.</p>
 </div>
 </section>
 
 <footer>
-<h3>TYCF Foundation</h3>
-<p>Food Donation • Sharing Happiness</p>
+<h3>TYCF FOUNDATION</h3>
+<p>TYCF FOOD DONATION</p>
 <a href="https://www.instagram.com/tycf_foundation/">TYCF Foundation Instagram</a>
 <br><br>
 <a href="https://www.instagram.com/tycf_fooddonation/">TYCF Food Donation Instagram</a>
 </footer>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import {createClient} from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(
-  'https://mswgamusywvqxscfcyff.supabase.co',
-  'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
+const supabase=createClient(
+'https://mswgamusywvqxscfcyff.supabase.co',
+'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
 );
 
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-let prices = {
-  'Veg Meals':1500,
-  'Egg Meals':1800,
-  'Chicken Meals':2500,
-  'Cake Celebration':1500
+let prices={
+'Veg Meals':1500,
+'Egg Meals':1800,
+'Chicken Meals':2500,
+'Cake Celebration':1500
 };
 
-const format = n => '₹' + Number(n).toLocaleString('en-IN');
+const format=n=>'₹'+Number(n).toLocaleString('en-IN');
 
 async function loadPrices(){
-  const {data,error} = await supabase.rpc('get_tycf_public_prices');
+const {data,error}=await supabase.rpc('get_tycf_public_prices');
+if(error||!data?.length)return;
 
-  if(error || !data || !data.length) return;
+const p=data[0];
 
-  const p = data[0];
+prices={
+'Veg Meals':p.veg_price,
+'Egg Meals':p.egg_price,
+'Chicken Meals':p.chicken_price,
+'Cake Celebration':p.cake_price
+};
 
-  prices = {
-    'Veg Meals':p.veg_price,
-    'Egg Meals':p.egg_price,
-    'Chicken Meals':p.chicken_price,
-    'Cake Celebration':p.cake_price
-  };
-
-  $('vegPrice').textContent = format(p.veg_price);
-  $('eggPrice').textContent = format(p.egg_price);
-  $('chickenPrice').textContent = format(p.chicken_price);
-  $('cakePrice').textContent = format(p.cake_price);
+$('vegPrice').textContent=format(p.veg_price);
+$('eggPrice').textContent=format(p.egg_price);
+$('chickenPrice').textContent=format(p.chicken_price);
+$('cakePrice').textContent=format(p.cake_price);
 }
 
-/* LOAD THE LATEST QR UPLOADED FROM ADMIN DASHBOARD */
-
 async function loadPaymentQr(){
-  const qrImage = $('paymentQr');
-  const qrMessage = $('qrMsg');
+const {data}=supabase.storage
+.from('tycf-payment-qr')
+.getPublicUrl('current/payment-qr');
 
-  const {data} = supabase.storage
-    .from('tycf-payment-qr')
-    .getPublicUrl('current/payment-qr');
+const img=$('paymentQr');
 
-  qrImage.onload = () => {
-    qrImage.style.display = 'block';
-    qrMessage.textContent = 'Scan this QR using your UPI app.';
-  };
+img.onload=()=>{
+img.style.display='block';
+$('qrMsg').textContent='Scan this QR using your UPI app.';
+};
 
-  qrImage.onerror = () => {
-    qrImage.style.display = 'none';
-    qrMessage.textContent = 'Payment QR is temporarily unavailable. Please contact TYCF Foundation.';
-  };
+img.onerror=()=>{
+$('qrMsg').textContent='Payment QR unavailable. Contact TYCF Foundation.';
+};
 
-  qrImage.src = data.publicUrl + '?v=' + Date.now();
+img.src=data.publicUrl+'?v='+Date.now();
 }
 
 loadPrices();
 loadPaymentQr();
 
-$('bookingForm').addEventListener('submit',async e=>{
-  e.preventDefault();
+/* PHOTO EDITOR */
 
-  const msg = $('formMsg');
-  const btn = $('submitBtn');
+let stickerImage=null;
+let objectUrl=null;
+let zoom=1;
+let offsetX=0;
+let offsetY=0;
+let drag=null;
 
-  btn.disabled = true;
-  msg.textContent = 'Submitting your request…';
+const W=1200;
+const H=675;
+const PHOTO_W=455;
+const FOOTER_H=68;
 
-  try{
-    const name = $('customerName').value.trim();
-    const mobile = $('mobile').value.replace(/\s+/g,'');
-    const pack = $('package').value;
-    const date = $('donationDate').value;
-    const file = $('stickerPhoto').files[0];
+function drawDesign(){
 
-    if(!/^\+?[0-9]{10,15}$/.test(mobile)){
-      throw new Error('Please enter a valid mobile number.');
-    }
+if(!stickerImage)return;
 
-    if(date < new Date().toISOString().slice(0,10)){
-      throw new Error('Please choose today or a future donation date.');
-    }
+const canvas=$('designCanvas');
+const ctx=canvas.getContext('2d');
 
-    let photoPath = null;
+ctx.clearRect(0,0,W,H);
 
-    if(file){
-      if(file.size > 5*1024*1024){
-        throw new Error('Photo must be 5 MB or smaller.');
-      }
+ctx.fillStyle='#fff';
+ctx.fillRect(0,0,W,H);
 
-      if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
-        throw new Error('Please choose a JPG, PNG or WebP photo.');
-      }
+const boxH=H-FOOTER_H;
 
-      const ext = file.type === 'image/png' ? 'png' :
-                  file.type === 'image/webp' ? 'webp' : 'jpg';
+const scale=Math.max(
+PHOTO_W/stickerImage.width,
+boxH/stickerImage.height
+)*zoom;
 
-      photoPath = 'incoming/' + crypto.randomUUID() + '.' + ext;
+const dw=stickerImage.width*scale;
+const dh=stickerImage.height*scale;
 
-      const {error:uploadError} = await supabase
-        .storage
-        .from('tycf-sticker-photos')
-        .upload(photoPath,file,{
-          contentType:file.type,
-          upsert:false
-        });
+const cx=PHOTO_W/2+offsetX;
+const cy=boxH/2+offsetY;
 
-      if(uploadError){
-        throw new Error('Photo upload failed: ' + uploadError.message);
-      }
-    }
+ctx.save();
+ctx.beginPath();
+ctx.rect(0,0,PHOTO_W,boxH);
+ctx.clip();
 
-    const row = {
-      customer_name:name,
-      customer_mobile:mobile,
-      occasion:$('occasion').value,
-      package_name:pack,
-      package_price:Number(prices[pack]),
-      donation_date:date,
-      sticker_name:$('stickerName').value.trim(),
-      customer_message:$('customerMessage').value.trim(),
-      sticker_photo_path:photoPath,
-      consent:$('consent').checked
-    };
+ctx.drawImage(
+stickerImage,
+cx-dw/2,
+cy-dh/2,
+dw,
+dh
+);
 
-    const {error} = await supabase
-      .from('tycf_orders')
-      .insert(row);
+ctx.restore();
 
-    if(error) throw new Error(error.message);
+/* DESIGN AREA */
 
-    $('bookingForm').reset();
+ctx.fillStyle='#fff8e8';
+ctx.fillRect(PHOTO_W,0,W-PHOTO_W,boxH);
 
-    msg.textContent =
-      'Thank you! Your donation request has been received. The TYCF team will contact you to confirm it. This message is not a payment confirmation.';
+ctx.textAlign='center';
 
-  }catch(err){
-    msg.textContent = 'Could not submit: ' + err.message;
-  }finally{
-    btn.disabled = false;
-  }
+ctx.fillStyle='#075b3c';
+ctx.font='bold 62px Georgia';
+ctx.fillText('Happy Birthday',825,130);
+
+ctx.fillStyle='#d49a00';
+ctx.font='bold 38px Georgia';
+ctx.fillText('SPECIAL CELEBRATION',825,205);
+
+ctx.strokeStyle='#d49a00';
+ctx.lineWidth=4;
+ctx.strokeRect(560,240,530,125);
+
+ctx.fillStyle='#e52d48';
+ctx.font='bold 65px Georgia';
+
+const name=$('stickerName').value.trim()||'YOUR NAME';
+
+ctx.fillText(name.slice(0,18),825,320,500);
+
+ctx.fillStyle='#7651a1';
+ctx.font='35px Georgia';
+ctx.fillText('Best Wishes From',825,450);
+
+ctx.fillStyle='#075b3c';
+ctx.font='bold 46px Arial';
+
+const from=$('bestWishesFrom').value.trim()||'TYCF';
+ctx.fillText(from.slice(0,18),825,510,500);
+
+/* FIXED FOOTER */
+
+ctx.fillStyle='#075b20';
+ctx.fillRect(0,H-FOOTER_H,W,FOOTER_H);
+
+ctx.fillStyle='#fff';
+ctx.font='bold 43px Arial';
+ctx.fillText('TYCF FOOD DONATION',W/2,H-20);
+}
+
+$('stickerPhoto').addEventListener('change',()=>{
+
+const file=$('stickerPhoto').files[0];
+
+if(objectUrl)URL.revokeObjectURL(objectUrl);
+
+stickerImage=null;
+zoom=1;
+offsetX=0;
+offsetY=0;
+$('photoZoom').value=1;
+
+if(!file){
+$('photoEditor').hidden=true;
+return;
+}
+
+if(file.size>5*1024*1024){
+alert('Photo must be 5 MB or smaller.');
+$('stickerPhoto').value='';
+return;
+}
+
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+alert('Choose JPG, PNG or WebP photo.');
+$('stickerPhoto').value='';
+return;
+}
+
+objectUrl=URL.createObjectURL(file);
+
+const img=new Image();
+
+img.onload=()=>{
+stickerImage=img;
+$('photoEditor').hidden=false;
+drawDesign();
+};
+
+img.onerror=()=>{
+alert('Unable to open this photo.');
+};
+
+img.src=objectUrl;
 });
-</script>
 
+$('photoZoom').addEventListener('input',e=>{
+zoom=Number(e.target.value);
+drawDesign();
+});
+
+$('stickerName').addEventListener('input',drawDesign);
+$('bestWishesFrom').addEventListener('input',drawDesign);
+
+/* DRAG PHOTO */
+
+$('designCanvas').addEventListener('pointerdown',e=>{
+
+if(!stickerImage)return;
+
+const r=e.currentTarget.getBoundingClientRect();
+
+drag={
+x:e.clientX,
+y:e.clientY,
+ox:offsetX,
+oy:offsetY,
+sx:W/r.width,
+sy:H/r.height
+};
+
+e.currentTarget.setPointerCapture(e.pointerId);
+});
+
+$('designCanvas').addEventListener('pointermove',e=>{
+
+if(!drag)return;
+
+offsetX=drag.ox+(e.clientX-drag.x)*drag.sx;
+offsetY=drag.oy+(e.clientY-drag.y)*drag.sy;
+
+drawDesign();
+});
+
+$('designCanvas').addEventListener('pointerup',()=>drag=null);
+$('designCanvas').addEventListener('pointercancel',()=>drag=null);
+
+async function makeDesignBlob(){
+
+if(!stickerImage)return null;
+
+drawDesign();
+
+return await new Promise(resolve=>{
+$('designCanvas').toBlob(resolve,'image/png');
+});
+}
+
+/* SUBMIT BOOKING */
+
+$('bookingForm').addEventListener('submit',async e=>{
+
+e.preventDefault();
+
+const btn=$('submitBtn');
+const msg=$('formMsg');
+
+btn.disabled=true;
+msg.textContent='Submitting your booking...';
+
+let photoPath=null;
+let designPath=null;
+
+try{
+
+const name=$('customerName').value.trim();
+const mobile=$('mobile').value.replace(/\s+/g,'');
+const pack=$('package').value;
+const date=$('donationDate').value;
+const file=$('stickerPhoto').files[0];
+
+if(!/^\+?[0-9]{10,15}$/.test(mobile)){
+throw new Error('Enter a valid mobile number.');
+}
+
+if(date<new Date().toISOString().slice(0,10)){
+throw new Error('Choose today or a future donation date.');
+}
+
+if(file){
+
+const originalPath='incoming/'+crypto.randomUUID()+'.'+
+(file.type==='image/png'?'png':
+file.type==='image/webp'?'webp':'jpg');
+
+const {error:uploadError}=await supabase.storage
+.from('tycf-sticker-photos')
+.upload(originalPath,file,{
+contentType:file.type,
+upsert:false
+});
+
+if(uploadError)throw uploadError;
+
+photoPath=originalPath;
+
+const blob=await makeDesignBlob();
+
+if(!blob)throw new Error('Design creation failed.');
+
+const finalPath='designs/'+crypto.randomUUID()+'.png';
+
+const {error:designError}=await supabase.storage
+.from('tycf-sticker-photos')
+.upload(finalPath,blob,{
+contentType:'image/png',
+upsert:false
+});
+
+if(designError)throw designError;
+
+designPath=finalPath;
+}
+
+const row={
+
+customer_name:name,
+customer_mobile:mobile,
+occasion:$('occasion').value,
+package_name:pack,
+package_price:Number(prices[pack]),
+donation_date:date,
+sticker_name:$('stickerName').value.trim(),
+customer_message:$('customerMessage').value.trim(),
+sticker_photo_path:photoPath,
+sticker_design_path:designPath,
+consent:$('consent').checked
+
+};
+
+const {error}=await supabase
+.from('tycf_orders')
+.insert(row);
+
+if(error)throw error;
+
+$('bookingForm').reset();
+$('photoEditor').hidden=true;
+
+stickerImage=null;
+
+msg.textContent=
+'Thank you! Your donation booking has been received. TYCF team will contact you.';
+
+}catch(err){
+
+msg.textContent='Could not submit: '+err.message;
+
+}finally{
+
+btn.disabled=false;
+
+}
+
+});
+
+</script>
 </body>
 </html>
