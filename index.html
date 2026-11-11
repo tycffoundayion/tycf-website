@@ -1,203 +1,688 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075b3c">
+<meta name="description" content="Celebrate special occasions by donating food through Telangana Yuva Chaithanya Foundation.">
+<title>TYCF Food Donation</title>
+<link rel="manifest" href="/manifest.webmanifest">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lobster&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f8fbf7;color:#173c2d}
+header{background:#075b3c;color:#fff;padding:22px;text-align:center}
+header h1{margin:0;font-size:27px}
+header img{width:150px;display:block;margin:0 auto 12px}
+nav{background:#06452f;padding:13px;text-align:center}
+nav a{color:#fff;margin:10px;text-decoration:none}
+.hero{padding:45px 20px;text-align:center;background:#e2f2e5}
+button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;cursor:pointer;text-decoration:none}
+button:disabled{opacity:.6;cursor:not-allowed}
+section{padding:30px 15px;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
+.card{background:#fff;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
+.price{font-size:27px;color:#08734f;font-weight:bold}
+form{max-width:650px;margin:auto;background:#fff;padding:22px;border-radius:12px}
+input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #bbb;border-radius:6px}
+label{text-align:left;display:block;font-weight:bold}
+.consent{display:flex;gap:10px;text-align:left;align-items:flex-start;font-weight:normal}
+.consent input{width:auto;margin-top:3px}
+footer{background:#06452f;color:#fff;text-align:center;padding:25px}
+footer a{color:#ffda83}
+#formMsg{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.payment-card{max-width:550px;margin:auto;background:#fff;padding:22px;border-radius:12px}
+#paymentQr{display:none;width:280px;height:280px;margin:15px auto;background:#fff}
+.qty-card{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;margin:10px 0;padding:14px;background:#f6faf6;border:1px solid #dce9df;border-radius:10px}
+.qty-info{flex:1}
+.qty-info strong{display:block}
+.qty-info small{color:#627568}
+.qty-controls{display:flex;align-items:center;gap:10px}
+.qty-controls button{padding:8px 13px;min-width:38px}
+.qty-number{font-weight:bold;min-width:20px;text-align:center}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:15px;background:#eaf5ec;border-radius:9px;font-size:20px;font-weight:bold;margin:15px 0}
+.editor{max-width:550px;margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px}
+.editor canvas{width:100%;height:auto;border:1px solid #ccc;background:#fff;touch-action:none}
+.editor input[type=range]{padding:0}
+.editor-note,.font-samples{font-size:13px;color:#526b5d}
+.replace-btn{background:#075b3c;color:#fff;width:100%;margin:5px 0 10px}
+@media(max-width:600px){
+nav a{display:inline-block;margin:7px;font-size:14px}
+.qty-card{align-items:flex-start}
+.qty-controls{gap:6px}
+}
+</style>
+</head>
+
+<body>
+<header>
+<img src="tycf-logo-cropped-1.png" alt="TYCF Logo">
+<h1>TYCF FOOD DONATION</h1>
+<p>Telangana Yuva Chaithanya Foundation</p>
+</header>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#packages">Packages</a>
+<a href="#booking">Book Donation</a>
+<a href="#payment">UPI Payment</a>
+<a href="admin.html">Admin Login</a>
+</nav>
+
+<div class="hero" id="home">
+<h2>Celebrate by Sharing Food ❤️</h2>
+<p>Make your Birthday and Anniversary special by donating food.</p>
+<a class="btn" href="#booking">Donate Now</a>
+</div>
+
+<section id="packages">
+<h2>Donation Packages</h2>
+<div class="cards">
+<div class="card">
+<h3>🍛 Veg Meals</h3>
+<div class="price" id="vegPrice">₹1,500</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+<div class="card">
+<h3>🥚 Egg Meals</h3>
+<div class="price" id="eggPrice">₹1,800</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+<div class="card">
+<h3>🍗 Chicken Meals</h3>
+<div class="price" id="chickenPrice">₹2,500</div>
+<p>25 People</p>
+<p>Photo Sticker + Water Bottle</p>
+</div>
+<div class="card">
+<h3>🎂 Cake Celebration</h3>
+<div class="price" id="cakePrice">₹1,500</div>
+<p>Cake Cutting + Egg Puffs</p>
+<p>Children's Celebration</p>
+</div>
+</div>
+</section>
+
+<section id="booking">
+<h2>Donation Booking</h2>
+<form id="bookingForm">
+
+<label for="customerName">Your Name</label>
+<input id="customerName" required maxlength="100" autocomplete="name">
+
+<label for="mobile">Mobile Number</label>
+<input id="mobile" required type="tel" minlength="10" maxlength="15" autocomplete="tel">
+
+<label for="occasion">Occasion</label>
+<select id="occasion">
+<option>Birthday</option>
+<option>Anniversary</option>
+<option>Other</option>
+</select>
+
+<label>Select Donation Packages (choose one or more)</label>
+
+<div class="qty-card">
+<div class="qty-info"><strong>🍛 Veg Meals</strong><small id="vegUnit">₹1,500 · 25 People</small></div>
+<div class="qty-controls">
+<button type="button" data-package="veg" data-step="-1">−</button>
+<span class="qty-number" id="qtyVeg">0</span>
+<button type="button" data-package="veg" data-step="1">+</button>
+</div>
+</div>
+
+<div class="qty-card">
+<div class="qty-info"><strong>🥚 Egg Meals</strong><small id="eggUnit">₹1,800 · 25 People</small></div>
+<div class="qty-controls">
+<button type="button" data-package="egg" data-step="-1">−</button>
+<span class="qty-number" id="qtyEgg">0</span>
+<button type="button" data-package="egg" data-step="1">+</button>
+</div>
+</div>
+
+<div class="qty-card">
+<div class="qty-info"><strong>🍗 Chicken Meals</strong><small id="chickenUnit">₹2,500 · 25 People</small></div>
+<div class="qty-controls">
+<button type="button" data-package="chicken" data-step="-1">−</button>
+<span class="qty-number" id="qtyChicken">0</span>
+<button type="button" data-package="chicken" data-step="1">+</button>
+</div>
+</div>
+
+<div class="qty-card">
+<div class="qty-info"><strong>🎂 Cake Celebration</strong><small id="cakeUnit">₹1,500 · Cake Cutting + Egg Puffs</small></div>
+<div class="qty-controls">
+<button type="button" data-package="cake" data-step="-1">−</button>
+<span class="qty-number" id="qtyCake">0</span>
+<button type="button" data-package="cake" data-step="1">+</button>
+</div>
+</div>
+
+<div class="total-row">
+<span>Total Donation</span>
+<span id="totalAmount">₹0</span>
+</div>
+
+<label for="donationDate">Donation Date</label>
+<input id="donationDate" type="date" required>
+
+<label for="stickerPhoto">Upload Your Photo (optional)</label>
+<input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+
+<button type="button" id="replacePhotoBtn" class="replace-btn" hidden>🔄 Replace Photo</button>
+<p id="selectedPhotoName" class="editor-note" aria-live="polite"></p>
+
+<label for="stickerName">Name on Design</label>
+<input id="stickerName" maxlength="100" placeholder="Birthday person name">
+
+<label for="bestWishesFrom">Best Wishes From</label>
+<input id="bestWishesFrom" maxlength="80" placeholder="Enter your name">
+
+<label for="birthdayFont">Happy Birthday Font Style</label>
+<select id="birthdayFont">
+<option value="Dancing Script">Style 1 - Elegant Script</option>
+<option value="Lobster">Style 2 - Bold Stylish</option>
+<option value="Playfair Display">Style 3 - Classic</option>
+<option value="Pacifico">Style 4 - Creative</option>
+</select>
+
+<p class="font-samples">Select a font and see your design preview below.</p>
+
+<div class="editor" id="photoEditor" hidden>
+<h3>Customize Your Photo</h3>
+<p class="editor-note">Drag the photo to move it. Use Zoom to adjust the photo.</p>
+<canvas id="designCanvas" width="1200" height="675"></canvas>
+<label for="photoZoom">Photo Zoom</label>
+<input id="photoZoom" type="range" min="1" max="2.5" step="0.01" value="1">
+<p><strong>Final Design Preview</strong></p>
+<p class="editor-note">TYCF Footer, logo and contact details are fixed.</p>
+</div>
+
+<label for="customerMessage">Message</label>
+<textarea id="customerMessage" maxlength="500"></textarea>
+
+<label class="consent">
+<input id="consent" type="checkbox" required>
+<span>I agree that TYCF Foundation may use these details to process this donation booking.</span>
+</label>
+
+<button id="submitBtn" type="submit">Submit Donation Request</button>
+<p id="formMsg" role="status" aria-live="polite"></p>
+</form>
+</section>
+
+<section id="payment">
+<h2>UPI Donation Payment</h2>
+<div class="payment-card">
+<p>Thank you for supporting TYCF Food Donation.</p>
+<div id="paymentQr"></div>
+<p id="qrMsg">Your payment QR will appear here after your booking is submitted.</p>
+<p id="paymentAmount"></p>
+<p id="paymentReference">UPI ID: 9177681777-2@ybl</p>
+<p>Please verify the recipient name and amount in your UPI app before paying. Payment is verified separately by TYCF.</p>
+</div>
+</section>
+
+<footer>
+<h3>TYCF FOUNDATION</h3>
+<p>TYCF FOOD DONATION</p>
+<a href="https://www.instagram.com/tycf_foundation/">TYCF Foundation Instagram</a>
+<br><br>
+<a href="https://www.instagram.com/tycf_fooddonation/">TYCF Food Donation Instagram</a>
+</footer>
+
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const supabase=createClient(
+'https://mswgamusywvqxscfcyff.supabase.co',
+'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
+);
+
+const $=id=>document.getElementById(id);
+const UPI_ID='9177681777-2@ybl';
+const format=n=>'₹'+Number(n).toLocaleString('en-IN');
+
+const packs={
+veg:{name:'Veg Meals',price:1500,qty:0,priceId:'vegPrice',unitId:'vegUnit',qtyId:'qtyVeg'},
+egg:{name:'Egg Meals',price:1800,qty:0,priceId:'eggPrice',unitId:'eggUnit',qtyId:'qtyEgg'},
+chicken:{name:'Chicken Meals',price:2500,qty:0,priceId:'chickenPrice',unitId:'chickenUnit',qtyId:'qtyChicken'},
+cake:{name:'Cake Celebration',price:1500,qty:0,priceId:'cakePrice',unitId:'cakeUnit',qtyId:'qtyCake'}
+};
+
+let stickerImage=null,objectUrl=null,zoom=1,offsetX=0,offsetY=0,drag=null;
+const canvas=$('designCanvas');
+const W=1200,H=675,PHOTO_W=455,FOOTER_H=130;
+
+function calculateTotal(){
+const items=[];
+let total=0;
+for(const p of Object.values(packs)){
+if(p.qty>0){
+const line_total=p.price*p.qty;
+items.push({name:p.name,quantity:p.qty,unit_price:p.price,line_total});
+total+=line_total;
+}
+}
+return{items,total};
+}
+
+function updatePackagePrices(){
+for(const p of Object.values(packs)){
+$(p.priceId).textContent=format(p.price);
+$(p.unitId).textContent=format(p.price)+(p.name==='Cake Celebration'?' · Cake Cutting + Egg Puffs':' · 25 People');
+$(p.qtyId).textContent=p.qty;
+}
+$('totalAmount').textContent=format(calculateTotal().total);
+}
+
+document.querySelectorAll('[data-package]').forEach(b=>{
+b.addEventListener('click',()=>{
+const p=packs[b.dataset.package];
+p.qty=Math.max(0,Math.min(100,p.qty+Number(b.dataset.step)));
+updatePackagePrices();
+});
+});
+
+async function loadPrices(){
+try{
+const {data,error}=await supabase.rpc('get_tycf_public_prices');
+if(error)throw error;
+const p=Array.isArray(data)?data[0]:data;
+if(!p)return;
+for(const [k,v] of Object.entries({
+veg:p.veg_price,egg:p.egg_price,chicken:p.chicken_price,cake:p.cake_price
+})){
+if(v!==null&&v!==undefined&&Number.isFinite(Number(v))&&Number(v)>=0){
+packs[k].price=Number(v);
+}
+}
+updatePackagePrices();
+}catch(e){
+console.warn('Using default prices:',e.message||e);
+}
+}
+
+/* PHOTO EDITOR */
+const logoImage=new Image();
+let logoLoaded=false;
+logoImage.onload=()=>{logoLoaded=true;drawDesign();};
+logoImage.src='tycf-logo-cropped-1.png';
+
+const fonts={
+'Dancing Script':{font:'Dancing Script',size:82,color:'#075b3c'},
+Lobster:{font:'Lobster',size:76,color:'#075b3c'},
+'Playfair Display':{font:'Playfair Display',size:68,color:'#075b3c'},
+Pacifico:{font:'Pacifico',size:72,color:'#075b3c'}
+};
+
+function drawDesign(){
+if(!stickerImage)return;
+const c=canvas.getContext('2d');
+c.clearRect(0,0,W,H);
+c.fillStyle='#fffaf0';
+c.fillRect(0,0,W,H);
+const bh=H-FOOTER_H;
+const s=Math.max(PHOTO_W/stickerImage.width,bh/stickerImage.height)*zoom;
+const dw=stickerImage.width*s,dh=stickerImage.height*s;
+const cx=PHOTO_W/2+offsetX,cy=bh/2+offsetY;
+
+c.save();
+c.beginPath();
+c.rect(0,0,PHOTO_W,bh);
+c.clip();
+c.drawImage(stickerImage,cx-dw/2,cy-dh/2,dw,dh);
+c.restore();
+
+c.fillStyle='#fffaf0';
+c.fillRect(PHOTO_W,0,W-PHOTO_W,bh);
+c.textAlign='center';
+const f=fonts[$('birthdayFont').value];
+c.fillStyle=f.color;
+c.font=`bold ${f.size}px "${f.font}"`;
+c.fillText('Happy Birthday',825,145,710);
+
+c.strokeStyle='#d49a00';
+c.lineWidth=5;
+c.beginPath();
+c.moveTo(590,175);
+c.quadraticCurveTo(825,205,1060,175);
+c.stroke();
+
+c.lineWidth=4;
+c.strokeRect(560,225,530,125);
+c.fillStyle='#e52d48';
+c.font='bold 65px Georgia';
+c.fillText(($('stickerName').value.trim()||'YOUR NAME').slice(0,18),825,310,500);
+c.fillStyle='#8b36a5';
+c.font='bold 35px Georgia';
+c.fillText('Best Wishes From',825,425);
+c.fillStyle='#075b3c';
+c.font='bold 46px Arial';
+c.fillText(($('bestWishesFrom').value.trim()||'YOUR NAME').slice(0,18),825,485,500);
+
+c.fillStyle='#fff';
+c.fillRect(0,H-FOOTER_H,W,FOOTER_H);
+c.strokeStyle='#075b3c';
+c.lineWidth=5;
+c.strokeRect(3,H-FOOTER_H+3,W-6,FOOTER_H-6);
+if(logoLoaded)c.drawImage(logoImage,15,H-FOOTER_H+12,105,105);
+
+c.strokeStyle='#08733f';
+c.lineWidth=3;
+c.beginPath();
+c.moveTo(135,H-FOOTER_H+12);
+c.lineTo(135,H-12);
+c.moveTo(900,H-FOOTER_H+12);
+c.lineTo(900,H-12);
+c.stroke();
+
+c.textAlign='center';
+c.fillStyle='#075b3c';
+c.font='bold 43px Arial';
+c.fillText('TYCF FOOD DONATION',515,H-78,745);
+c.textAlign='left';
+c.fillStyle='#222';
+c.font='bold 19px Arial';
+c.fillText('www.tycf-food-donation.pages.dev',155,H-42,400);
+c.fillText('@tycf_fooddonation',575,H-42,300);
+c.textAlign='right';
+c.fillStyle='#111';
+c.font='bold 27px Arial';
+c.fillText('8340834108',1170,H-73);
+c.fillText('8340834107',1170,H-28);
+}
+
+$('replacePhotoBtn').addEventListener('click',()=>$('stickerPhoto').click());
+
+$('stickerPhoto').addEventListener('change',()=>{
+const file=$('stickerPhoto').files[0];
+if(!file)return;
+if(file.size>5*1024*1024){
+alert('Photo must be 5 MB or smaller.');
+$('stickerPhoto').value='';
+return;
+}
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+alert('Choose JPG, PNG or WebP photo.');
+$('stickerPhoto').value='';
+return;
+}
+const url=URL.createObjectURL(file);
+const img=new Image();
+img.onload=()=>{
+if(objectUrl)URL.revokeObjectURL(objectUrl);
+objectUrl=url;
+stickerImage=img;
+zoom=1;
+offsetX=0;
+offsetY=0;
+$('photoZoom').value=1;
+$('photoEditor').hidden=false;
+$('replacePhotoBtn').hidden=false;
+$('selectedPhotoName').textContent='Selected Photo: '+file.name;
+drawDesign();
+};
+img.onerror=()=>{
+URL.revokeObjectURL(url);
+alert('Unable to open this photo.');
+$('stickerPhoto').value='';
+};
+img.src=url;
+});
+
+$('birthdayFont').addEventListener('change',async()=>{
+const f=fonts[$('birthdayFont').value];
+try{await document.fonts.load(`bold ${f.size}px "${f.font}"`);}
+catch(e){console.warn(e);}
+drawDesign();
+});
+
+$('photoZoom').addEventListener('input',e=>{
+zoom=Number(e.target.value);
+drawDesign();
+});
+$('stickerName').addEventListener('input',drawDesign);
+$('bestWishesFrom').addEventListener('input',drawDesign);
+
+/* DRAG PHOTO */
+canvas.addEventListener('pointerdown',e=>{
+if(!stickerImage)return;
+const r=canvas.getBoundingClientRect();
+drag={
+x:e.clientX,y:e.clientY,ox:offsetX,oy:offsetY,
+sx:W/r.width,sy:H/r.height
+};
+canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+if(!drag)return;
+offsetX=drag.ox+(e.clientX-drag.x)*drag.sx;
+offsetY=drag.oy+(e.clientY-drag.y)*drag.sy;
+drawDesign();
+});
+canvas.addEventListener('pointerup',()=>drag=null);
+canvas.addEventListener('pointercancel',()=>drag=null);
+
 /* CANVAS TO IMAGE FILE */
-function canvasToBlob(canvas){
-  return new Promise((resolve,reject)=>{
-    canvas.toBlob(blob=>{
-      if(blob) resolve(blob);
-      else reject(new Error('Could not create sticker design image.'));
-    },'image/jpeg',0.92);
-  });
+function canvasToBlob(c){
+return new Promise((resolve,reject)=>{
+c.toBlob(b=>{
+if(b)resolve(b);
+else reject(new Error('Could not create sticker design image.'));
+},'image/jpeg',0.92);
+});
 }
 
 /* UPLOAD PHOTO */
 async function uploadSticker(file,prefix){
-  const extension=file.type==='image/png'?'png':
-    file.type==='image/webp'?'webp':'jpg';
-
-  const path=`${prefix}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-
-  const {error}=await supabase.storage
-    .from('tycf-sticker-photos')
-    .upload(path,file,{contentType:file.type,upsert:false});
-
-  if(error) throw error;
-  return path;
+const ext=file.type==='image/png'?'png':
+file.type==='image/webp'?'webp':'jpg';
+const path=`${prefix}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+const {error}=await supabase.storage
+.from('tycf-sticker-photos')
+.upload(path,file,{contentType:file.type,upsert:false});
+if(error)throw error;
+return path;
 }
 
 /* UPI QR */
 function showPaymentQR(amount){
-  const qrBox=$('paymentQr');
-  qrBox.innerHTML='';
-  qrBox.style.display='block';
-
-  const upiLink=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent('TYCF Food Donation')}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Food Donation')}`;
-
-  if(typeof QRCode==='undefined'){
-    $('qrMsg').textContent='QR library could not load.';
-    return;
-  }
-
-  new QRCode(qrBox,{
-    text:upiLink,
-    width:280,
-    height:280,
-    correctLevel:QRCode.CorrectLevel.H
-  });
-
-  $('qrMsg').textContent='Scan this QR using your UPI app. Verify recipient before paying.';
-  $('paymentAmount').textContent='Donation Amount: '+format(amount);
-  $('paymentReference').textContent='UPI ID: '+UPI_ID;
+const box=$('paymentQr');
+box.innerHTML='';
+box.style.display='block';
+const uri=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Food Donation')}`;
+if(typeof QRCode==='undefined'){
+$('qrMsg').textContent='QR library could not load. Contact TYCF Foundation for payment details.';
+return;
+}
+new QRCode(box,{
+text:uri,width:280,height:280,
+correctLevel:QRCode.CorrectLevel.H
+});
+$('qrMsg').textContent='Scan this QR using your UPI app. Verify recipient and amount before paying.';
+$('paymentAmount').textContent='Donation Amount: '+format(amount);
+$('paymentReference').textContent='UPI ID: '+UPI_ID;
 }
 
 /* BOOKING SUBMISSION */
 $('bookingForm').addEventListener('submit',async e=>{
-  e.preventDefault();
+e.preventDefault();
+const btn=$('submitBtn');
+const msg=$('formMsg');
+const {items,total}=calculateTotal();
+msg.textContent='';
 
-  const button=$('submitBtn');
-  const message=$('formMsg');
-  const {items,total}=calculateTotal();
-
-  message.textContent='';
-
-  if(!items.length){
-    message.textContent='Please select at least one package.';
-    return;
-  }
-
-  const customerName=$('customerName').value.trim();
-  const mobile=$('mobile').value.trim();
-  const donationDate=$('donationDate').value;
-
-  if(!/^[0-9+\-\s]{10,15}$/.test(mobile)){
-    message.textContent='Please enter a valid mobile number.';
-    return;
-  }
-
-  if(!donationDate){
-    message.textContent='Please select donation date.';
-    return;
-  }
-
-  if(!$('consent').checked){
-    message.textContent='Please accept the consent checkbox.';
-    return;
-  }
-
-  button.disabled=true;
-  button.textContent='Submitting...';
-
-  try{
-    let photoPath=null;
-    let designPath=null;
-
-    const photoFile=$('stickerPhoto').files[0];
-
-    if(photoFile){
-      photoPath=await uploadSticker(photoFile,'customer-photos');
-    }
-
-    if(stickerImage){
-      const blob=await canvasToBlob(canvas);
-      const designFile=new File(
-        [blob],
-        'tycf-sticker-design.jpg',
-        {type:'image/jpeg'}
-      );
-      designPath=await uploadSticker(designFile,'sticker-designs');
-    }
-
-    const packageNames=items
-      .map(item=>`${item.name} x ${item.quantity}`)
-      .join(', ');
-
-    const orderData={
-      customer_name:customerName,
-      customer_mobile:mobile,
-      occasion:$('occasion').value,
-      donation_date:donationDate,
-      package_name:packageNames,
-      package_price:total,
-      sticker_name:$('stickerName').value.trim(),
-      customer_message:[
-        $('customerMessage').value.trim(),
-        $('bestWishesFrom').value.trim()
-      ].filter(Boolean).join(' | '),
-      sticker_photo_path:photoPath,
-      sticker_design_path:designPath,
-      payment_status:'Pending',
-      status:'Received'
-    };
-
-    const {error}=await supabase
-      .from('tycf_orders')
-      .insert([orderData]);
-
-    if(error) throw error;
-
-    message.textContent='Booking submitted successfully! Please complete UPI payment.';
-    showPaymentQR(total);
-    $('payment').scrollIntoView({behavior:'smooth'});
-
-  }catch(error){
-    console.error('Booking error:',error);
-    message.textContent='Booking failed: '+(error.message||'Please try again.');
-  }finally{
-    button.disabled=false;
-    button.textContent='Submit Donation Request';
-  }
-});
-
-/* INITIAL SETUP */
-function setMinimumDate(){
-  const today=new Date();
-  const localDate=new Date(
-    today.getTime()-today.getTimezoneOffset()*60000
-  ).toISOString().split('T')[0];
-
-  $('donationDate').min=localDate;
+if(!items.length){
+msg.textContent='Please select at least one package.';
+return;
 }
 
+const name=$('customerName').value.trim();
+const mobile=$('mobile').value.trim();
+const date=$('donationDate').value;
+
+if(!/^[0-9+\-\s]{10,15}$/.test(mobile)){
+msg.textContent='Please enter a valid mobile number.';
+return;
+}
+if(!date){
+msg.textContent='Please select donation date.';
+return;
+}
+
+const today=new Date();
+today.setHours(0,0,0,0);
+if(new Date(date+'T00:00:00')<today){
+msg.textContent='Please select today or a future donation date.';
+return;
+}
+if(!$('consent').checked){
+msg.textContent='Please accept the consent checkbox.';
+return;
+}
+
+btn.disabled=true;
+btn.textContent='Submitting...';
+
+try{
+let photoPath=null;
+let designPath=null;
+const photo=$('stickerPhoto').files[0];
+
+if(photo){
+photoPath=await uploadSticker(photo,'customer-photos');
+if(stickerImage){
+const blob=await canvasToBlob(canvas);
+const design=new File([blob],'tycf-sticker-design.jpg',{type:'image/jpeg'});
+designPath=await uploadSticker(design,'sticker-designs');
+}
+}
+
+const packageNames=items.map(i=>`${i.name} x ${i.quantity}`).join(', ');
+const order={
+customer_name:name,
+customer_mobile:mobile,
+occasion:$('occasion').value,
+donation_date:date,
+package_name:packageNames,
+package_price:total,
+package_items:items,
+total_amount:total,
+sticker_name:$('stickerName').value.trim(),
+customer_message:[
+$('customerMessage').value.trim(),
+$('bestWishesFrom').value.trim()
+].filter(Boolean).join(' | '),
+sticker_photo_path:photoPath,
+sticker_design_path:designPath,
+payment_status:'Pending',
+consent:$('consent').checked
+};
+
+const {error}=await supabase.from('tycf_orders').insert([order]);
+if(error)throw error;
+
+msg.textContent='Booking submitted successfully! Please complete UPI payment.';
+showPaymentQR(total);
+$('payment').scrollIntoView({behavior:'smooth'});
+
+/* RESET FORM AFTER SUCCESS */
+$('bookingForm').reset();
+for(const p of Object.values(packs))p.qty=0;
+updatePackagePrices();
+$('photoEditor').hidden=true;
+$('replacePhotoBtn').hidden=true;
+$('selectedPhotoName').textContent='';
+stickerImage=null;
+
+if(objectUrl){
+URL.revokeObjectURL(objectUrl);
+objectUrl=null;
+}
+zoom=1;
+offsetX=0;
+offsetY=0;
+
+}catch(err){
+console.error('Booking error:',err);
+msg.textContent='Booking failed: '+(err.message||'Please try again.');
+}finally{
+btn.disabled=false;
+btn.textContent='Submit Donation Request';
+}
+});
+
+/* DATE VALIDATION */
+function setMinimumDate(){
+const d=new Date();
+const local=new Date(d.getTime()-d.getTimezoneOffset()*60000)
+.toISOString().split('T')[0];
+
+$('donationDate').min=local;
+}
+
+/* INITIAL SETUP */
 setMinimumDate();
 updatePackagePrices();
 loadPrices();
 
-/* INSTALL APP */
+/* PWA INSTALL */
 let deferredInstallPrompt=null;
 
-const installButton=$('installAppBtn');
-const installHelp=$('installAppHelp');
+const installButton=document.createElement('button');
+installButton.type='button';
+installButton.textContent='Install TYCF App';
+installButton.style.cssText='display:block;margin:10px auto;background:#e9ad36';
+
+const installHelp=document.createElement('p');
+installHelp.style.textAlign='center';
+
+document.querySelector('header').append(installButton,installHelp);
 
 window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();
-  deferredInstallPrompt=e;
+e.preventDefault();
+deferredInstallPrompt=e;
 });
 
 installButton.addEventListener('click',async()=>{
-  if(deferredInstallPrompt){
-    deferredInstallPrompt.prompt();
-    const result=await deferredInstallPrompt.userChoice;
-    installHelp.textContent=result.outcome==='accepted'
-      ?'TYCF app installation started.'
-      :'You can install the app later from your browser menu.';
-    deferredInstallPrompt=null;
-  }else{
-    installHelp.textContent='Open browser menu and select Add to Home screen or Install app.';
-  }
+if(deferredInstallPrompt){
+deferredInstallPrompt.prompt();
+const result=await deferredInstallPrompt.userChoice;
+
+installHelp.textContent=result.outcome==='accepted'
+?'TYCF app installation started.'
+:'You can install the app later from your browser menu.';
+
+deferredInstallPrompt=null;
+}else{
+installHelp.textContent='Open browser menu and select Add to Home screen or Install app.';
+}
 });
 
 window.addEventListener('appinstalled',()=>{
-  installHelp.textContent='TYCF app installed successfully.';
-  installButton.hidden=true;
+installHelp.textContent='TYCF app installed successfully.';
+installButton.hidden=true;
 });
 
 /* SERVICE WORKER */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(()=>console.log('Service Worker registered.'))
-      .catch(error=>console.error('Service Worker error:',error));
-  });
+window.addEventListener('load',()=>{
+navigator.serviceWorker.register('/sw.js')
+.then(()=>console.log('Service Worker registered.'))
+.catch(e=>console.error('Service Worker error:',e));
+});
 }
+
 </script>
 </body>
 </html>
