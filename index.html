@@ -14,7 +14,7 @@ nav a{color:white;margin:10px;text-decoration:none}
 .hero{padding:65px 20px;text-align:center;background:#e2f2e5}
 .hero h2{font-size:34px;color:#075b3c}
 .hero p{font-size:18px}
-button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;text-decoration:none}
+button,.btn{background:#e9ad36;color:#222;border:0;padding:13px 22px;border-radius:7px;font-weight:bold;text-decoration:none;cursor:pointer}
 section{padding:35px 18px;text-align:center}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;max-width:1000px;margin:auto}
 .card{background:white;padding:22px;border-radius:12px;box-shadow:0 2px 12px #0001}
@@ -22,85 +22,245 @@ section{padding:35px 18px;text-align:center}
 form{max-width:550px;margin:auto;background:white;padding:22px;border-radius:12px}
 input,select,textarea{width:100%;padding:12px;margin:8px 0 15px;border:1px solid #bbb;border-radius:6px}
 label{text-align:left;display:block;font-weight:bold}
+.consent{display:flex;gap:10px;text-align:left;align-items:flex-start;font-weight:normal}
+.consent input{width:auto;margin:3px 0}
 footer{background:#06452f;color:white;text-align:center;padding:25px}
 footer a{color:#ffda83}
+#formMsg{padding:10px;white-space:pre-wrap}
 </style>
 </head>
 <body>
-<header><img src="tycf-logo-cropped-1.png" alt="TYCF Official Logo" style="display:block;width:160px;max-width:55%;height:auto;margin:0 auto 12px;">
+
+<header>
+<img src="tycf-logo-cropped-1.png" alt="TYCF Official Logo" style="display:block;width:160px;max-width:55%;height:auto;margin:0 auto 12px;">
 <h1>TYCF FOOD DONATION</h1>
 <p>Telangana Yuva Chaithanya Foundation</p>
 </header>
+
 <nav>
 <a href="#home">Home</a>
 <a href="#packages">Packages</a>
 <a href="#booking">Book Donation</a>
 </nav>
+
 <div class="hero" id="home">
 <h2>Celebrate by Sharing Food ❤️</h2>
 <p>Make your Birthday and Anniversary special by donating food to people in need.</p>
 <a class="btn" href="#booking">Donate Now</a>
 </div>
+
 <section id="packages">
 <h2>Donation Packages</h2>
 <div class="cards">
 <div class="card">
 <h3>🍛 Veg Meals</h3>
-<div class="price">₹1,500</div>
+<div class="price" id="vegPrice">₹1,500</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
 <div class="card">
 <h3>🥚 Egg Meals</h3>
-<div class="price">₹1,800</div>
+<div class="price" id="eggPrice">₹1,800</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
 <div class="card">
 <h3>🍗 Chicken Meals</h3>
-<div class="price">₹2,500</div>
+<div class="price" id="chickenPrice">₹2,500</div>
 <p>25 People</p>
 <p>Photo Sticker + Water Bottle</p>
 </div>
 <div class="card">
 <h3>🎂 Cake Celebration</h3>
-<div class="price">₹1,500</div>
+<div class="price" id="cakePrice">₹1,500</div>
 <p>Cake Cutting + Egg Puffs</p>
 <p>Children's Celebration</p>
 </div>
 </div>
 </section>
+
 <section id="booking">
 <h2>Donation Booking</h2>
-<form onsubmit="event.preventDefault();alert('This is a demo form. Please contact the foundation to confirm your booking.');">
+
+<form id="bookingForm">
+
 <label>Your Name</label>
-<input required placeholder="Enter your name">
+<input id="customerName" required maxlength="100" placeholder="Enter your name">
+
 <label>Mobile Number</label>
-<input required type="tel" placeholder="Enter mobile number">
+<input id="mobile" required type="tel" minlength="10" maxlength="15" placeholder="Enter mobile number">
+
 <label>Occasion</label>
-<select><option>Birthday</option><option>Anniversary</option><option>Other</option></select>
-<label>Select Package</label>
-<select>
-<option>Veg Meals - ₹1500</option>
-<option>Egg Meals - ₹1800</option>
-<option>Chicken Meals - ₹2500</option>
-<option>Cake Celebration - ₹1500</option>
+<select id="occasion" required>
+<option value="Birthday">Birthday</option>
+<option value="Anniversary">Anniversary</option>
+<option value="Other">Other</option>
 </select>
-<label>Photo for Sticker</label>
-<input type="file" accept="image/*">
+
+<label>Select Package</label>
+<select id="package" required>
+<option value="Veg Meals">Veg Meals</option>
+<option value="Egg Meals">Egg Meals</option>
+<option value="Chicken Meals">Chicken Meals</option>
+<option value="Cake Celebration">Cake Celebration</option>
+</select>
+
+<label>Donation Date</label>
+<input id="donationDate" type="date" required>
+
+<label>Photo for Sticker (JPG/PNG/WebP, max 5 MB)</label>
+<input id="stickerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+
 <label>Name on Sticker</label>
-<input placeholder="Enter name">
+<input id="stickerName" maxlength="100" placeholder="Enter name">
+
 <label>Message</label>
-<textarea placeholder="Your message"></textarea>
-<button type="submit">Submit Request</button>
+<textarea id="customerMessage" maxlength="500" placeholder="Your message"></textarea>
+
+<label class="consent">
+<input id="consent" type="checkbox" required>
+<span>I agree that TYCF Foundation may use these details to process this donation booking and contact me about it.</span>
+</label>
+
+<button id="submitBtn" type="submit">Submit Donation Request</button>
+<p id="formMsg" role="status"></p>
+
 </form>
-<p>Note: This is a demo form. Online booking and payment are not connected yet.</p>
 </section>
+
 <footer>
 <h3>TYCF Foundation</h3>
 <p>Food Donation • Sharing Happiness</p>
-<a href="https://www.instagram.com/tycf_foundation/">TYCF Foundation Instagram</a><br><br>
+<a href="https://www.instagram.com/tycf_foundation/">TYCF Foundation Instagram</a>
+<br><br>
 <a href="https://www.instagram.com/tycf_fooddonation/">TYCF Food Donation Instagram</a>
 </footer>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+const supabase = createClient(
+  'https://mswgamusywvqxscfcyff.supabase.co',
+  'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
+);
+
+const $ = id => document.getElementById(id);
+
+let prices = {
+  'Veg Meals':1500,
+  'Egg Meals':1800,
+  'Chicken Meals':2500,
+  'Cake Celebration':1500
+};
+
+const format = n => '₹' + Number(n).toLocaleString('en-IN');
+
+async function loadPrices(){
+  const {data,error} = await supabase.rpc('get_tycf_public_prices');
+
+  if(error || !data || !data.length) return;
+
+  const p = data[0];
+
+  prices = {
+    'Veg Meals':p.veg_price,
+    'Egg Meals':p.egg_price,
+    'Chicken Meals':p.chicken_price,
+    'Cake Celebration':p.cake_price
+  };
+
+  $('vegPrice').textContent = format(p.veg_price);
+  $('eggPrice').textContent = format(p.egg_price);
+  $('chickenPrice').textContent = format(p.chicken_price);
+  $('cakePrice').textContent = format(p.cake_price);
+}
+
+loadPrices();
+
+$('bookingForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  const msg = $('formMsg');
+  const btn = $('submitBtn');
+
+  btn.disabled = true;
+  msg.textContent = 'Submitting your request…';
+
+  try{
+    const name = $('customerName').value.trim();
+    const mobile = $('mobile').value.replace(/\s+/g,'');
+    const pack = $('package').value;
+    const date = $('donationDate').value;
+    const file = $('stickerPhoto').files[0];
+
+    if(!/^\+?[0-9]{10,15}$/.test(mobile)){
+      throw new Error('Please enter a valid mobile number.');
+    }
+
+    if(date < new Date().toISOString().slice(0,10)){
+      throw new Error('Please choose today or a future donation date.');
+    }
+
+    let photoPath = null;
+
+    if(file){
+      if(file.size > 5*1024*1024){
+        throw new Error('Photo must be 5 MB or smaller.');
+      }
+
+      if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+        throw new Error('Please choose a JPG, PNG or WebP photo.');
+      }
+
+      const ext = file.type === 'image/png' ? 'png' :
+                  file.type === 'image/webp' ? 'webp' : 'jpg';
+
+      photoPath = 'incoming/' + crypto.randomUUID() + '.' + ext;
+
+      const {error:uploadError} = await supabase
+        .storage
+        .from('tycf-sticker-photos')
+        .upload(photoPath,file,{
+          contentType:file.type,
+          upsert:false
+        });
+
+      if(uploadError){
+        throw new Error('Photo upload failed: ' + uploadError.message);
+      }
+    }
+
+    const row = {
+      customer_name:name,
+      customer_mobile:mobile,
+      occasion:$('occasion').value,
+      package_name:pack,
+      package_price:Number(prices[pack]),
+      donation_date:date,
+      sticker_name:$('stickerName').value.trim(),
+      customer_message:$('customerMessage').value.trim(),
+      sticker_photo_path:photoPath,
+      consent:$('consent').checked
+    };
+
+    const {error} = await supabase
+      .from('tycf_orders')
+      .insert(row);
+
+    if(error) throw new Error(error.message);
+
+    $('bookingForm').reset();
+
+    msg.textContent =
+      'Thank you! Your donation request has been received. The TYCF team will contact you to confirm it. This message is not a payment confirmation.';
+
+  }catch(err){
+    msg.textContent = 'Could not submit: ' + err.message;
+  }finally{
+    btn.disabled = false;
+  }
+});
+</script>
+
 </body>
 </html>
