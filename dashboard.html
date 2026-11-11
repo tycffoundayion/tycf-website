@@ -1,23 +1,22 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TYCF Admin Dashboard</title>
 <style>
-:root{font-family:Arial,sans-serif;color:#173b2d;background:#e8f5ec}
 *{box-sizing:border-box}
-body{margin:0}
+body{margin:0;font-family:Arial,sans-serif;background:#e8f5ec;color:#173b2d}
 header{background:#075b3c;color:white;padding:18px}
 header h1{margin:0;font-size:23px}
-header p{margin:6px 0 0}
+header p{margin:6px 0}
 main{max-width:1100px;margin:auto;padding:16px}
-nav,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
 button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:white;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
 button.light{background:white;color:#075b3c;border:1px solid #b7d4c3}
 button.warn{background:#8a3b25}
 button:disabled{opacity:.5;cursor:not-allowed}
+.actions,nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
 .panel,.stat{background:white;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .stat strong{display:block;font-size:25px;margin-top:8px}
@@ -28,19 +27,17 @@ label{font-weight:600;font-size:13px}
 .order h3{margin:0 0 8px}
 .muted{color:#557064;font-size:13px}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
-.tag.paid{background:#d8f4df;color:#12612c}
-.tag.pending{background:#fff0ce;color:#805500}
-#message{padding:10px;color:#8a2b22;white-space:pre-wrap}
-#qrPreviewWrap img{display:block;max-width:280px;width:100%;height:auto;border:1px solid #dce9e0;border-radius:10px;padding:8px;margin:12px 0}
-.wa-box{background:#f2f8f3;border:1px solid #dce9e0;padding:10px;border-radius:8px;margin:12px 0}
-.wa-box label{display:block}
-.wa-box input{margin-bottom:8px}
+.paid{background:#d8f4df;color:#12612c}
+.pending{background:#fff0ce;color:#805500}
+#message{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
 .order-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:15px 0}
 .order-image-card{background:#f5faf6;border:1px solid #dce9e0;border-radius:9px;padding:10px}
 .order-image-card strong{display:block;margin-bottom:8px}
-.order-image-card img{display:block;width:100%;max-width:100%;max-height:260px;object-fit:contain;background:white;border-radius:7px}
-.order-image-card a{display:block}
+.order-image-card img{display:block;width:100%;max-height:260px;object-fit:contain;background:white;border-radius:7px}
 .image-missing{font-size:13px;color:#805500}
+.wa-box{background:#f2f8f3;border:1px solid #dce9e0;padding:10px;border-radius:8px;margin:12px 0}
+#qrPreviewWrap img{display:block;width:100%;max-width:280px;margin:12px 0;border:1px solid #ddd;padding:8px;border-radius:10px}
+hr{border:0;border-top:1px solid #ddd;margin:22px 0}
 @media(max-width:600px){main{padding:10px}.panel{padding:12px}}
 </style>
 </head>
@@ -49,7 +46,7 @@ label{font-weight:600;font-size:13px}
 <header>
 <h1>TYCF Food Donation — Admin</h1>
 <p>Bookings, payment verification, reminders, package settings and UPI QR</p>
-<p id="adminDisplayName" style="margin:8px 0 0;font-weight:bold">TYCF Admin</p>
+<p id="adminDisplayName"><b>TYCF Admin</b></p>
 </header>
 
 <main>
@@ -61,6 +58,7 @@ label{font-weight:600;font-size:13px}
 <div id="message">Checking admin access…</div>
 
 <section id="app" hidden>
+
 <div class="grid">
 <div class="stat">Total bookings<strong id="total">0</strong></div>
 <div class="stat">Received<strong id="received">0</strong></div>
@@ -76,7 +74,7 @@ label{font-weight:600;font-size:13px}
 </nav>
 
 <section id="bookingsTab" class="panel">
-<h2>Donation bookings</h2>
+<h2>Donation Bookings</h2>
 <input id="search" placeholder="Search name, phone or package">
 <label>Filter status</label>
 <select id="statusFilter">
@@ -91,7 +89,7 @@ label{font-weight:600;font-size:13px}
 </section>
 
 <section id="remindersTab" class="panel" hidden>
-<h2>Donations due tomorrow</h2>
+<h2>Upcoming Donation Reminders</h2>
 <p class="muted">Reminder list only. WhatsApp messages are not sent automatically.</p>
 <div id="reminderList"></div>
 </section>
@@ -106,36 +104,22 @@ label{font-weight:600;font-size:13px}
 <button type="submit">Save Profile</button>
 </form>
 <p class="muted">Email changes may require confirmation from your email inbox.</p>
-<hr>
 
+<hr>
 <h2>Package & WhatsApp Settings</h2>
 <form id="settingsForm">
 <label>TYCF Foundation WhatsApp Contact Number (country code + number)</label>
 <input id="waNumber" placeholder="Example: 919876543210" required>
-<p class="muted">
-This saves the Foundation contact number. It does not select the WhatsApp account used to send messages. WhatsApp uses the account currently logged in on your device.
-</p>
+<p class="muted">This is the Foundation contact number saved in settings. WhatsApp messages are opened manually.</p>
 
 <div class="row">
-<div>
-<label>Veg meals price (₹)</label>
-<input id="vegPrice" type="number" min="1" required>
-</div>
-<div>
-<label>Egg meals price (₹)</label>
-<input id="eggPrice" type="number" min="1" required>
-</div>
-<div>
-<label>Chicken meals price (₹)</label>
-<input id="chickenPrice" type="number" min="1" required>
-</div>
-<div>
-<label>Cake celebration price (₹)</label>
-<input id="cakePrice" type="number" min="1" required>
-</div>
+<div><label>Veg Meals Price (₹)</label><input id="vegPrice" type="number" min="1" required></div>
+<div><label>Egg Meals Price (₹)</label><input id="eggPrice" type="number" min="1" required></div>
+<div><label>Chicken Meals Price (₹)</label><input id="chickenPrice" type="number" min="1" required></div>
+<div><label>Cake Celebration Price (₹)</label><input id="cakePrice" type="number" min="1" required></div>
 </div>
 
-<label>Reminder days before donation</label>
+<label>Reminder Days Before Donation</label>
 <input id="reminderDays" type="number" min="1" max="30" value="1">
 <button type="submit">Save Settings</button>
 </form>
@@ -144,66 +128,75 @@ This saves the Foundation contact number. It does not select the WhatsApp accoun
 <section id="qrTab" class="panel" hidden>
 <h2>UPI Payment QR Settings</h2>
 <p class="muted">Upload a new QR image to replace the current one.</p>
-<div id="qrPreviewWrap">
-<p class="muted">Open this tab to load the current QR.</p>
-</div>
+<div id="qrPreviewWrap"><p class="muted">Loading QR preview…</p></div>
+
 <form id="qrForm">
 <label>Choose new UPI QR image (JPG, PNG or WebP; max 5 MB)</label>
 <input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required>
 <button type="submit">Upload / Replace QR</button>
 </form>
+
 <div class="actions">
-<button type="button" class="warn" id="deleteQrBtn">Delete current QR</button>
+<button type="button" class="warn" id="deleteQrBtn">Delete Current QR</button>
 </div>
 <p class="muted">The customer website displays the QR stored here.</p>
 </section>
+
 </section>
 </main>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabase = createClient(
+const supabase=createClient(
 'https://mswgamusywvqxscfcyff.supabase.co',
 'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
 );
 
-const $ = id => document.getElementById(id);
-let orders = [];
-let settings = null;
-let currentEmail = '';
+const $=id=>document.getElementById(id);
+let orders=[];
+let settings=null;
+let currentEmail='';
 
-const say = text => $('message').textContent = text;
-
-const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[char]));
-
-const todayPlus = days => {
-const date = new Date();
-date.setDate(date.getDate() + days);
-return date.toISOString().slice(0,10);
-};
-
-function customerWhatsAppNumber(value) {
-let phone = String(value || '').replace(/\D/g,'');
-if(phone.length === 10) phone = '91' + phone;
-return phone.length >= 11 && phone.length <= 15 ? phone : '';
+function say(message){
+$('message').textContent=message;
 }
 
-function confirmationMessage(order) {
+function esc(value){
+return String(value??'').replace(/[&<>"']/g,char=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[char]));
+}
+
+function datePlus(days){
+const d=new Date();
+d.setDate(d.getDate()+days);
+return d.getFullYear()+'-'+
+String(d.getMonth()+1).padStart(2,'0')+'-'+
+String(d.getDate()).padStart(2,'0');
+}
+
+function validWhatsApp(value){
+let phone=String(value||'').replace(/\D/g,'');
+if(phone.length===10)phone='91'+phone;
+return phone.length>=11&&phone.length<=15?phone:'';
+}
+
+function confirmationMessage(order){
 return [
 'TYCF FOOD DONATION',
 '',
-'Dear ' + (order.customer_name || 'Customer') + ',',
+'Dear '+(order.customer_name||'Customer')+',',
+'Your donation booking has been confirmed.',
 '',
-'Your donation order has been confirmed successfully.',
-'',
-'Order Details:',
-'Package: ' + (order.package_name || ''),
-'Donation Amount: Rs. ' + Number(order.package_price || 0).toLocaleString('en-IN'),
-'Donation Date: ' + (order.donation_date || ''),
-'Occasion: ' + (order.occasion || ''),
+'Package: '+(order.package_name||''),
+'Donation Amount: Rs. '+Number(order.package_price||0).toLocaleString('en-IN'),
+'Donation Date: '+(order.donation_date||''),
+'Occasion: '+(order.occasion||''),
 '',
 'Payment Status: PAID',
 'Order Status: CONFIRMED',
@@ -213,109 +206,112 @@ return [
 ].join('\n');
 }
 
-function whatsappUrl(order) {
-const selectedNumber = order.whatsapp_recipient || order.customer_mobile;
-const phone = customerWhatsAppNumber(selectedNumber);
-if(!phone) return '';
-return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(confirmationMessage(order));
+function whatsappLink(order){
+const phone=validWhatsApp(order.whatsapp_recipient||order.customer_mobile);
+if(!phone)return '';
+return 'https://wa.me/'+phone+'?text='+encodeURIComponent(confirmationMessage(order));
 }
 
-async function init() {
-const {data:{session},error} = await supabase.auth.getSession();
+/* ADMIN LOGIN CHECK */
+async function init(){
+const {data:{session},error}=await supabase.auth.getSession();
 
-if(error || !session) {
-location.href = 'admin.html';
+if(error||!session){
+location.href='admin.html';
 return;
 }
 
-const {data:admin,error:adminError} = await supabase
+const {data:admin,error:adminError}=await supabase
 .from('tycf_admins')
 .select('user_id')
 .eq('user_id',session.user.id)
 .maybeSingle();
 
-if(adminError || !admin) {
+if(adminError||!admin){
 await supabase.auth.signOut();
-location.href = 'admin.html';
+location.href='admin.html';
 return;
 }
 
-$('app').hidden = false;
-const profileName = session.user.user_metadata?.display_name || 'TYCF Admin';
-currentEmail = session.user.email || '';
-$('adminDisplayName').textContent = profileName;
-$('displayName').value = profileName;
-$('newAdminEmail').value = currentEmail;
+$('app').hidden=false;
+
+const profileName=session.user.user_metadata?.display_name||'TYCF Admin';
+currentEmail=session.user.email||'';
+
+$('adminDisplayName').textContent=profileName;
+$('displayName').value=profileName;
+$('newAdminEmail').value=currentEmail;
 
 await loadAll();
 }
 
-async function loadOrderImageUrls(orderList) {
-await Promise.all(orderList.map(async order => {
-order.stickerPhotoUrl = null;
-order.stickerDesignUrl = null;
+/* LOAD CUSTOMER PHOTO AND FINAL DESIGN */
+async function loadOrderImages(list){
+await Promise.all(list.map(async order=>{
+order.stickerPhotoUrl=null;
+order.stickerDesignUrl=null;
 
-if(order.sticker_photo_path) {
-const {data,error} = await supabase.storage
+if(order.sticker_photo_path){
+const {data,error}=await supabase.storage
 .from('tycf-sticker-photos')
 .createSignedUrl(order.sticker_photo_path,3600);
 
-if(!error && data?.signedUrl) {
-order.stickerPhotoUrl = data.signedUrl;
-} else {
+if(!error&&data?.signedUrl){
+order.stickerPhotoUrl=data.signedUrl;
+}else{
 console.warn('Customer photo URL error:',order.id,error);
 }
 }
 
-if(order.sticker_design_path) {
-const {data,error} = await supabase.storage
+if(order.sticker_design_path){
+const {data,error}=await supabase.storage
 .from('tycf-sticker-photos')
 .createSignedUrl(order.sticker_design_path,3600);
 
-if(!error && data?.signedUrl) {
-order.stickerDesignUrl = data.signedUrl;
-} else {
+if(!error&&data?.signedUrl){
+order.stickerDesignUrl=data.signedUrl;
+}else{
 console.warn('Final design URL error:',order.id,error);
 }
 }
 }));
 }
 
-async function loadAll() {
+/* LOAD BOOKINGS AND SETTINGS */
+async function loadAll(){
 say('Loading bookings and settings…');
 
-const [ordersResult,settingsResult] = await Promise.all([
+const [orderResult,settingsResult]=await Promise.all([
 supabase.from('tycf_orders')
 .select('*')
 .order('created_at',{ascending:false})
 .limit(500),
+
 supabase.from('tycf_settings')
 .select('*')
 .limit(1)
 .maybeSingle()
 ]);
 
-if(ordersResult.error) {
-say('Bookings error: ' + ordersResult.error.message);
+if(orderResult.error){
+say('Bookings error: '+orderResult.error.message);
 return;
 }
 
-if(settingsResult.error) {
-say('Settings error: ' + settingsResult.error.message);
+if(settingsResult.error){
+say('Settings error: '+settingsResult.error.message);
 return;
 }
 
-orders = ordersResult.data || [];
+orders=orderResult.data||[];
+settings=settingsResult.data;
 
-await loadOrderImageUrls(orders);
-
-settings = settingsResult.data;
-
-if(!settings) {
+if(!settings){
 say('No settings row found in tycf_settings. Please check setup.');
 return;
 }
 
+await loadOrderImages(orders);
 renderOrders();
 renderStats();
 fillSettings();
@@ -323,268 +319,252 @@ renderReminders();
 say('Dashboard loaded.');
 }
 
-function renderStats() {
-$('total').textContent = orders.length;
-$('received').textContent = orders.filter(x => x.status === 'Received').length;
-$('confirmed').textContent = orders.filter(x => x.status === 'Confirmed').length;
-$('delivered').textContent = orders.filter(x => x.status === 'Delivered').length;
+function renderStats(){
+$('total').textContent=orders.length;
+$('received').textContent=orders.filter(o=>o.status==='Received').length;
+$('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;
+$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
 }
 
-function orderMarkup(order) {
-const paid = order.payment_status === 'Paid';
+/* BOOKING DISPLAY */
+function orderMarkup(order){
+const paid=order.payment_status==='Paid';
+const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
 
-const statuses = ['Received','Confirmed','Preparing','Delivered','Cancelled']
-.map(status => {
-const blocked = status === 'Confirmed' && !paid;
+const statusOptions=statuses.map(status=>{
+const blocked=status==='Confirmed'&&!paid;
 return `<option value="${status}" ${order.status===status?'selected':''} ${blocked?'disabled':''}>${status}${blocked?' (Verify payment first)':''}</option>`;
 }).join('');
 
-const savedRecipient = order.whatsapp_recipient || order.customer_mobile || '';
-const waLink = paid ? whatsappUrl(order) : '';
-
-const photoMarkup = order.stickerPhotoUrl
+const photo=order.stickerPhotoUrl
 ? `<div class="order-image-card">
 <strong>Customer Uploaded Photo</strong>
 <a href="${esc(order.stickerPhotoUrl)}" target="_blank" rel="noopener">
-<img src="${esc(order.stickerPhotoUrl)}" alt="Customer uploaded photo" loading="lazy">
+<img src="${esc(order.stickerPhotoUrl)}" alt="Customer photo" loading="lazy">
 </a>
 </div>`
 : (order.sticker_photo_path
-? '<p class="image-missing">Customer photo path is saved, but image preview is unavailable. Check Storage SELECT permission.</p>'
+? '<p class="image-missing">Customer photo is saved, but preview is unavailable. Check Storage read permission.</p>'
 : '');
 
-const designMarkup = order.stickerDesignUrl
+const design=order.stickerDesignUrl
 ? `<div class="order-image-card">
 <strong>Final Sticker Design</strong>
 <a href="${esc(order.stickerDesignUrl)}" target="_blank" rel="noopener">
-<img src="${esc(order.stickerDesignUrl)}" alt="Final TYCF sticker design" loading="lazy">
+<img src="${esc(order.stickerDesignUrl)}" alt="Final sticker design" loading="lazy">
 </a>
 </div>`
 : (order.sticker_design_path
-? '<p class="image-missing">Final design path is saved, but image preview is unavailable. Check Storage SELECT permission.</p>'
+? '<p class="image-missing">Final design is saved, but preview is unavailable. Check Storage read permission.</p>'
 : '');
+
+const link=paid?whatsappLink(order):'';
 
 return `
 <article class="order">
 <h3>${esc(order.customer_name)} <span class="tag">${esc(order.status)}</span></h3>
-<div>${esc(order.package_name)} — ₹${esc(order.package_price)}</div>
+<p><b>${esc(order.package_name)}</b> — ₹${esc(order.package_price)}</p>
+<p class="muted">Mobile: ${esc(order.customer_mobile)} · Occasion: ${esc(order.occasion)} · Donation date: ${esc(order.donation_date)}</p>
+<p class="muted">Sticker name: ${esc(order.sticker_name)} · Message: ${esc(order.customer_message)}</p>
 
-<div class="muted">
-Booking Mobile: ${esc(order.customer_mobile)} ·
-Occasion: ${esc(order.occasion)} ·
-Donation date: ${esc(order.donation_date)}
-</div>
+${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
 
-<div class="muted">
-Sticker name: ${esc(order.sticker_name)} ·
-Message: ${esc(order.customer_message)}
-</div>
-
-${photoMarkup || designMarkup ? `<div class="order-images">${photoMarkup}${designMarkup}</div>` : ''}
-
-<p><strong>Payment Status:</strong>
+<p><b>Payment Status:</b>
 <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span>
 </p>
 
 <div class="wa-box">
 <label for="wa-${esc(order.id)}">Customer WhatsApp Number</label>
-<input
-id="wa-${esc(order.id)}"
-type="tel"
-inputmode="numeric"
-maxlength="15"
-value="${esc(savedRecipient)}"
-placeholder="Example: 919876543210"
->
+<input id="wa-${esc(order.id)}" type="tel" inputmode="numeric" maxlength="15" value="${esc(order.whatsapp_recipient||order.customer_mobile||'')}" placeholder="919876543210">
 <button type="button" data-save-wa="${esc(order.id)}">Save WhatsApp Number</button>
-<p class="muted">You can change the WhatsApp number without changing the original booking mobile number.</p>
+<p class="muted">This number can be changed without changing the original booking mobile number.</p>
 </div>
 
 <div class="actions">
-${!paid ? `<button data-verify="${esc(order.id)}">Verify Payment / Mark Paid</button>` : ''}
-<select aria-label="Booking status" id="st-${esc(order.id)}">${statuses}</select>
-<button data-save="${esc(order.id)}">Save status</button>
-${waLink ? `<a class="btn" href="${waLink}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>` : ''}
-${paid && !waLink ? '<span class="muted">WhatsApp number is invalid. Check the number.</span>' : ''}
+${!paid?`<button data-verify="${esc(order.id)}">Verify Payment / Mark Paid</button>`:''}
+<select id="st-${esc(order.id)}" aria-label="Booking status">${statusOptions}</select>
+<button data-save="${esc(order.id)}">Save Status</button>
+${link?`<a class="btn" href="${link}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>`:''}
+${paid&&!link?'<span class="muted">Invalid WhatsApp number. Please check it.</span>':''}
 </div>
 </article>`;
 }
 
-function renderOrders() {
-const query = $('search').value.toLowerCase();
-const filter = $('statusFilter').value;
+function renderOrders(){
+const query=$('search').value.toLowerCase();
+const filter=$('statusFilter').value;
 
-const filtered = orders.filter(order =>
-(!filter || order.status === filter) &&
-[order.customer_name,order.customer_mobile,order.package_name,order.whatsapp_recipient]
-.some(value => String(value || '').toLowerCase().includes(query))
+const filtered=orders.filter(order=>
+(!filter||order.status===filter)&&
+[
+order.customer_name,
+order.customer_mobile,
+order.package_name,
+order.whatsapp_recipient
+].some(value=>String(value||'').toLowerCase().includes(query))
 );
 
-$('ordersList').innerHTML = filtered.length
-? filtered.map(orderMarkup).join('')
-: '<p>No matching bookings.</p>';
+$('ordersList').innerHTML=filtered.length
+?filtered.map(orderMarkup).join('')
+:'<p>No matching bookings.</p>';
 
-document.querySelectorAll('[data-save]').forEach(button => {
-button.addEventListener('click',() => saveStatus(button.dataset.save));
+document.querySelectorAll('[data-save]').forEach(button=>{
+button.addEventListener('click',()=>saveStatus(button.dataset.save));
 });
 
-document.querySelectorAll('[data-verify]').forEach(button => {
-button.addEventListener('click',() => verifyPayment(button.dataset.verify));
+document.querySelectorAll('[data-verify]').forEach(button=>{
+button.addEventListener('click',()=>verifyPayment(button.dataset.verify));
 });
 
-document.querySelectorAll('[data-save-wa]').forEach(button => {
-button.addEventListener('click',() => saveWhatsAppNumber(button.dataset.saveWa));
+document.querySelectorAll('[data-save-wa]').forEach(button=>{
+button.addEventListener('click',()=>saveWhatsAppNumber(button.dataset.saveWa));
 });
 }
 
-async function saveWhatsAppNumber(id) {
-const input = $('wa-' + id);
-if(!input) return;
+/* SAVE CUSTOMER WHATSAPP NUMBER */
+async function saveWhatsAppNumber(id){
+const input=$('wa-'+id);
+const phone=validWhatsApp(input?.value);
 
-const number = input.value.trim();
-const normalized = customerWhatsAppNumber(number);
-
-if(!normalized) {
-say('Enter a valid customer WhatsApp number with country code. Example: 919876543210');
+if(!phone){
+say('Enter a valid WhatsApp number with country code. Example: 919876543210');
 return;
 }
 
-say('Saving customer WhatsApp number…');
+say('Saving WhatsApp number…');
 
-const {error} = await supabase.from('tycf_orders')
-.update({whatsapp_recipient:normalized})
+const {error}=await supabase.from('tycf_orders')
+.update({whatsapp_recipient:phone})
 .eq('id',id);
 
-if(error) {
-say('Could not save WhatsApp number: ' + error.message);
+if(error){
+say('WhatsApp number save failed: '+error.message);
 return;
 }
 
-say('Customer WhatsApp number saved successfully.');
 await loadAll();
+say('WhatsApp number saved.');
 }
 
-async function verifyPayment(id) {
-const order = orders.find(item => String(item.id) === String(id));
-if(!order) return;
+/* VERIFY PAYMENT */
+async function verifyPayment(id){
+const order=orders.find(o=>String(o.id)===String(id));
+if(!order)return;
 
-if(order.payment_status === 'Paid') {
+if(order.payment_status==='Paid'){
 say('This booking is already marked Paid.');
 return;
 }
 
-if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?')) return;
+if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?'))return;
 
-say('Approving payment and confirming order…');
+say('Updating payment status…');
 
-const {error} = await supabase.from('tycf_orders')
-.update({
-payment_status:'Paid',
-status:'Confirmed'
-})
+const {error}=await supabase.from('tycf_orders')
+.update({payment_status:'Paid',status:'Confirmed'})
 .eq('id',id);
 
-if(error) {
-say('Payment update failed: ' + error.message);
+if(error){
+say('Payment update failed: '+error.message);
 return;
 }
 
 await loadAll();
-say('Payment marked Paid and booking Confirmed. Check the WhatsApp number and click Send WhatsApp Confirmation.');
+say('Payment marked Paid and booking Confirmed. You can now send WhatsApp confirmation.');
 }
 
-async function saveStatus(id) {
-const status = $('st-' + id).value;
-const order = orders.find(item => String(item.id) === String(id));
+/* SAVE BOOKING STATUS */
+async function saveStatus(id){
+const status=$('st-'+id).value;
+const order=orders.find(o=>String(o.id)===String(id));
 
-if(status === 'Confirmed' && order?.payment_status !== 'Paid') {
+if(status==='Confirmed'&&order?.payment_status!=='Paid'){
 say('Verify payment before confirming this booking.');
 return;
 }
 
-say('Saving status…');
+say('Saving booking status…');
 
-const {error} = await supabase.from('tycf_orders')
-.update({status}).eq('id',id);
+const {error}=await supabase.from('tycf_orders')
+.update({status})
+.eq('id',id);
 
-if(error) {
-say('Could not update: ' + error.message);
+if(error){
+say('Status update failed: '+error.message);
 return;
 }
 
-say('Status updated.');
 await loadAll();
+say('Booking status updated.');
 }
 
-function renderReminders() {
-const days = Number(settings.reminder_days || 1);
+/* REMINDERS */
+function renderReminders(){
+const days=Number(settings.reminder_days||1);
 
-const due = orders.filter(order =>
-order.donation_date === todayPlus(days) &&
+const due=orders.filter(order=>
+order.donation_date===datePlus(days)&&
 !['Delivered','Cancelled'].includes(order.status)
 );
 
-$('reminderList').innerHTML = due.length
-? due.map(order => `
+$('reminderList').innerHTML=due.length
+?due.map(order=>`
 <div class="order">
 <b>${esc(order.customer_name)}</b> — ${esc(order.package_name)}
-<div class="muted">
-${esc(order.customer_mobile)} ·
-${esc(order.donation_date)} ·
-${esc(order.status)}
-</div>
+<p class="muted">${esc(order.customer_mobile)} · ${esc(order.donation_date)} · ${esc(order.status)}</p>
 </div>`).join('')
-: '<p>No donations due on the reminder date.</p>';
+:'<p>No donations due on the reminder date.</p>';
 }
 
-function fillSettings() {
-$('waNumber').value = settings.whatsapp_number || '';
-$('vegPrice').value = settings.veg_price ?? 1500;
-$('eggPrice').value = settings.egg_price ?? 1800;
-$('chickenPrice').value = settings.chicken_price ?? 2500;
-$('cakePrice').value = settings.cake_price ?? 1500;
-$('reminderDays').value = settings.reminder_days ?? 1;
+/* SETTINGS */
+function fillSettings(){
+$('waNumber').value=settings.whatsapp_number||'';
+$('vegPrice').value=settings.veg_price??1500;
+$('eggPrice').value=settings.egg_price??1800;
+$('chickenPrice').value=settings.chicken_price??2500;
+$('cakePrice').value=settings.cake_price??1500;
+$('reminderDays').value=settings.reminder_days??1;
 }
 
 /* ADMIN PROFILE */
-$('profileForm').addEventListener('submit',async event => {
+$('profileForm').addEventListener('submit',async event=>{
 event.preventDefault();
 
-const displayName = $('displayName').value.trim();
-const newEmail = $('newAdminEmail').value.trim();
+const displayName=$('displayName').value.trim();
+const newEmail=$('newAdminEmail').value.trim();
 
-if(!displayName) {
+if(!displayName){
 say('Enter a display name.');
 return;
 }
 
 say('Saving admin profile…');
 
-const update = {data:{display_name:displayName}};
-if(newEmail && newEmail !== currentEmail) update.email = newEmail;
+const update={data:{display_name:displayName}};
+if(newEmail&&newEmail!==currentEmail)update.email=newEmail;
 
-const {error} = await supabase.auth.updateUser(update);
+const {error}=await supabase.auth.updateUser(update);
 
-if(error) {
-say('Profile update failed: ' + error.message);
+if(error){
+say('Profile update failed: '+error.message);
 return;
 }
 
-$('adminDisplayName').textContent = displayName;
+$('adminDisplayName').textContent=displayName;
 
-if(update.email) {
-currentEmail = newEmail;
-say('Display name saved. Check your email inbox to confirm the login email change.');
-} else {
+if(update.email){
+currentEmail=newEmail;
+say('Profile saved. Check your email inbox to confirm the email change.');
+}else{
 say('Admin display name saved.');
 }
 });
 
-/* FOUNDATION WHATSAPP CONTACT AND PACKAGE SETTINGS */
-$('settingsForm').addEventListener('submit',async event => {
+/* PACKAGE AND FOUNDATION WHATSAPP SETTINGS */
+$('settingsForm').addEventListener('submit',async event=>{
 event.preventDefault();
 
-const update = {
+const update={
 whatsapp_number:$('waNumber').value.replace(/\D/g,''),
 veg_price:Number($('vegPrice').value),
 egg_price:Number($('eggPrice').value),
@@ -593,79 +573,126 @@ cake_price:Number($('cakePrice').value),
 reminder_days:Number($('reminderDays').value)
 };
 
-if(!/^\d{10,15}$/.test(update.whatsapp_number)) {
-say('Enter Foundation WhatsApp number with country code, digits only.');
+if(!/^\d{10,15}$/.test(update.whatsapp_number)){
+say('Enter Foundation WhatsApp number with country code.');
 return;
 }
 
 if(
-update.veg_price < 1 ||
-update.egg_price < 1 ||
-update.chicken_price < 1 ||
-update.cake_price < 1 ||
-update.reminder_days < 1 ||
-update.reminder_days > 30
-) {
+update.veg_price<1||
+update.egg_price<1||
+update.chicken_price<1||
+update.cake_price<1||
+update.reminder_days<1||
+update.reminder_days>30
+){
 say('Please check all settings fields.');
 return;
 }
 
 say('Saving settings…');
 
-const {error} = await supabase.from('tycf_settings')
+const {error}=await supabase.from('tycf_settings')
 .update(update)
 .not('id','is',null);
 
-if(error) {
-say('Settings save failed: ' + error.message);
+if(error){
+say('Settings save failed: '+error.message);
 return;
 }
 
-say('Foundation WhatsApp contact and package settings saved.');
 await loadAll();
+say('Package and WhatsApp settings saved.');
 });
 
 /* UPI QR SETTINGS */
-const QR_PATH = 'current/payment-qr';
+const QR_PATH='current/payment-qr';
 
-async function loadQr() {
-const {data} = supabase.storage.from('tycf-payment-qr').getPublicUrl(QR_PATH);
-const url = data.publicUrl + '?v=' + Date.now();
+async function loadQr(){
+const {data}=supabase.storage
+.from('tycf-payment-qr')
+.getPublicUrl(QR_PATH);
 
-try {
-const response = await fetch(url,{method:'HEAD'});
-$('qrPreviewWrap').innerHTML = response.ok
-? `<img src="${url}" alt="Current UPI payment QR">`
-: '<p class="muted">No QR uploaded yet.</p>';
-} catch(error) {
-$('qrPreviewWrap').innerHTML = '<p class="muted">Could not check the QR image. Try Refresh.</p>';
+const url=data.publicUrl+'?v='+Date.now();
+$('qrPreviewWrap').innerHTML='<p class="muted">Checking current QR…</p>';
+
+try{
+const response=await fetch(url,{method:'HEAD'});
+
+$('qrPreviewWrap').innerHTML=response.ok
+?`<img src="${url}" alt="Current UPI QR">`
+:'<p class="muted">No QR uploaded yet.</p>';
+}catch(error){
+$('qrPreviewWrap').innerHTML='<p class="muted">Could not load QR preview.</p>';
 }
 }
 
-$('qrForm').addEventListener('submit',async event => {
+$('qrForm').addEventListener('submit',async event=>{
 event.preventDefault();
 
-const file = $('qrFile').files[0];
-if(!file) { say('Choose a QR image first.'); return; }
+const file=$('qrFile').files[0];
+if(!file){
+say('Choose a QR image first.');
+return;
+}
 
-if(!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
 say('Use JPG, PNG or WebP image.');
 return;
 }
 
-if(file.size > 5*1024*1024) {
+if(file.size>5*1024*1024){
 say('Image must be 5 MB or smaller.');
 return;
 }
 
 say('Uploading QR…');
 
-const {error} = await supabase.storage.from('tycf-payment-qr')
+const {error}=await supabase.storage
+.from('tycf-payment-qr')
 .upload(QR_PATH,file,{
 upsert:true,
 contentType:file.type,
 cacheControl:'0'
 });
 
-if(error) {
-say('QR upload failed: ' + er
+if(error){
+say('QR upload failed: '+error.message);
+return;
+}
+
+$('qrFile').value='';
+await loadQr();
+say('UPI QR uploaded successfully.');
+});
+
+/* DELETE QR */
+$('deleteQrBtn').addEventListener('click',async()=>{
+if(!confirm('Delete the current TYCF payment QR?'))return;
+
+say('Deleting current QR…');
+
+const {error}=await supabase.storage
+.from('tycf-payment-qr')
+.remove([QR_PATH]);
+
+if(error){
+say('QR delete failed: '+error.message);
+return;
+}
+
+$('qrPreviewWrap').innerHTML='<p class="muted">No QR uploaded yet.</p>';
+$('qrFile').value='';
+say('Current payment QR deleted.');
+});
+
+/* TABS */
+function showTab(name){
+['bookings','reminders','settings','qr'].forEach(tab=>{
+$(tab+'Tab').hidden=tab!==name;
+});
+
+if(name==='qr')loadQr();
+}
+
+document.querySelectorAll('[data-ta
