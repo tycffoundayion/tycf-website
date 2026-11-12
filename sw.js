@@ -1,4 +1,5 @@
-const CACHE_NAME = "tycf-shell-v2";
+
+const CACHE_NAME = "tycf-shell-v3";
 
 const CORE_ASSETS = [
   "/",
@@ -6,6 +7,7 @@ const CORE_ASSETS = [
   "/admin.html",
   "/dashboard.html",
   "/manifest.webmanifest",
+  "/tycf-app-icon-512.png",
   "/tycf-logo-cropped-1.png",
   "/offline.html"
 ];
