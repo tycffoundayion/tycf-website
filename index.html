@@ -608,8 +608,131 @@ return path;
 /* UPI PAYMENT QR */
 
 function showPaymentQR(amount){
-const box=$('paymentQr');
-box.innerHTML='';
-box.style.display='block';
+  const box=$('paymentQr');
+  box.innerHTML='';
+  box.style.display='block';
 
-const uri=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURICo
+  const uri=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Food Donation')}`;
+
+  if(typeof QRCode!=='undefined'){
+    new QRCode(box,{
+      text:uri,
+      width:260,
+      height:260,
+      correctLevel:QRCode.CorrectLevel.M
+    });
+    $('qrMsg').textContent='Scan this QR using your UPI app.';
+  }else{
+    $('qrMsg').textContent='QR could not load. Please use the UPI ID shown below.';
+  }
+
+  $('paymentAmount').textContent='Donation Amount: '+format(amount);
+  $('payment').scrollIntoView({behavior:'smooth'});
+}
+
+/* DONATION BOOKING */
+
+$('bookingForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  const btn=$('submitBtn');
+  const msg=$('formMsg');
+  const {items,total}=calculateTotal();
+
+  if(!items.length){
+    msg.textContent='Please select at least one donation package.';
+    return;
+  }
+
+  if(!$('consent').checked){
+    msg.textContent='Please accept the consent to continue.';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent='Please wait...';
+  msg.textContent='Submitting your donation request...';
+
+  try{
+    let photoPath=null;
+    let designPath=null;
+
+    const photoFile=$('stickerPhoto').files[0];
+
+    if(photoFile){
+      photoPath=await uploadSticker(photoFile,'customer-photos');
+    }
+
+    if(stickerImage){
+      const blob=await canvasToBlob(canvas);
+      const designFile=new File(
+        [blob],
+        'tycf-sticker.jpg',
+        {type:'image/jpeg'}
+      );
+      designPath=await uploadSticker(designFile,'sticker-designs');
+    }
+
+    const first=items[0];
+
+    const order={
+      customer_name:$('customerName').value.trim(),
+      customer_mobile:$('mobile').value.trim(),
+      occasion:$('occasion').value,
+      donation_date:$('donationDate').value,
+      package_name:items.map(x=>x.name+' x '+x.quantity).join(', '),
+      package_price:first.unit_price,
+      package_items:items,
+      total_amount:total,
+      sticker_name:$('stickerName').value.trim(),
+      customer_message:$('customerMessage').value.trim(),
+      sticker_photo_path:photoPath,
+      sticker_design_path:designPath,
+      payment_status:'Pending',
+      status:'Received',
+      consent:$('consent').checked
+    };
+
+    const {data,error}=await supabase
+      .from('tycf_orders')
+      .insert(order)
+      .select()
+      .single();
+
+    if(error)throw error;
+
+    msg.textContent='Your donation request has been submitted successfully. Please complete the UPI payment.';
+    showPaymentQR(total);
+
+    $('paymentReference').textContent='UPI ID: '+UPI_ID;
+    $('bookingForm').reset();
+
+    packages.forEach(p=>p.qty=0);
+    updateTotal();
+
+    $('photoEditor').hidden=true;
+    $('replacePhotoBtn').hidden=true;
+    stickerImage=null;
+
+  }catch(error){
+    console.error('Booking error:',error);
+    msg.textContent='Unable to submit: '+(error.message||'Please try again.');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Submit Donation Request';
+  }
+});
+
+/* INITIALIZE PAGE */
+
+const dateInput=$('donationDate');
+if(dateInput){
+  dateInput.min=new Date().toISOString().split('T')[0];
+}
+
+loadPackages();
+loadHeader();
+
+</script>
+</body>
+</html>
