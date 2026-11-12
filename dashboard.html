@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +31,7 @@ label{font-weight:bold;font-size:13px;display:block}
 .order-image-card img{width:100%;max-height:250px;object-fit:contain;background:white}
 .order-image-card button{width:100%;margin-top:8px}
 .wa-box{background:#f2f8f3;padding:10px;border-radius:8px;margin:10px 0}
-#qrPreviewWrap img{max-width:280px;width:100%}
+#qrPreviewWrap img{max-width:280px;width:100%;display:block}
 .report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}
 .report-card{background:#f5faf6;color:#173b2d;border:1px solid #dce9e0;text-align:left;width:100%}
 .report-card strong{display:block;font-size:22px}
@@ -43,54 +42,46 @@ label{font-weight:bold;font-size:13px;display:block}
 .preview-header img{width:65px;height:65px;object-fit:contain;background:white;border-radius:8px}
 [hidden]{display:none!important}
 hr{border:0;border-top:1px solid #ddd;margin:20px 0}
+@media(max-width:600px){header{padding:15px}main{padding:8px}nav button{flex:1 1 42%}}
 </style>
 </head>
 <body>
-
 <header>
 <h2>TYCF Food Donation — Admin</h2>
 <p>Bookings, packages, header design, payment and reports</p>
 <b id="adminDisplayName">TYCF Admin</b>
 </header>
-
 <main>
 <div class="actions">
-<button class="light" id="refreshBtn">Refresh</button>
-<button class="light" id="logoutBtn">Logout</button>
+<button class="light" id="refreshBtn" type="button">Refresh</button>
+<button class="light" id="logoutBtn" type="button">Logout</button>
 </div>
-
 <div id="message">Checking admin access...</div>
 
 <section id="app" hidden>
-
 <div class="grid">
 <div class="stat">Total bookings<strong id="total">0</strong></div>
 <div class="stat">Received<strong id="received">0</strong></div>
 <div class="stat">Confirmed<strong id="confirmed">0</strong></div>
 <div class="stat">Delivered<strong id="delivered">0</strong></div>
 </div>
-
 <nav>
-<button data-tab="bookings">Bookings</button>
-<button data-tab="reminders">Reminders</button>
-<button data-tab="packages">Donation Packages</button>
-<button data-tab="header">Header Design</button>
-<button data-tab="settings">Settings</button>
-<button data-tab="qr">UPI QR</button>
-<button data-tab="reports">Reports</button>
+<button data-tab="bookings" type="button">Bookings</button>
+<button data-tab="reminders" type="button">Reminders</button>
+<button data-tab="packages" type="button">Donation Packages</button>
+<button data-tab="header" type="button">Header Design</button>
+<button data-tab="settings" type="button">Settings</button>
+<button data-tab="qr" type="button">UPI QR</button>
+<button data-tab="reports" type="button">Reports</button>
 </nav>
 
 <section id="bookingsTab" class="panel">
 <h2>Donation Bookings</h2>
 <input id="search" placeholder="Search name, phone or package">
-<label>Filter status</label>
+<label for="statusFilter">Filter status</label>
 <select id="statusFilter">
-<option value="">All statuses</option>
-<option>Received</option>
-<option>Confirmed</option>
-<option>Preparing</option>
-<option>Delivered</option>
-<option>Cancelled</option>
+<option value="">All statuses</option><option>Received</option><option>Confirmed</option>
+<option>Preparing</option><option>Delivered</option><option>Cancelled</option>
 </select>
 <div id="ordersList"></div>
 </section>
@@ -104,127 +95,71 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <section id="packagesTab" class="panel" hidden>
 <h2>Donation Package Management</h2>
 <p class="muted">Add, edit, activate, deactivate or delete packages. Active packages appear on the public website.</p>
-
 <form id="packageForm">
 <input type="hidden" id="packageId">
-
-<label>Package Name</label>
-<input id="packageName" maxlength="100" required placeholder="Example: Veg Meals">
-
-<label>Price (₹)</label>
-<input id="packagePrice" type="number" min="1" max="1000000" required>
-
-<label>Number of People</label>
-<input id="packagePeople" type="number" min="0" max="100000" value="25" required>
-
-<label>Description</label>
-<textarea id="packageDescription" maxlength="1000" placeholder="Package details"></textarea>
-
-<label>Package Photo (optional)</label>
-<input id="packageImage" type="file" accept="image/jpeg,image/png,image/webp">
-
+<label for="packageName">Package Name</label><input id="packageName" maxlength="100" required placeholder="Example: Veg Meals">
+<label for="packagePrice">Price (₹)</label><input id="packagePrice" type="number" min="1" max="1000000" required>
+<label for="packagePeople">Number of People</label><input id="packagePeople" type="number" min="0" max="100000" value="25" required>
+<label for="packageDescription">Description</label><textarea id="packageDescription" maxlength="1000" placeholder="Package details"></textarea>
+<label for="packageImage">Package Photo (optional)</label><input id="packageImage" type="file" accept="image/jpeg,image/png,image/webp">
 <div id="packageImagePreview"></div>
-
-<div class="actions">
-<button type="submit" id="packageSaveBtn">Save Package</button>
-<button type="button" class="light" id="packageCancelBtn">Clear Form</button>
-</div>
+<div class="actions"><button type="submit" id="packageSaveBtn">Save Package</button><button type="button" class="light" id="packageCancelBtn">Clear Form</button></div>
 </form>
-
-<hr>
-<h3>Existing Packages</h3>
-<div id="packageList">Loading packages...</div>
+<hr><h3>Existing Packages</h3><div id="packageList">Loading packages...</div>
 </section>
 
 <section id="headerTab" class="panel" hidden>
 <h2>Website Header Design</h2>
-<p class="muted">Upload a nature photo, preview it and save it as the website header background.</p>
-
-<label>Header Background Photo (JPG, PNG or WebP, max 5 MB)</label>
+<p class="muted">Upload a background photo, preview it and save it as the website header background.</p>
+<label for="headerPhoto">Header Background Photo (JPG, PNG or WebP, max 5 MB)</label>
 <input id="headerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
-
-<label>Header Background Colour</label>
-<input id="headerColor" type="color" value="#075b3c">
-
-<div class="preview-header" id="headerPreview">
-<img src="tycf-logo-cropped-1.png" alt="TYCF Logo">
-<h2>TYCF FOOD DONATION</h2>
-<p>Telangana Yuva Chaithanya Foundation</p>
-</div>
-
-<div class="actions">
-<button type="button" id="headerPreviewBtn">Live Preview</button>
-<button type="button" id="headerSaveBtn">Save Header Design</button>
-<button type="button" class="light" id="headerResetBtn">Reset Preview</button>
-</div>
+<label for="headerColor">Header Background Colour</label><input id="headerColor" type="color" value="#075b3c">
+<div class="preview-header" id="headerPreview"><img src="tycf-logo-cropped-1.png" alt="TYCF Logo"><h2>TYCF FOOD DONATION</h2><p>Telangana Yuva Chaithanya Foundation</p></div>
+<div class="actions"><button type="button" id="headerPreviewBtn">Live Preview</button><button type="button" id="headerSaveBtn">Save Header Design</button><button type="button" class="light" id="headerResetBtn">Reset Preview</button></div>
 <p class="muted">The existing logo and organization name remain unchanged.</p>
 </section>
 
 <section id="settingsTab" class="panel" hidden>
 <h2>Admin Profile</h2>
 <form id="profileForm">
-<label>Display Name</label>
-<input id="displayName" required maxlength="60">
-<label>Login Email</label>
-<input id="newAdminEmail" type="email" required>
-<button>Save Profile</button>
+<label for="displayName">Display Name</label><input id="displayName" required maxlength="60">
+<label for="newAdminEmail">Login Email</label><input id="newAdminEmail" type="email" required>
+<button type="submit">Save Profile</button>
 </form>
-
 <p class="muted">Email changes may require confirmation from your inbox.</p>
-<hr>
-
-<h2>Package & WhatsApp Settings</h2>
+<hr><h2>Package & WhatsApp Settings</h2>
 <form id="settingsForm">
-<label>Foundation WhatsApp Number (country code + number)</label>
-<input id="waNumber" placeholder="919876543210" required>
-
+<label for="waNumber">Foundation WhatsApp Number (country code + number)</label><input id="waNumber" placeholder="919876543210" required>
 <div class="row">
-<div><label>Veg Meals Price</label><input id="vegPrice" type="number" min="1" required></div>
-<div><label>Egg Meals Price</label><input id="eggPrice" type="number" min="1" required></div>
-<div><label>Chicken Meals Price</label><input id="chickenPrice" type="number" min="1" required></div>
-<div><label>Cake Celebration Price</label><input id="cakePrice" type="number" min="1" required></div>
+<div><label for="vegPrice">Veg Meals Price</label><input id="vegPrice" type="number" min="1" required></div>
+<div><label for="eggPrice">Egg Meals Price</label><input id="eggPrice" type="number" min="1" required></div>
+<div><label for="chickenPrice">Chicken Meals Price</label><input id="chickenPrice" type="number" min="1" required></div>
+<div><label for="cakePrice">Cake Celebration Price</label><input id="cakePrice" type="number" min="1" required></div>
 </div>
-
-<label>Reminder Days Before Donation</label>
-<input id="reminderDays" type="number" min="1" max="30" value="1">
-<button>Save Settings</button>
+<label for="reminderDays">Reminder Days Before Donation</label><input id="reminderDays" type="number" min="1" max="30" value="1">
+<button type="submit">Save Settings</button>
 </form>
 </section>
 
 <section id="qrTab" class="panel" hidden>
-<h2>UPI Payment QR Settings</h2>
-<div id="qrPreviewWrap">Loading QR preview...</div>
-<form id="qrForm">
-<label>Choose QR image (JPG, PNG or WebP; max 5 MB)</label>
-<input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required>
-<button>Upload / Replace QR</button>
-</form>
+<h2>UPI Payment QR Settings</h2><div id="qrPreviewWrap">Loading QR preview...</div>
+<form id="qrForm"><label for="qrFile">Choose QR image (JPG, PNG or WebP; max 5 MB)</label><input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required><button type="submit">Upload / Replace QR</button></form>
 <button class="warn" id="deleteQrBtn" type="button">Delete Current QR</button>
 </section>
 
 <section id="reportsTab" class="panel" hidden>
-<h2>Monthly Donation Reports</h2>
-<p class="muted">Cancelled bookings are excluded from paid and pending donation totals.</p>
-
+<h2>Monthly Donation Reports</h2><p class="muted">Cancelled bookings are excluded from paid and pending donation totals.</p>
 <div class="report-controls">
-<div><label>Month</label><input id="reportMonth" type="month"></div>
-<div>
-<label>Report Type</label>
-<select id="reportDateType">
-<option value="booking">Booking Date Report</option>
-<option value="donation">Donation Date Report</option>
-</select>
+<div><label for="reportMonth">Month</label><input id="reportMonth" type="month"></div>
+<div><label for="reportDateType">Report Type</label><select id="reportDateType"><option value="booking">Booking Date Report</option><option value="donation">Donation Date Report</option></select></div>
 </div>
-</div>
-
 <div class="grid">
 <div class="stat">Total Bookings<strong id="reportTotal">0</strong></div>
 <div class="stat">Paid Donations<strong id="reportPaid">₹0</strong></div>
 <div class="stat">Pending Donations<strong id="reportPending">₹0</strong></div>
 <div class="stat">Cancelled Orders<strong id="reportCancelled">0</strong></div>
 </div>
-<h3>Booking Status</h3>
-<div id="reportStatusCards" class="report-grid"></div>
+<h3>Booking Status</h3><div id="reportStatusCards" class="report-grid"></div>
 <div class="actions"><button class="light" id="clearReportStatus" type="button">Show All Orders</button></div>
 <div id="reportOrders"></div>
 </section>
@@ -233,241 +168,398 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 
 <script type="module">
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const supabase=createClient(
-'https://mswgamusywvqxscfcyff.supabase.co',
-'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
-);
-
+const supabase=createClient('https://mswgamusywvqxscfcyff.supabase.co','sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u');
 const $=id=>document.getElementById(id);
-let orders=[],settings=null,user=null,reportStatusFilter='';
-let packageRows=[],selectedPackageImage=null,headerFile=null,headerObjectUrl=null;
+let orders=[],settings=null,user=null,reportStatusFilter='',packageRows=[],headerFile=null,headerObjectUrl=null;
 const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
 const say=m=>$('message').textContent=m;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
-
-const monthNow=()=>{
-const d=new Date();
-return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-};
-const datePlus=n=>{
-const d=new Date();
-d.setDate(d.getDate()+n);
-const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
-return local.toISOString().slice(0,10);
-};
-function phone(v){
-let p=String(v||'').replace(/\D/g,'');
-if(p.length===10)p='91'+p;
-return p.length>=11&&p.length<=15?p:'';
-}
-
+const monthNow=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};
+const datePlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+function phone(v){let p=String(v||'').replace(/\D/g,'');if(p.length===10)p='91'+p;return p.length>=11&&p.length<=15?p:'';}
 function waLink(o){
-const p=phone(o.whatsapp_recipient||o.customer_mobile);
-if(!p)return'';
-const msg=`TYCF FOOD DONATION
-
-Dear ${o.customer_name||'Customer'},
-Your donation booking has been confirmed.
-
-Package: ${o.package_name||''}
-Donation Amount: Rs. ${Number(o.package_price||0).toLocaleString('en-IN')}
-Donation Date: ${o.donation_date||''}
-Occasion: ${o.occasion||''}
-
-Payment Status: PAID
-Order Status: CONFIRMED
-
-Thank you for supporting TYCF Foundation.
-Sharing Happiness ❤️`;
-return'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
+const p=phone(o.whatsapp_recipient||o.customer_mobile);if(!p)return '';
+const msg=`TYCF FOOD DONATION\n\nDear ${o.customer_name||'Customer'},\nYour donation booking has been confirmed.\n\nPackage: ${o.package_name||''}\nDonation Amount: Rs. ${Number(o.package_price||0).toLocaleString('en-IN')}\nDonation Date: ${o.donation_date||''}\nOccasion: ${o.occasion||''}\n\nPayment Status: PAID\nOrder Status: CONFIRMED\n\nThank you for supporting TYCF Foundation.\nSharing Happiness ❤️`;
+return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
-
-/* ADMIN AUTHENTICATION */
 async function init(){
 try{
-const {data:{session},error}=await supabase.auth.getSession();
-if(error)throw error;
+const {data:{session},error}=await supabase.auth.getSession();if(error)throw error;
 if(!session){location.href='admin.html';return;}
-
-const {data:admin,error:ae}=await supabase
-.from('tycf_admins').select('user_id')
-.eq('user_id',session.user.id).maybeSingle();
-
-if(ae)throw ae;
-if(!admin){await supabase.auth.signOut();location.href='admin.html';return;}
-
-user=session.user;
-$('app').hidden=false;
-const name=user.user_metadata?.display_name||'TYCF Admin';
-$('adminDisplayName').textContent=name;
-$('displayName').value=name;
-$('newAdminEmail').value=user.email||'';
-$('reportMonth').value=monthNow();
-
-await loadAll();
+const {data:admin,error:ae}=await supabase.from('tycf_admins').select('user_id').eq('user_id',session.user.id).maybeSingle();
+if(ae)throw ae;if(!admin){await supabase.auth.signOut();location.href='admin.html';return;}
+user=session.user;$('app').hidden=false;
+$('adminDisplayName').textContent=user.user_metadata?.display_name||'TYCF Admin';
+$('displayName').value=user.user_metadata?.display_name||'TYCF Admin';$('newAdminEmail').value=user.email||'';
+$('reportMonth').value=monthNow();await loadAll();
 }catch(e){say('Dashboard error: '+e.message);}
 }
-
-/* LOAD DASHBOARD DATA */
 async function loadAll(){
 say('Loading dashboard...');
 const [a,b]=await Promise.all([
 supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
 supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
 ]);
-if(a.error){say('Bookings error: '+a.error.message);return;}
-if(b.error){say('Settings error: '+b.error.message);return;}
-orders=a.data||[];
-settings=b.data;
-if(!settings){say('No settings row found in tycf_settings.');return;}
-
+if(a.error){say('Bookings error: '+a.error.message);return;}if(b.error){say('Settings error: '+b.error.message);return;}
+orders=a.data||[];settings=b.data;if(!settings){say('No settings row found in tycf_settings.');return;}
 await Promise.all(orders.map(async o=>{
 o.stickerPhotoUrl=null;o.stickerDesignUrl=null;
-for(const [field,target] of [
-['sticker_photo_path','stickerPhotoUrl'],
-['sticker_design_path','stickerDesignUrl']
-]){
-if(o[field]){
-const r=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(o[field],3600);
-if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;
-}
+for(const [field,target] of [['sticker_photo_path','stickerPhotoUrl'],['sticker_design_path','stickerDesignUrl']]){
+if(o[field]){const r=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(o[field],3600);if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;}
 }
 }));
-
-renderStats();
-renderOrders();
-renderReminders();
-fillSettings();
+renderStats();renderOrders();renderReminders();fillSettings();
 await Promise.all([loadPackageList(),renderQr(),loadHeaderSettings()]);
-if(!$('reportsTab').hidden)renderReport();
-say('Dashboard loaded.');
+if(!$('reportsTab').hidden)renderReport();say('Dashboard loaded.');
 }
-
-/* COUNTS */
 function renderStats(){
-$('total').textContent=orders.length;
-$('received').textContent=orders.filter(o=>o.status==='Received').length;
-$('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;
-$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
+$('total').textContent=orders.length;$('received').textContent=orders.filter(o=>o.status==='Received').length;
+$('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
 }
-
-/* BOOKINGS */
 function orderHtml(o){
 const paid=o.payment_status==='Paid';
 const photo=o.stickerPhotoUrl?`<div class="order-image-card"><b>Customer Photo</b><a href="${esc(o.stickerPhotoUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerPhotoUrl)}" alt="Customer photo"></a></div>`:'';
 const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
 const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
-return `<article class="order">
-<h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
+return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
 <p><b>${esc(o.package_name)}</b> — ${money(o.package_price)}</p>
 <p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
 <p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
 ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
 <p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
-<div class="wa-box">
-<label>Customer WhatsApp Number</label>
-<input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15">
-<button data-savewa="${esc(o.id)}">Save WhatsApp Number</button>
-</div>
-<div class="actions">
-${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}
-<select id="st-${esc(o.id)}">${opts}</select>
-<button data-status="${esc(o.id)}">Save Status</button>
-${paid&&waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>`:''}
-</div></article>`;
+<div class="wa-box"><label>Customer WhatsApp Number</label><input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15"><button data-savewa="${esc(o.id)}">Save WhatsApp Number</button></div>
+<div class="actions">${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}<select id="st-${esc(o.id)}">${opts}</select><button data-status="${esc(o.id)}">Save Status</button>
+${paid&&waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>`:''}</div></article>`;
 }
 function renderOrders(){
 const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
 const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
 $('ordersList').innerHTML=list.length?list.map(orderHtml).join(''):'<p>No matching bookings.</p>';
 }
-
 async function downloadSticker(id){
-const o=orders.find(x=>String(x.id)===String(id));
-if(!o?.stickerDesignUrl){say('Sticker design unavailable.');return;}
-try{
-const r=await fetch(o.stickerDesignUrl);
-if(!r.ok)throw Error('Could not fetch design');
-const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');
-a.href=url;a.download='TYCF-'+String(o.sticker_name||o.customer_name||'Sticker').replace(/[^a-z0-9_-]/gi,'-')+'.jpg';
-a.click();URL.revokeObjectURL(url);say('Sticker downloaded.');
-}catch(e){say('Download failed: '+e.message);}
+const o=orders.find(x=>String(x.id)===String(id));if(!o?.stickerDesignUrl){say('Sticker design unavailable.');return;}
+try{const r=await fetch(o.stickerDesignUrl);if(!r.ok)throw Error('Could not fetch design');const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='TYCF-'+String(o.sticker_name||o.customer_name||'Sticker').replace(/[^a-z0-9_-]/gi,'-')+'.jpg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('Sticker downloaded.');}catch(e){say('Download failed: '+e.message);}
 }
-
 async function saveWA(id){
-const p=phone($('wa-'+id).value);
-if(!p){say('Enter valid WhatsApp number with country code.');return;}
+const p=phone($('wa-'+id).value);if(!p){say('Enter valid WhatsApp number with country code.');return;}
 const {error}=await supabase.from('tycf_orders').update({whatsapp_recipient:p}).eq('id',id);
-if(error){say(error.message);return;}
-await loadAll();say('WhatsApp number saved.');
+if(error){say('WhatsApp number save failed: '+error.message);return;}await loadAll();say('WhatsApp number saved.');
 }
 async function verify(id){
-const o=orders.find(x=>String(x.id)===String(id));
-if(!o||o.payment_status==='Paid')return;
-if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?'))return;
+const o=orders.find(x=>String(x.id)===String(id));if(!o||o.payment_status==='Paid')return;
+if(!confirm('Only continue if payment has actually reached the TYCF Foundation account. Mark this payment as Paid?'))return;
 const {error}=await supabase.from('tycf_orders').update({payment_status:'Paid',status:'Confirmed'}).eq('id',id);
-if(error){say(error.message);return;}
-await loadAll();say('Payment marked Paid and booking Confirmed.');
+if(error){say('Payment update failed: '+error.message);return;}await loadAll();say('Payment marked Paid and booking Confirmed.');
 }
 async function saveStatus(id){
 const st=$('st-'+id).value,o=orders.find(x=>String(x.id)===String(id));
 if(st==='Confirmed'&&o?.payment_status!=='Paid'){say('Verify payment before confirming.');return;}
 const {error}=await supabase.from('tycf_orders').update({status:st}).eq('id',id);
-if(error){say(error.message);return;}
-await loadAll();say('Booking status updated.');
+if(error){say('Status update failed: '+error.message);return;}await loadAll();say('Booking status updated.');
 }
-
-/* REMINDERS */
 function renderReminders(){
-const n=Number(settings.reminder_days||1);
-const list=orders.filter(o=>o.donation_date===datePlus(n)&&!['Delivered','Cancelled'].includes(o.status));
+const n=Number(settings.reminder_days||1),list=orders.filter(o=>o.donation_date===datePlus(n)&&!['Delivered','Cancelled'].includes(o.status));
 $('reminderList').innerHTML=list.length?list.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p class="muted">${esc(o.customer_mobile)} · ${esc(o.donation_date)} · ${esc(o.status)}</p></article>`).join(''):'<p>No donations due on reminder day.</p>';
 }
-
-/* REPORTS */
-function reportMonth(o){
-return $('reportDateType').value==='donation'?String(o.donation_date||'').slice(0,7):String(o.created_at||'').slice(0,7);
-}
+function reportMonth(o){return $('reportDateType').value==='donation'?String(o.donation_date||'').slice(0,7):String(o.created_at||'').slice(0,7);}
 function renderReport(){
 const m=$('reportMonth').value,list=orders.filter(o=>reportMonth(o)===m),active=list.filter(o=>o.status!=='Cancelled');
 $('reportTotal').textContent=list.length;
-$('reportPaid').textContent=money(active.filter(o=>o.payment_status==='Paid').reduce((s,o)=>s+Number(o.package_price||0),0));
-$('reportPending').textContent=money(active.filter(o=>o.payment_status!=='Paid').reduce((s,o)=>s+Number(o.package_price||0),0));
+$('reportPaid').textContent=money(active.filter(o=>o.payment_status==='Paid').reduce((s,o)=>s+Number(o.total_amount??o.package_price??0),0));
+$('reportPending').textContent=money(active.filter(o=>o.payment_status!=='Paid').reduce((s,o)=>s+Number(o.total_amount??o.package_price??0),0));
 $('reportCancelled').textContent=list.filter(o=>o.status==='Cancelled').length;
 $('reportStatusCards').innerHTML=statuses.map(s=>`<button class="report-card ${reportStatusFilter===s?'active':''}" data-rstatus="${s}">${s}<strong>${list.filter(o=>o.status===s).length}</strong></button>`).join('');
-$('reportStatusCards').querySelectorAll('[data-rstatus]').forEach(b=>b.onclick=()=>{reportStatusFilter=reportStatusFilter===b.dataset.rstatus?'':b.dataset.rstatus;renderReport();});
 const shown=list.filter(o=>!reportStatusFilter||o.status===reportStatusFilter);
-$('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p>${money(o.package_price)} · ${esc(o.status)} · ${esc(o.payment_status)}</p><p class="muted">Booked: ${esc(String(o.created_at||'').slice(0,10))} · Donation: ${esc(o.donation_date)}</p></article>`).join(''):'<p>No bookings for this report.</p>';
+$('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p>${money(o.total_amount??o.package_price)} · ${esc(o.status)} · ${esc(o.payment_status)}</p><p class="muted">Booked: ${esc(String(o.created_at||'').slice(0,10))} · Donation: ${esc(o.donation_date)}</p></article>`).join(''):'<p>No bookings for this report.</p>';
 }
-
-/* SETTINGS */
 function fillSettings(){
-const s=settings;
-$('waNumber').value=s.whatsapp_number||'';
-$('vegPrice').value=s.veg_price??1500;
-$('eggPrice').value=s.egg_price??1800;
-$('chickenPrice').value=s.chicken_price??2500;
-$('cakePrice').value=s.cake_price??1500;
-$('reminderDays').value=s.reminder_days??1;
+const s=settings;$('waNumber').value=s.whatsapp_number||'';$('vegPrice').value=s.veg_price??1500;$('eggPrice').value=s.egg_price??1800;
+$('chickenPrice').value=s.chicken_price??2500;$('cakePrice').value=s.cake_price??1500;$('reminderDays').value=s.reminder_days??1;
 }
 async function saveSettings(e){
-e.preventDefault();
-const p={
-whatsapp_number:$('waNumber').value.trim(),
-veg_price:Number($('vegPrice').value),
-egg_price:Number($('eggPrice').value),
-chicken_price:Number($('chickenPrice').value),
-cake_price:Number($('cakePrice').value),
-reminder_days:Number($('reminderDays').value),
-updated_at:new Date().toISOString()
-};
-const {error}=await supabase.from('tycf_settings').update(p).eq('id',settings.id);
-if(error){say('Settings save failed: '+error.message);return;}
-await loadAll();say('Settings saved.');
+e.preventDefault();const p={whatsapp_number:$('waNumber').value.trim(),veg_price:Number($('vegPrice').value),egg_price:Number($('eggPrice').value),chicken_price:Number($('chickenPrice').value),cake_price:Number($('cakePrice').value),reminder_days:Number($('reminderDays').value),updated_at:new Date().toISOString()};
+const {error}=await supabase.from('tycf_settings').update(p).eq('id',settings.id);if(error){say('Settings save failed: '+error.message);return;}
+await loadAll();
+say('Settings saved.');
 }
+
 async function saveProfile(e){
 e.preventDefault();
-const name=$('displayName').value.trim(),email=$('newAdminEmail').value.trim();
-const {error}=await supabase.auth.updateUser({email,data:{display_name:n
+const name=$('displayName').value.trim();
+const email=$('newAdminEmail').value.trim();
+if(!name||!email){say('Enter display name and email.');return;}
+const {error}=await supabase.auth.updateUser({
+email,
+data:{display_name:name}
+});
+if(error){say('Profile update failed: '+error.message);return;}
+$('adminDisplayName').textContent=name;
+say('Profile updated. If email confirmation is required, check your inbox.');
+}
+
+async function renderQr(){
+const path='current/payment-qr';
+const {data,error}=await supabase.storage.from('tycf-payment-qr').list('current',{limit:100});
+if(error){$('qrPreviewWrap').textContent='QR list error: '+error.message;return;}
+const found=(data||[]).some(x=>x.name==='payment-qr');
+if(!found){
+$('qrPreviewWrap').innerHTML='<p>No QR image uploaded yet. Upload your UPI QR below.</p>';
+return;
+}
+const {data:urlData}=supabase.storage.from('tycf-payment-qr').getPublicUrl(path);
+$('qrPreviewWrap').innerHTML=`<img src="${esc(urlData.publicUrl+'?t='+Date.now())}" alt="Current UPI QR"><p class="muted">Current UPI QR image</p>`;
+}
+
+async function saveQr(e){
+e.preventDefault();
+const file=$('qrFile').files[0];
+if(!file)return;
+if(file.size>5*1024*1024){say('QR image must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+say('Uploading QR...');
+const {error}=await supabase.storage.from('tycf-payment-qr').upload('current/payment-qr',file,{upsert:true,contentType:file.type});
+if(error){say('QR upload failed: '+error.message);return;}
+$('qrFile').value='';
+await renderQr();
+say('UPI QR uploaded.');
+}
+
+async function deleteQr(){
+if(!confirm('Delete the current UPI QR image?'))return;
+const {error}=await supabase.storage.from('tycf-payment-qr').remove(['current/payment-qr']);
+if(error){say('QR delete failed: '+error.message);return;}
+await renderQr();
+say('QR image deleted.');
+}
+
+async function loadHeaderSettings(){
+const {data,error}=await supabase.rpc('get_tycf_public_header');
+if(error){say('Header settings load failed: '+error.message);return;}
+const h=Array.isArray(data)?data[0]:data;
+if(h?.header_background_color)$('headerColor').value=h.header_background_color;
+const preview=$('headerPreview');
+preview.style.backgroundColor=$('headerColor').value;
+if(h?.header_background_path){
+const {data:u}=supabase.storage.from('tycf-header-assets').getPublicUrl(h.header_background_path);
+preview.style.backgroundImage=`url("${u.publicUrl}")`;
+}else{
+preview.style.backgroundImage='none';
+}
+}
+
+function previewHeader(){
+$('headerPreview').style.backgroundColor=$('headerColor').value;
+$('headerPreview').style.backgroundImage=headerObjectUrl?`url("${headerObjectUrl}")`:'none';
+}
+
+async function saveHeader(){
+const color=$('headerColor').value;
+let path=settings.header_background_path||null;
+if(headerFile){
+if(headerFile.size>5*1024*1024){say('Header photo must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(headerFile.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+path='header/header-'+Date.now();
+const {error}=await supabase.storage.from('tycf-header-assets').upload(path,headerFile,{upsert:true,contentType:headerFile.type});
+if(error){say('Header upload failed: '+error.message);return;}
+}
+const {error}=await supabase.from('tycf_settings').update({
+header_background_path:path,
+header_background_color:color,
+updated_at:new Date().toISOString()
+}).eq('id',settings.id);
+if(error){say('Header save failed: '+error.message);return;}
+headerFile=null;
+$('headerPhoto').value='';
+await loadHeaderSettings();
+say('Header design saved.');
+       }async function loadPackageList(){
+const {data,error}=await supabase.from('tycf_packages').select('*').order('created_at',{ascending:true});
+if(error){$('packageList').textContent='Package loading failed: '+error.message;return;}
+packageRows=data||[];
+$('packageList').innerHTML=packageRows.length?packageRows.map(p=>{
+const img=p.image_path?supabase.storage.from('tycf-package-images').getPublicUrl(p.image_path).data.publicUrl:'';
+return `<article class="package-admin">
+<h3>${esc(p.name)} ${p.is_active?'<span class="tag paid">Active</span>':'<span class="tag">Inactive</span>'}</h3>
+<p><b>${money(p.price)}</b> · ${Number(p.people_count||0)} people</p>
+<p>${esc(p.description||'')}</p>
+${img?`<img src="${esc(img)}" alt="Package photo">`:''}
+<div class="actions">
+<button type="button" data-editpackage="${esc(p.id)}">Edit</button>
+<button type="button" class="light" data-togglepackage="${esc(p.id)}">${p.is_active?'Deactivate':'Activate'}</button>
+<button type="button" class="warn" data-deletepackage="${esc(p.id)}">Delete</button>
+</div></article>`;
+}).join(''):'<p>No packages found.</p>';
+}
+
+function clearPackageForm(){
+$('packageForm').reset();
+$('packageId').value='';
+$('packageImagePreview').innerHTML='';
+$('packagePeople').value=25;
+$('packageSaveBtn').textContent='Save Package';
+}
+
+async function savePackage(e){
+e.preventDefault();
+const id=$('packageId').value;
+const name=$('packageName').value.trim();
+const price=Number($('packagePrice').value);
+const people=Number($('packagePeople').value);
+if(!name||price<=0||people<0){say('Enter valid package details.');return;}
+const payload={
+name,price,people_count:people,
+description:$('packageDescription').value.trim(),
+updated_at:new Date().toISOString()
+};
+const file=$('packageImage').files[0];
+if(file){
+if(file.size>5*1024*1024){say('Package image must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+const path='packages/'+Date.now()+'-'+file.name.replace(/[^a-z0-9._-]/gi,'-');
+const {error}=await supabase.storage.from('tycf-package-images').upload(path,file,{upsert:true,contentType:file.type});
+if(error){say('Image upload failed: '+error.message);return;}
+payload.image_path=path;
+}
+const result=id?
+await supabase.from('tycf_packages').update(payload).eq('id',id):
+await supabase.from('tycf_packages').insert({...payload,is_active:true});
+if(result.error){say('Package save failed: '+result.error.message);return;}
+clearPackageForm();
+await loadPackageList();
+say('Package saved.');
+}
+
+function editPackage(id){
+const p=packageRows.find(x=>String(x.id)===String(id));
+if(!p)return;
+$('packageId').value=p.id;
+$('packageName').value=p.name||'';
+$('packagePrice').value=p.price||'';
+$('packagePeople').value=p.people_count??25;
+$('packageDescription').value=p.description||'';
+$('packageSaveBtn').textContent='Update Package';
+$('packageImagePreview').innerHTML=p.image_path?
+'<p class="muted">Current image retained unless a new one is selected.</p>':'';
+window.scrollTo({top:$('packageForm').getBoundingClientRect().top+window.scrollY-20,behavior:'smooth'});
+}
+
+async function togglePackage(id){
+const p=packageRows.find(x=>String(x.id)===String(id));
+if(!p)return;
+const {error}=await supabase.from('tycf_packages').update({
+is_active:!p.is_active,updated_at:new Date().toISOString()
+}).eq('id',id);
+if(error){say('Package update failed: '+error.message);return;}
+await loadPackageList();
+say('Package status updated.');
+}
+
+async function deletePackage(id){
+if(!confirm('Delete this package?'))return;
+const {error}=await supabase.from('tycf_packages').delete().eq('id',id);
+if(error){say('Package delete failed: '+error.message);return;}
+await loadPackageList();
+say('Package deleted.');
+  }
+  function showTab(name){
+document.querySelectorAll('main section[id$="Tab"]').forEach(s=>s.hidden=true);
+const target=$(name+'Tab');
+if(target)target.hidden=false;
+if(name==='reports')renderReport();
+if(name==='packages')loadPackageList();
+if(name==='qr')renderQr();
+if(name==='header')loadHeaderSettings();
+}
+
+document.querySelectorAll('[data-tab]').forEach(b=>
+b.addEventListener('click',()=>showTab(b.dataset.tab))
+);
+
+$('refreshBtn').addEventListener('click',loadAll);
+
+$('logoutBtn').addEventListener('click',async()=>{
+await supabase.auth.signOut();
+location.href='admin.html';
+});
+
+$('search').addEventListener('input',renderOrders);
+$('statusFilter').addEventListener('change',renderOrders);
+$('settingsForm').addEventListener('submit',saveSettings);
+$('profileForm').addEventListener('submit',saveProfile);
+$('qrForm').addEventListener('submit',saveQr);
+$('deleteQrBtn').addEventListener('click',deleteQr);
+$('packageForm').addEventListener('submit',savePackage);
+$('packageCancelBtn').addEventListener('click',clearPackageForm);
+
+$('headerPreviewBtn').addEventListener('click',previewHeader);
+$('headerSaveBtn').addEventListener('click',saveHeader);
+
+$('headerResetBtn').addEventListener('click',async()=>{
+headerFile=null;
+if(headerObjectUrl)URL.revokeObjectURL(headerObjectUrl);
+headerObjectUrl=null;
+$('headerPhoto').value='';
+await loadHeaderSettings();
+});
+
+$('headerPhoto').addEventListener('change',()=>{
+const f=$('headerPhoto').files[0];
+if(!f)return;
+if(headerObjectUrl)URL.revokeObjectURL(headerObjectUrl);
+headerFile=f;
+headerObjectUrl=URL.createObjectURL(f);
+previewHeader();
+});
+
+$('headerColor').addEventListener('input',()=>{
+$('headerPreview').style.backgroundColor=$('headerColor').value;
+});
+
+$('packageImage').addEventListener('change',()=>{
+const f=$('packageImage').files[0];
+if(!f)return;
+if(f.size>5*1024*1024){
+say('Image must be under 5 MB.');
+$('packageImage').value='';
+return;
+}
+const url=URL.createObjectURL(f);
+$('packageImagePreview').innerHTML=
+`<img src="${url}" alt="Package preview" style="max-width:180px">`;
+});
+
+document.addEventListener('click',e=>{
+const b=e.target.closest('button');
+if(!b)return;
+if(b.dataset.verify)verify(b.dataset.verify);
+if(b.dataset.status)saveStatus(b.dataset.status);
+if(b.dataset.savewa)saveWA(b.dataset.savewa);
+if(b.dataset.download)downloadSticker(b.dataset.download);
+if(b.dataset.editpackage)editPackage(b.dataset.editpackage);
+if(b.dataset.togglepackage)togglePackage(b.dataset.togglepackage);
+if(b.dataset.deletepackage)deletePackage(b.dataset.deletepackage);
+if(b.dataset.rstatus){
+reportStatusFilter=reportStatusFilter===b.dataset.rstatus?'':b.dataset.rstatus;
+renderReport();
+}
+});
+
+$('reportMonth').addEventListener('change',renderReport);
+$('reportDateType').addEventListener('change',renderReport);
+
+$('clearReportStatus').addEventListener('click',()=>{
+reportStatusFilter='';
+renderReport();
+});
+
+init();
+</script>
+</body>
+</html>
