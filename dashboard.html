@@ -73,8 +73,21 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <button data-tab="settings" type="button">Settings</button>
 <button data-tab="qr" type="button">UPI QR</button>
 <button data-tab="reports" type="button">Reports</button>
+ <button data-tab="appicon" type="button">App Icon</button>
 </nav>
+<section id="appiconTab" class="panel" hidden>
+  <h2>Website App Icon Settings</h2>
+  <p class="muted">Change the TYCF website app icon.</p>
 
+  <div id="appIconPreview">
+    No app icon uploaded yet.
+  </div>
+
+  <label for="appIconFile">Choose New App Icon (PNG, 512x512)</label>
+  <input id="appIconFile" type="file" accept="image/png">
+
+  <button id="saveAppIconBtn" type="button">Save App Icon</button>
+</section>
 <section id="bookingsTab" class="panel">
 <h2>Donation Bookings</h2>
 <input id="search" placeholder="Search name, phone or package">
@@ -183,6 +196,104 @@ const p=phone(o.whatsapp_recipient||o.customer_mobile);if(!p)return '';
 const msg=`TYCF FOOD DONATION\n\nDear ${o.customer_name||'Customer'},\nYour donation booking has been confirmed.\n\nPackage: ${o.package_name||''}\nDonation Amount: Rs. ${Number(o.package_price||0).toLocaleString('en-IN')}\nDonation Date: ${o.donation_date||''}\nOccasion: ${o.occasion||''}\n\nPayment Status: PAID\nOrder Status: CONFIRMED\n\nThank you for supporting TYCF Foundation.\nSharing Happiness ❤️`;
 return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
+// TYCF APP ICON SETTINGS
+
+async function loadAppIconSettings(){
+  const {data,error}=await supabase.rpc('get_tycf_public_app_icon');
+
+  if(error){
+    say('App icon loading failed: '+error.message);
+    return;
+  }
+
+  const preview=$('appIconPreview');
+
+  if(data){
+    const {data:u}=supabase.storage
+      .from('tycf-header-assets')
+      .getPublicUrl(data);
+
+    preview.innerHTML=
+      `<img src="${esc(u.publicUrl)}?t=${Date.now()}"
+      alt="TYCF App Icon"
+      style="width:120px;height:120px;object-fit:contain">`;
+  }else{
+    preview.textContent='No app icon uploaded yet.';
+  }
+}
+
+$('appIconFile').addEventListener('change',()=>{
+  const file=$('appIconFile').files[0];
+  if(!file)return;
+
+  if(file.type!=='image/png'){
+    say('Please select a PNG image.');
+    $('appIconFile').value='';
+    return;
+  }
+
+  if(file.size>5*1024*1024){
+    say('Image must be under 5 MB.');
+    $('appIconFile').value='';
+    return;
+  }
+
+  const url=URL.createObjectURL(file);
+
+  $('appIconPreview').innerHTML=
+    `<img src="${url}" alt="New App Icon Preview"
+    style="width:120px;height:120px;object-fit:contain">`;
+});
+
+async function saveAppIcon(){
+  const file=$('appIconFile').files[0];
+
+  if(!file){
+    say('Please choose a PNG app icon first.');
+    return;
+  }
+
+  if(!settings?.id){
+    say('Settings are not loaded. Refresh and try again.');
+    return;
+  }
+
+  say('Uploading app icon...');
+
+  const path='app-icons/current.png';
+
+  const {error:uploadError}=await supabase.storage
+    .from('tycf-header-assets')
+    .upload(path,file,{
+      upsert:true,
+      contentType:'image/png',
+      cacheControl:'0'
+    });
+
+  if(uploadError){
+    say('App icon upload failed: '+uploadError.message);
+    return;
+  }
+
+  const {error:updateError}=await supabase
+    .from('tycf_settings')
+    .update({
+      app_icon_path:path,
+      updated_at:new Date().toISOString()
+    })
+    .eq('id',settings.id);
+
+  if(updateError){
+    say('App icon save failed: '+updateError.message);
+    return;
+  }
+
+  $('appIconFile').value='';
+  await loadAppIconSettings();
+  say('TYCF App Icon saved successfully.');
+}
+
+$('saveAppIconBtn').addEventListener('click',saveAppIcon);
 async function init(){
 try{
 const {data:{session},error}=await supabase.auth.getSession();if(error)throw error;
@@ -476,6 +587,7 @@ if(name==='reports')renderReport();
 if(name==='packages')loadPackageList();
 if(name==='qr')renderQr();
 if(name==='header')loadHeaderSettings();
+if(name==='appicon')loadAppIconSettings();
 }
 
 document.querySelectorAll('[data-tab]').forEach(b=>
