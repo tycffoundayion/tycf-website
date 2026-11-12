@@ -694,11 +694,9 @@ $('bookingForm').addEventListener('submit',async e=>{
       consent:$('consent').checked
     };
 
-    const {data,error}=await supabase
-      .from('tycf_orders')
-      .insert(order)
-      .select()
-      .single();
+    const {error}=await supabase
+  .from('tycf_orders')
+  .insert(order);
 
     if(error)throw error;
 
