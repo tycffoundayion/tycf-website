@@ -1,24 +1,26 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075b3c">
 <title>TYCF Admin Dashboard</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#e8f5ec;color:#173b2d}
-header{background:#075b3c;color:white;padding:18px}
+header{background:#075b3c;color:white;padding:20px}
 main{max-width:1100px;margin:auto;padding:14px}
 button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:white;cursor:pointer;text-decoration:none;display:inline-block}
 button.light{background:white;color:#075b3c;border:1px solid #b7d4c3}
-button.warn{background:#8a3b25}
-button:disabled{opacity:.5}
+button.warn{background:#9a382b}
+button:disabled{opacity:.5;cursor:not-allowed}
 .actions,nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.panel,.stat{background:white;border-radius:12px;padding:15px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
+.panel,.stat{background:white;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
 .grid,.row,.report-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .stat strong{display:block;font-size:24px;margin-top:7px}
-input,select{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;margin:5px 0 12px;background:white}
-label{font-weight:bold;font-size:13px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;margin:5px 0 12px;background:white}
+label{font-weight:bold;font-size:13px;display:block}
 .order{border:1px solid #dce9e0;border-radius:10px;padding:13px;margin:10px 0}
 .muted{color:#557064;font-size:13px}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
@@ -35,27 +37,29 @@ label{font-weight:bold;font-size:13px}
 .report-card{background:#f5faf6;color:#173b2d;border:1px solid #dce9e0;text-align:left;width:100%}
 .report-card strong{display:block;font-size:22px}
 .report-card.active{border:2px solid #075b3c}
+.package-admin{border:1px solid #dce9e0;padding:14px;border-radius:10px;margin:10px 0}
+.package-admin img{width:100%;max-width:180px;max-height:130px;object-fit:cover;border-radius:8px}
+.preview-header{padding:25px;color:white;border-radius:10px;background:#075b3c;background-size:cover;background-position:center;margin:12px 0}
+.preview-header img{width:65px;height:65px;object-fit:contain;background:white;border-radius:8px}
 [hidden]{display:none!important}
 hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 </style>
 </head>
-
 <body>
 
 <header>
 <h2>TYCF Food Donation — Admin</h2>
-<p>Bookings, payment verification, reminders, settings and reports</p>
+<p>Bookings, packages, header design, payment and reports</p>
 <b id="adminDisplayName">TYCF Admin</b>
 </header>
 
 <main>
-
 <div class="actions">
 <button class="light" id="refreshBtn">Refresh</button>
 <button class="light" id="logoutBtn">Logout</button>
 </div>
 
-<div id="message">Checking admin access…</div>
+<div id="message">Checking admin access...</div>
 
 <section id="app" hidden>
 
@@ -68,16 +72,17 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 
 <nav>
 <button data-tab="bookings">Bookings</button>
-<button data-tab="reminders">Tomorrow reminders</button>
+<button data-tab="reminders">Reminders</button>
+<button data-tab="packages">Donation Packages</button>
+<button data-tab="header">Header Design</button>
 <button data-tab="settings">Settings</button>
-<button data-tab="qr">UPI QR Settings</button>
-<button data-tab="reports">Monthly Reports</button>
+<button data-tab="qr">UPI QR</button>
+<button data-tab="reports">Reports</button>
 </nav>
 
 <section id="bookingsTab" class="panel">
 <h2>Donation Bookings</h2>
 <input id="search" placeholder="Search name, phone or package">
-
 <label>Filter status</label>
 <select id="statusFilter">
 <option value="">All statuses</option>
@@ -87,7 +92,6 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <option>Delivered</option>
 <option>Cancelled</option>
 </select>
-
 <div id="ordersList"></div>
 </section>
 
@@ -97,97 +101,113 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <div id="reminderList"></div>
 </section>
 
+<section id="packagesTab" class="panel" hidden>
+<h2>Donation Package Management</h2>
+<p class="muted">Add, edit, activate, deactivate or delete packages. Active packages appear on the public website.</p>
+
+<form id="packageForm">
+<input type="hidden" id="packageId">
+
+<label>Package Name</label>
+<input id="packageName" maxlength="100" required placeholder="Example: Veg Meals">
+
+<label>Price (₹)</label>
+<input id="packagePrice" type="number" min="1" max="1000000" required>
+
+<label>Number of People</label>
+<input id="packagePeople" type="number" min="0" max="100000" value="25" required>
+
+<label>Description</label>
+<textarea id="packageDescription" maxlength="1000" placeholder="Package details"></textarea>
+
+<label>Package Photo (optional)</label>
+<input id="packageImage" type="file" accept="image/jpeg,image/png,image/webp">
+
+<div id="packageImagePreview"></div>
+
+<div class="actions">
+<button type="submit" id="packageSaveBtn">Save Package</button>
+<button type="button" class="light" id="packageCancelBtn">Clear Form</button>
+</div>
+</form>
+
+<hr>
+<h3>Existing Packages</h3>
+<div id="packageList">Loading packages...</div>
+</section>
+
+<section id="headerTab" class="panel" hidden>
+<h2>Website Header Design</h2>
+<p class="muted">Upload a nature photo, preview it and save it as the website header background.</p>
+
+<label>Header Background Photo (JPG, PNG or WebP, max 5 MB)</label>
+<input id="headerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+
+<label>Header Background Colour</label>
+<input id="headerColor" type="color" value="#075b3c">
+
+<div class="preview-header" id="headerPreview">
+<img src="tycf-logo-cropped-1.png" alt="TYCF Logo">
+<h2>TYCF FOOD DONATION</h2>
+<p>Telangana Yuva Chaithanya Foundation</p>
+</div>
+
+<div class="actions">
+<button type="button" id="headerPreviewBtn">Live Preview</button>
+<button type="button" id="headerSaveBtn">Save Header Design</button>
+<button type="button" class="light" id="headerResetBtn">Reset Preview</button>
+</div>
+<p class="muted">The existing logo and organization name remain unchanged.</p>
+</section>
+
 <section id="settingsTab" class="panel" hidden>
-
 <h2>Admin Profile</h2>
-
 <form id="profileForm">
 <label>Display Name</label>
 <input id="displayName" required maxlength="60">
-
 <label>Login Email</label>
 <input id="newAdminEmail" type="email" required>
-
 <button>Save Profile</button>
 </form>
 
 <p class="muted">Email changes may require confirmation from your inbox.</p>
-
 <hr>
 
 <h2>Package & WhatsApp Settings</h2>
-
 <form id="settingsForm">
-
 <label>Foundation WhatsApp Number (country code + number)</label>
 <input id="waNumber" placeholder="919876543210" required>
 
 <div class="row">
-
-<div>
-<label>Veg Meals Price</label>
-<input id="vegPrice" type="number" min="1" required>
-</div>
-
-<div>
-<label>Egg Meals Price</label>
-<input id="eggPrice" type="number" min="1" required>
-</div>
-
-<div>
-<label>Chicken Meals Price</label>
-<input id="chickenPrice" type="number" min="1" required>
-</div>
-
-<div>
-<label>Cake Celebration Price</label>
-<input id="cakePrice" type="number" min="1" required>
-</div>
-
+<div><label>Veg Meals Price</label><input id="vegPrice" type="number" min="1" required></div>
+<div><label>Egg Meals Price</label><input id="eggPrice" type="number" min="1" required></div>
+<div><label>Chicken Meals Price</label><input id="chickenPrice" type="number" min="1" required></div>
+<div><label>Cake Celebration Price</label><input id="cakePrice" type="number" min="1" required></div>
 </div>
 
 <label>Reminder Days Before Donation</label>
 <input id="reminderDays" type="number" min="1" max="30" value="1">
-
 <button>Save Settings</button>
-
 </form>
 </section>
 
 <section id="qrTab" class="panel" hidden>
-
 <h2>UPI Payment QR Settings</h2>
-
-<div id="qrPreviewWrap">Loading QR preview…</div>
-
+<div id="qrPreviewWrap">Loading QR preview...</div>
 <form id="qrForm">
-
 <label>Choose QR image (JPG, PNG or WebP; max 5 MB)</label>
 <input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required>
-
 <button>Upload / Replace QR</button>
-
 </form>
-
 <button class="warn" id="deleteQrBtn" type="button">Delete Current QR</button>
-
 </section>
 
 <section id="reportsTab" class="panel" hidden>
-
 <h2>Monthly Donation Reports</h2>
-
-<p class="muted">
-Cancelled bookings are excluded from paid and pending donation totals.
-</p>
+<p class="muted">Cancelled bookings are excluded from paid and pending donation totals.</p>
 
 <div class="report-controls">
-
-<div>
-<label>Month</label>
-<input id="reportMonth" type="month">
-</div>
-
+<div><label>Month</label><input id="reportMonth" type="month"></div>
 <div>
 <label>Report Type</label>
 <select id="reportDateType">
@@ -195,49 +215,23 @@ Cancelled bookings are excluded from paid and pending donation totals.
 <option value="donation">Donation Date Report</option>
 </select>
 </div>
-
 </div>
 
 <div class="grid">
-
-<div class="stat">
-Total Bookings
-<strong id="reportTotal">0</strong>
+<div class="stat">Total Bookings<strong id="reportTotal">0</strong></div>
+<div class="stat">Paid Donations<strong id="reportPaid">₹0</strong></div>
+<div class="stat">Pending Donations<strong id="reportPending">₹0</strong></div>
+<div class="stat">Cancelled Orders<strong id="reportCancelled">0</strong></div>
 </div>
-
-<div class="stat">
-Paid Donations
-<strong id="reportPaid">₹0</strong>
-</div>
-
-<div class="stat">
-Pending Donations
-<strong id="reportPending">₹0</strong>
-</div>
-
-<div class="stat">
-Cancelled Orders
-<strong id="reportCancelled">0</strong>
-</div>
-
-</div>
-
 <h3>Booking Status</h3>
-
 <div id="reportStatusCards" class="report-grid"></div>
-
-<div class="actions">
-<button class="light" id="clearReportStatus" type="button">Show All Orders</button>
-</div>
-
+<div class="actions"><button class="light" id="clearReportStatus" type="button">Show All Orders</button></div>
 <div id="reportOrders"></div>
-
 </section>
 </section>
 </main>
 
 <script type="module">
-
 import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabase=createClient(
@@ -246,43 +240,23 @@ const supabase=createClient(
 );
 
 const $=id=>document.getElementById(id);
-
-let orders=[];
-let settings=null;
-let user=null;
-let reportStatusFilter='';
-
-const statuses=[
-'Received',
-'Confirmed',
-'Preparing',
-'Delivered',
-'Cancelled'
-];
-
+let orders=[],settings=null,user=null,reportStatusFilter='';
+let packageRows=[],selectedPackageImage=null,headerFile=null,headerObjectUrl=null;
+const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
 const say=m=>$('message').textContent=m;
-
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[c]));
-
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
 
 const monthNow=()=>{
-let d=new Date();
+const d=new Date();
 return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 };
-
 const datePlus=n=>{
-let d=new Date();
+const d=new Date();
 d.setDate(d.getDate()+n);
-return d.toISOString().slice(0,10);
+const local=new Date(d.getTime()-d.getTimezoneOffset()*60000);
+return local.toISOString().slice(0,10);
 };
-
 function phone(v){
 let p=String(v||'').replace(/\D/g,'');
 if(p.length===10)p='91'+p;
@@ -290,11 +264,9 @@ return p.length>=11&&p.length<=15?p:'';
 }
 
 function waLink(o){
-
-let p=phone(o.whatsapp_recipient||o.customer_mobile);
+const p=phone(o.whatsapp_recipient||o.customer_mobile);
 if(!p)return'';
-
-let msg=`TYCF FOOD DONATION
+const msg=`TYCF FOOD DONATION
 
 Dear ${o.customer_name||'Customer'},
 Your donation booking has been confirmed.
@@ -309,726 +281,193 @@ Order Status: CONFIRMED
 
 Thank you for supporting TYCF Foundation.
 Sharing Happiness ❤️`;
-
 return'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
 
-/* ADMIN LOGIN CHECK */
-
+/* ADMIN AUTHENTICATION */
 async function init(){
-
 try{
-
 const {data:{session},error}=await supabase.auth.getSession();
-
 if(error)throw error;
-
-if(!session){
-location.href='admin.html';
-return;
-}
+if(!session){location.href='admin.html';return;}
 
 const {data:admin,error:ae}=await supabase
-.from('tycf_admins')
-.select('user_id')
-.eq('user_id',session.user.id)
-.maybeSingle();
+.from('tycf_admins').select('user_id')
+.eq('user_id',session.user.id).maybeSingle();
 
 if(ae)throw ae;
-
-if(!admin){
-await supabase.auth.signOut();
-location.href='admin.html';
-return;
-}
+if(!admin){await supabase.auth.signOut();location.href='admin.html';return;}
 
 user=session.user;
-
 $('app').hidden=false;
-
-let name=user.user_metadata?.display_name||'TYCF Admin';
-
+const name=user.user_metadata?.display_name||'TYCF Admin';
 $('adminDisplayName').textContent=name;
 $('displayName').value=name;
 $('newAdminEmail').value=user.email||'';
 $('reportMonth').value=monthNow();
 
 await loadAll();
-
-}catch(e){
-say('Dashboard error: '+e.message);
+}catch(e){say('Dashboard error: '+e.message);}
 }
 
-}
-
-/* LOAD BOOKINGS AND SETTINGS */
-
+/* LOAD DASHBOARD DATA */
 async function loadAll(){
-
-say('Loading bookings and settings…');
-
+say('Loading dashboard...');
 const [a,b]=await Promise.all([
-
-supabase.from('tycf_orders')
-.select('*')
-.order('created_at',{ascending:false})
-.limit(500),
-
-supabase.from('tycf_settings')
-.select('*')
-.limit(1)
-.maybeSingle()
-
+supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
+supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
 ]);
-
-if(a.error){
-say('Bookings error: '+a.error.message);
-return;
-}
-
-if(b.error){
-say('Settings error: '+b.error.message);
-return;
-}
-
+if(a.error){say('Bookings error: '+a.error.message);return;}
+if(b.error){say('Settings error: '+b.error.message);return;}
 orders=a.data||[];
 settings=b.data;
-
-if(!settings){
-say('No settings row found in tycf_settings.');
-return;
-}
-
-/* LOAD PHOTO AND DESIGN PREVIEWS */
+if(!settings){say('No settings row found in tycf_settings.');return;}
 
 await Promise.all(orders.map(async o=>{
-
-o.stickerPhotoUrl=null;
-o.stickerDesignUrl=null;
-
+o.stickerPhotoUrl=null;o.stickerDesignUrl=null;
 for(const [field,target] of [
 ['sticker_photo_path','stickerPhotoUrl'],
 ['sticker_design_path','stickerDesignUrl']
 ]){
-
 if(o[field]){
-
-let r=await supabase.storage
-.from('tycf-sticker-photos')
-.createSignedUrl(o[field],3600);
-
-if(!r.error&&r.data?.signedUrl){
-o[target]=r.data.signedUrl;
+const r=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(o[field],3600);
+if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;
 }
-
 }
-
-}
-
 }));
 
 renderStats();
 renderOrders();
 renderReminders();
 fillSettings();
-renderQr();
-
-if(!$('reportsTab').hidden){
-renderReport();
-}
-
+await Promise.all([loadPackageList(),renderQr(),loadHeaderSettings()]);
+if(!$('reportsTab').hidden)renderReport();
 say('Dashboard loaded.');
-
 }
 
-/* DASHBOARD COUNTS */
-
+/* COUNTS */
 function renderStats(){
-
 $('total').textContent=orders.length;
-
-$('received').textContent=
-orders.filter(o=>o.status==='Received').length;
-
-$('confirmed').textContent=
-orders.filter(o=>o.status==='Confirmed').length;
-
-$('delivered').textContent=
-orders.filter(o=>o.status==='Delivered').length;
-
+$('received').textContent=orders.filter(o=>o.status==='Received').length;
+$('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;
+$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
 }
 
-/* BOOKING CARD */
-
+/* BOOKINGS */
 function orderHtml(o){
-
-let paid=o.payment_status==='Paid';
-
-let photo=o.stickerPhotoUrl
-?`<div class="order-image-card">
-<b>Customer Uploaded Photo</b>
-<a href="${esc(o.stickerPhotoUrl)}" target="_blank">
-<img src="${esc(o.stickerPhotoUrl)}">
-</a>
-</div>`
-:'';
-
-let design=o.stickerDesignUrl
-?`<div class="order-image-card">
-<b>Final Sticker Design</b>
-<a href="${esc(o.stickerDesignUrl)}" target="_blank">
-<img src="${esc(o.stickerDesignUrl)}">
-</a>
-<button data-download="${esc(o.id)}">Download Sticker for Printing</button>
-</div>`
-:'';
-
-let opts=statuses.map(s=>`
-<option value="${s}"
-${o.status===s?'selected':''}
-${s==='Confirmed'&&!paid?'disabled':''}>
-${s}
-</option>`).join('');
-
-return `
-<article class="order">
-
-<h3>
-${esc(o.customer_name)}
-<span class="tag">${esc(o.status)}</span>
-</h3>
-
-<p>
-<b>${esc(o.package_name)}</b> — ${money(o.package_price)}
-</p>
-
-<p class="muted">
-Mobile: ${esc(o.customer_mobile)} ·
-Occasion: ${esc(o.occasion)} ·
-Donation date: ${esc(o.donation_date)}
-</p>
-
-<p class="muted">
-Sticker name: ${esc(o.sticker_name)} ·
-Message: ${esc(o.customer_message)}
-</p>
-
+const paid=o.payment_status==='Paid';
+const photo=o.stickerPhotoUrl?`<div class="order-image-card"><b>Customer Photo</b><a href="${esc(o.stickerPhotoUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerPhotoUrl)}" alt="Customer photo"></a></div>`:'';
+const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
+const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
+return `<article class="order">
+<h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
+<p><b>${esc(o.package_name)}</b> — ${money(o.package_price)}</p>
+<p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
+<p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
 ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
-
-<p>
-Payment:
-<span class="tag ${paid?'paid':'pending'}">
-${paid?'Paid':'Pending'}
-</span>
-</p>
-
+<p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
 <div class="wa-box">
-
 <label>Customer WhatsApp Number</label>
-
-<input
-id="wa-${esc(o.id)}"
-value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}"
-maxlength="15"
->
-
-<button data-savewa="${esc(o.id)}">
-Save WhatsApp Number
-</button>
-
+<input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15">
+<button data-savewa="${esc(o.id)}">Save WhatsApp Number</button>
 </div>
-
 <div class="actions">
-
-${!paid?`
-<button data-verify="${esc(o.id)}">
-Verify Payment / Mark Paid
-</button>`:''}
-
-<select id="st-${esc(o.id)}">
-${opts}
-</select>
-
-<button data-status="${esc(o.id)}">
-Save Status
-</button>
-
-${paid&&waLink(o)?`
-<a class="btn" href="${waLink(o)}" target="_blank">
-Send WhatsApp Confirmation
-</a>`:''}
-
-</div>
-
-</article>`;
+${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}
+<select id="st-${esc(o.id)}">${opts}</select>
+<button data-status="${esc(o.id)}">Save Status</button>
+${paid&&waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>`:''}
+</div></article>`;
 }
-
-/* DISPLAY BOOKINGS */
-
 function renderOrders(){
-
-let q=$('search').value.toLowerCase();
-let f=$('statusFilter').value;
-
-let list=orders.filter(o=>
-(!f||o.status===f)&&
-[
-o.customer_name,
-o.customer_mobile,
-o.package_name,
-o.whatsapp_recipient
-].some(v=>String(v||'').toLowerCase().includes(q))
-);
-
-$('ordersList').innerHTML=list.length
-?list.map(orderHtml).join('')
-:'<p>No matching bookings.</p>';
-
+const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
+const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
+$('ordersList').innerHTML=list.length?list.map(orderHtml).join(''):'<p>No matching bookings.</p>';
 }
 
-/* DOWNLOAD STICKER */
-
-async function download(id){
-
-let o=orders.find(x=>String(x.id)===String(id));
-
-if(!o?.stickerDesignUrl){
-say('Sticker design unavailable.');
-return;
-}
-
+async function downloadSticker(id){
+const o=orders.find(x=>String(x.id)===String(id));
+if(!o?.stickerDesignUrl){say('Sticker design unavailable.');return;}
 try{
-
-let r=await fetch(o.stickerDesignUrl);
-
+const r=await fetch(o.stickerDesignUrl);
 if(!r.ok)throw Error('Could not fetch design');
-
-let blob=await r.blob();
-let url=URL.createObjectURL(blob);
-let a=document.createElement('a');
-
-a.href=url;
-
-a.download='TYCF-'+
-String(o.sticker_name||o.customer_name||'Sticker')
-.replace(/[^a-z0-9_-]/gi,'-')+'.png';
-
-a.click();
-
-URL.revokeObjectURL(url);
-
-say('Sticker downloaded.');
-
-}catch(e){
-say('Download failed: '+e.message);
+const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=url;a.download='TYCF-'+String(o.sticker_name||o.customer_name||'Sticker').replace(/[^a-z0-9_-]/gi,'-')+'.jpg';
+a.click();URL.revokeObjectURL(url);say('Sticker downloaded.');
+}catch(e){say('Download failed: '+e.message);}
 }
-
-}
-
-/* SAVE WHATSAPP NUMBER */
 
 async function saveWA(id){
-
-let p=phone($('wa-'+id).value);
-
-if(!p){
-say('Enter valid WhatsApp number with country code.');
-return;
+const p=phone($('wa-'+id).value);
+if(!p){say('Enter valid WhatsApp number with country code.');return;}
+const {error}=await supabase.from('tycf_orders').update({whatsapp_recipient:p}).eq('id',id);
+if(error){say(error.message);return;}
+await loadAll();say('WhatsApp number saved.');
 }
-
-let{error}=await supabase
-.from('tycf_orders')
-.update({whatsapp_recipient:p})
-.eq('id',id);
-
-if(error){
-say(error.message);
-return;
-}
-
-await loadAll();
-say('WhatsApp number saved.');
-
-}
-
-/* VERIFY PAYMENT */
-
 async function verify(id){
-
-let o=orders.find(x=>String(x.id)===String(id));
-
+const o=orders.find(x=>String(x.id)===String(id));
 if(!o||o.payment_status==='Paid')return;
-
 if(!confirm('Has the payment actually reached the TYCF Foundation account and been verified?'))return;
-
-let{error}=await supabase
-.from('tycf_orders')
-.update({
-payment_status:'Paid',
-status:'Confirmed'
-})
-.eq('id',id);
-
-if(error){
-say(error.message);
-return;
+const {error}=await supabase.from('tycf_orders').update({payment_status:'Paid',status:'Confirmed'}).eq('id',id);
+if(error){say(error.message);return;}
+await loadAll();say('Payment marked Paid and booking Confirmed.');
 }
-
-await loadAll();
-say('Payment marked Paid and booking Confirmed.');
-
-}
-
-/* SAVE BOOKING STATUS */
-
 async function saveStatus(id){
-
-let st=$('st-'+id).value;
-let o=orders.find(x=>String(x.id)===String(id));
-
-if(st==='Confirmed'&&o?.payment_status!=='Paid'){
-say('Verify payment before confirming.');
-return;
-}
-
-let{error}=await supabase
-.from('tycf_orders')
-.update({status:st})
-.eq('id',id);
-
-if(error){
-say(error.message);
-return;
-}
-
-await loadAll();
-say('Booking status updated.');
-
+const st=$('st-'+id).value,o=orders.find(x=>String(x.id)===String(id));
+if(st==='Confirmed'&&o?.payment_status!=='Paid'){say('Verify payment before confirming.');return;}
+const {error}=await supabase.from('tycf_orders').update({status:st}).eq('id',id);
+if(error){say(error.message);return;}
+await loadAll();say('Booking status updated.');
 }
 
 /* REMINDERS */
-
 function renderReminders(){
-
-let n=Number(settings.reminder_days||1);
-
-let list=orders.filter(o=>
-o.donation_date===datePlus(n)&&
-!['Delivered','Cancelled'].includes(o.status)
-);
-
-$('reminderList').innerHTML=list.length
-?list.map(o=>`
-<article class="order">
-<b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}
-<p class="muted">
-${esc(o.customer_mobile)} ·
-${esc(o.donation_date)} ·
-${esc(o.status)}
-</p>
-</article>`).join('')
-:'<p>No donations due on reminder day.</p>';
-
+const n=Number(settings.reminder_days||1);
+const list=orders.filter(o=>o.donation_date===datePlus(n)&&!['Delivered','Cancelled'].includes(o.status));
+$('reminderList').innerHTML=list.length?list.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p class="muted">${esc(o.customer_mobile)} · ${esc(o.donation_date)} · ${esc(o.status)}</p></article>`).join(''):'<p>No donations due on reminder day.</p>';
 }
 
-/* MONTHLY REPORTS */
-
+/* REPORTS */
 function reportMonth(o){
-
-return $('reportDateType').value==='donation'
-?String(o.donation_date||'').slice(0,7)
-:String(o.created_at||'').slice(0,7);
-
+return $('reportDateType').value==='donation'?String(o.donation_date||'').slice(0,7):String(o.created_at||'').slice(0,7);
 }
-
 function renderReport(){
-
-let m=$('reportMonth').value;
-
-let list=orders.filter(o=>reportMonth(o)===m);
-
-let active=list.filter(o=>o.status!=='Cancelled');
-
+const m=$('reportMonth').value,list=orders.filter(o=>reportMonth(o)===m),active=list.filter(o=>o.status!=='Cancelled');
 $('reportTotal').textContent=list.length;
-
-$('reportPaid').textContent=money(
-active.filter(o=>o.payment_status==='Paid')
-.reduce((s,o)=>s+Number(o.package_price||0),0)
-);
-
-$('reportPending').textContent=money(
-active.filter(o=>o.payment_status!=='Paid')
-.reduce((s,o)=>s+Number(o.package_price||0),0)
-);
-
-$('reportCancelled').textContent=
-list.filter(o=>o.status==='Cancelled').length;
-
-$('reportStatusCards').innerHTML=statuses.map(s=>`
-<button class="report-card ${reportStatusFilter===s?'active':''}" data-rstatus="${s}">
-${s}
-<strong>${list.filter(o=>o.status===s).length}</strong>
-</button>
-`).join('');
-
-$('reportStatusCards')
-.querySelectorAll('[data-rstatus]')
-.forEach(b=>b.onclick=()=>{
-reportStatusFilter=
-reportStatusFilter===b.dataset.rstatus?'':b.dataset.rstatus;
-renderReport();
-});
-
-let shown=list.filter(o=>
-!reportStatusFilter||o.status===reportStatusFilter
-);
-
-$('reportOrders').innerHTML=shown.length
-?shown.map(o=>`
-<article class="order">
-<b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}
-<p>
-${money(o.package_price)} ·
-${esc(o.status)} ·
-${esc(o.payment_status)}
-</p>
-<p class="muted">
-Booked: ${esc(String(o.created_at||'').slice(0,10))} ·
-Donation: ${esc(o.donation_date)}
-</p>
-</article>`).join('')
-:'<p>No bookings for this report.</p>';
-
+$('reportPaid').textContent=money(active.filter(o=>o.payment_status==='Paid').reduce((s,o)=>s+Number(o.package_price||0),0));
+$('reportPending').textContent=money(active.filter(o=>o.payment_status!=='Paid').reduce((s,o)=>s+Number(o.package_price||0),0));
+$('reportCancelled').textContent=list.filter(o=>o.status==='Cancelled').length;
+$('reportStatusCards').innerHTML=statuses.map(s=>`<button class="report-card ${reportStatusFilter===s?'active':''}" data-rstatus="${s}">${s}<strong>${list.filter(o=>o.status===s).length}</strong></button>`).join('');
+$('reportStatusCards').querySelectorAll('[data-rstatus]').forEach(b=>b.onclick=()=>{reportStatusFilter=reportStatusFilter===b.dataset.rstatus?'':b.dataset.rstatus;renderReport();});
+const shown=list.filter(o=>!reportStatusFilter||o.status===reportStatusFilter);
+$('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p>${money(o.package_price)} · ${esc(o.status)} · ${esc(o.payment_status)}</p><p class="muted">Booked: ${esc(String(o.created_at||'').slice(0,10))} · Donation: ${esc(o.donation_date)}</p></article>`).join(''):'<p>No bookings for this report.</p>';
 }
 
 /* SETTINGS */
-
 function fillSettings(){
-
-let s=settings;
-
-$('waNumber').value=
-s.wa_number||
-s.whatsapp_number||
-s.foundation_whatsapp||
-s.foundation_whatsapp_number||'';
-
+const s=settings;
+$('waNumber').value=s.whatsapp_number||'';
 $('vegPrice').value=s.veg_price??1500;
 $('eggPrice').value=s.egg_price??1800;
 $('chickenPrice').value=s.chicken_price??2500;
 $('cakePrice').value=s.cake_price??1500;
 $('reminderDays').value=s.reminder_days??1;
-
 }
-
-function existingKey(keys){
-
-return keys.find(k=>
-Object.prototype.hasOwnProperty.call(settings,k)
-);
-
-}
-
 async function saveSettings(e){
-
 e.preventDefault();
-
-let p={};
-
-const add=(keys,v)=>{
-let k=existingKey(keys);
-if(k)p[k]=v;
+const p={
+whatsapp_number:$('waNumber').value.trim(),
+veg_price:Number($('vegPrice').value),
+egg_price:Number($('eggPrice').value),
+chicken_price:Number($('chickenPrice').value),
+cake_price:Number($('cakePrice').value),
+reminder_days:Number($('reminderDays').value),
+updated_at:new Date().toISOString()
 };
-
-add(['wa_number','whatsapp_number','foundation_whatsapp','foundation_whatsapp_number'],$('waNumber').value.trim());
-add(['veg_price','veg_meals_price'],$('vegPrice').value);
-add(['egg_price','egg_meals_price'],$('eggPrice').value);
-add(['chicken_price','chicken_meals_price'],$('chickenPrice').value);
-add(['cake_price','cake_celebration_price'],$('cakePrice').value);
-add(['reminder_days'],$('reminderDays').value);
-
-if(!Object.keys(p).length){
-say('Settings columns could not be identified in tycf_settings.');
-return;
+const {error}=await supabase.from('tycf_settings').update(p).eq('id',settings.id);
+if(error){say('Settings save failed: '+error.message);return;}
+await loadAll();say('Settings saved.');
 }
-
-let q=supabase.from('tycf_settings').update(p);
-
-if(settings.id!==undefined){
-q=q.eq('id',settings.id);
-}
-
-let{error}=await q;
-
-if(error){
-say('Settings save failed: '+error.message);
-return;
-}
-
-await loadAll();
-say('Settings saved.');
-
-}
-
-/* ADMIN PROFILE */
-
 async function saveProfile(e){
-
 e.preventDefault();
-
-let name=$('displayName').value.trim();
-let email=$('newAdminEmail').value.trim();
-
-let{error}=await supabase.auth.updateUser({
-email,
-data:{display_name:name}
-});
-
-if(error){
-say('Profile update failed: '+error.message);
-return;
-}
-
-$('adminDisplayName').textContent=name;
-
-say('Profile updated. Email confirmation may be required.');
-
-}
-
-/* UPI QR SETTINGS */
-
-async function renderQr(){
-
-let{data,error}=await supabase.storage
-.from('tycf-payment-qr')
-.createSignedUrl('current/payment-qr',3600);
-
-$('qrPreviewWrap').innerHTML=
-!error&&data?.signedUrl
-?`<img src="${esc(data.signedUrl)}" alt="Current UPI QR"><p>Current payment QR</p>`
-:'<p class="muted">QR preview unavailable. Upload QR or check bucket permissions.</p>';
-
-}
-
-async function uploadQr(e){
-
-e.preventDefault();
-
-let f=$('qrFile').files[0];
-
-if(!f)return;
-
-if(f.size>5*1024*1024||
-!['image/jpeg','image/png','image/webp'].includes(f.type)){
-say('Choose JPG, PNG or WebP under 5 MB.');
-return;
-}
-
-let{error}=await supabase.storage
-.from('tycf-payment-qr')
-.upload('current/payment-qr',f,{
-upsert:true,
-contentType:f.type
-});
-
-if(error){
-say('QR upload failed: '+error.message);
-return;
-}
-
-$('qrForm').reset();
-
-await renderQr();
-
-say('Payment QR uploaded.');
-
-}
-
-async function deleteQr(){
-
-if(!confirm('Delete current payment QR?'))return;
-
-let{error}=await supabase.storage
-.from('tycf-payment-qr')
-.remove(['current/payment-qr']);
-
-if(error){
-say('QR delete failed: '+error.message);
-return;
-}
-
-await renderQr();
-
-say('QR deleted.');
-
-}
-
-/* TAB NAVIGATION */
-
-function tab(t){
-
-['bookings','reminders','settings','qr','reports']
-.forEach(x=>{
-$(x+'Tab').hidden=x!==t;
-});
-
-if(t==='reports')renderReport();
-if(t==='qr')renderQr();
-
-}
-
-document.querySelectorAll('[data-tab]')
-.forEach(b=>b.onclick=()=>tab(b.dataset.tab));
-
-/* BOOKING BUTTON ACTIONS */
-
-$('ordersList').addEventListener('click',e=>{
-
-let b=e.target.closest('button');
-
-if(!b)return;
-
-if(b.dataset.download)download(b.dataset.download);
-if(b.dataset.savewa)saveWA(b.dataset.savewa);
-if(b.dataset.verify)verify(b.dataset.verify);
-if(b.dataset.status)saveStatus(b.dataset.status);
-
-});
-
-/* EVENT LISTENERS */
-
-$('search').addEventListener('input',renderOrders);
-$('statusFilter').addEventListener('change',renderOrders);
-
-$('reportMonth').addEventListener('change',()=>{
-reportStatusFilter='';
-renderReport();
-});
-
-$('reportDateType').addEventListener('change',()=>{
-reportStatusFilter='';
-renderReport();
-});
-
-$('clearReportStatus').onclick=()=>{
-reportStatusFilter='';
-renderReport();
-};
-
-$('refreshBtn').onclick=loadAll;
-
-$('logoutBtn').onclick=async()=>{
-await supabase.auth.signOut();
-location.href='admin.html';
-};
-
-$('settingsForm').addEventListener('submit',saveSettings);
-$('profileForm').addEventListener('submit',saveProfile);
-$('qrForm').addEventListener('submit',uploadQr);
-$('deleteQrBtn').onclick=deleteQr;
-
-init();
-
-</script>
-</body>
-</html>
+const name=$('displayName').value.trim(),email=$('newAdminEmail').value.trim();
+const {error}=await supabase.auth.updateUser({email,data:{display_name:n
