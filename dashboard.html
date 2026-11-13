@@ -191,12 +191,27 @@ const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
 const monthNow=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};
 const datePlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
 function phone(v){let p=String(v||'').replace(/\D/g,'');if(p.length===10)p='91'+p;return p.length>=11&&p.length<=15?p:'';}
+
 function waLink(o){
-const p=phone(o.whatsapp_recipient||o.customer_mobile);if(!p)return '';
-const msg=`TYCF FOOD DONATION
+  const p=phone(o.whatsapp_recipient||o.customer_mobile);
+  if(!p)return '';
+
+  const status=(o.status||'Received').toLowerCase();
+
+  const messages={
+    received:'We have received your donation booking request.',
+    confirmed:'Your donation booking has been confirmed.',
+    preparing:'Your food donation is being prepared.',
+    delivered:'Your food donation has been successfully delivered. Thank you for sharing happiness!',
+    cancelled:'Your donation booking has been cancelled. Please contact TYCF Foundation for assistance.'
+  };
+
+  const statusMessage=messages[status]||'Your donation booking status has been updated.';
+
+  const msg=`TYCF FOOD DONATION
 
 Dear ${o.customer_name||'Customer'},
-Your donation booking has been confirmed.
+${statusMessage}
 
 Package: ${o.package_name||''}
 Donation Amount: Rs. ${Number(o.total_amount??o.package_price??0).toLocaleString('en-IN')}
@@ -207,8 +222,11 @@ Payment Status: ${(o.payment_status||'Pending').toUpperCase()}
 Order Status: ${(o.status||'Received').toUpperCase()}
 
 Thank you for supporting TYCF Foundation.
-Sharing Happiness ❤️`;return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
+Sharing Happiness ❤️`;
+
+  return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
+
 // TYCF APP ICON SETTINGS
 
 async function loadAppIconSettings(){
@@ -354,7 +372,7 @@ ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
 <p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
 <div class="wa-box"><label>Customer WhatsApp Number</label><input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15"><button data-savewa="${esc(o.id)}">Save WhatsApp Number</button></div>
 <div class="actions">${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}<select id="st-${esc(o.id)}">${opts}</select><button data-status="${esc(o.id)}">Save Status</button>
-${paid&&waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Confirmation</a>`:''}</div></article>`;
+${waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Update</a>`:''}
 }
 function renderOrders(){
 const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
