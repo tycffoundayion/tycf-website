@@ -24,7 +24,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f7faf7;color:#173c2d}
 button,.btn{border:0;border-radius:8px;padding:13px 20px;background:#e9ad36;color:#222;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}
 button:disabled{opacity:.6;cursor:not-allowed}
 header{position:relative;background:#075b3c;color:white;min-height:170px;padding:24px 5%;display:flex;align-items:center;gap:22px;background-size:cover;background-position:center;isolation:isolate}
-header:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,48,29,.88),rgba(0,65,39,.65));z-index:-1}
+header:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,48,29,.48),rgba(0,65,39,.30));z-index:-1}
 .logo{width:105px;height:105px;object-fit:contain;background:#fff;border-radius:14px;padding:5px;flex-shrink:0}
 .header-text h1{font-size:clamp(22px,4vw,34px);margin:0 0 8px}
 .header-text p{margin:0;color:#e5f4e9}
@@ -275,9 +275,11 @@ try{
 
 if(error)throw error;
 
+const packageOrder=['Veg Meals','Egg Meals','Chicken Meals','Cake Celebration'];
 packages=(data||[]).sort((a,b)=>{
-const order=['Veg Meals','Egg Meals','Chicken Meals','Cake Celebration'];
-return order.indexOf(a.name)-order.indexOf(b.name);
+const aIndex=packageOrder.indexOf(a.name);
+const bIndex=packageOrder.indexOf(b.name);
+return (aIndex<0?packageOrder.length:aIndex)-(bIndex<0?packageOrder.length:bIndex);
 }).map(p=>({
 id:p.id,
 name:p.name,
