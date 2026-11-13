@@ -179,9 +179,41 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 </section>
 </main>
 
+
 <script type="module">
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-const supabase=createClient('https://mswgamusywvqxscfcyff.supabase.co','sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u');
+window.addEventListener('error', (event) => {
+  const box = document.getElementById('message');
+  if (box) box.textContent =
+    'Dashboard script error: ' + event.message;
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const box = document.getElementById('message');
+  if (box) box.textContent =
+    'Dashboard request error: ' +
+    (event.reason?.message || String(event.reason));
+});
+
+let createClient;
+
+try {
+  ({ createClient } = await import(
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  ));
+} catch (error) {
+  document.getElementById('message').textContent =
+    'Dashboard startup error: ' + error.message;
+  throw error;
+}
+
+const supabase = createClient(
+  'https://mswgamusywvqxscfcyff.supabase.co',
+  'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
+);
+
+document.getElementById('message').textContent =
+  'Dashboard script loaded. Starting admin check...';
+
 const $=id=>document.getElementById(id);
 let orders=[],settings=null,user=null,reportStatusFilter='',packageRows=[],headerFile=null,headerObjectUrl=null;
 const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
