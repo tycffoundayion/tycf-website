@@ -386,50 +386,22 @@ updateTotal();
 
 /* HEADER BACKGROUND */
 
+/* HEADER BACKGROUND */
+
 async function loadHeader(){
   const header=$('siteHeader');
   const status=$('headerBackgroundStatus');
 
-  try{
-    const {data,error}=await supabase.rpc('get_tycf_public_header');
+  const imageUrl='https://mswgamusywvqxscfcyff.supabase.co/storage/v1/object/public/tycf-header-assets/header/header-1794503381608';
 
-    if(error) throw error;
+  header.style.backgroundColor='#075b3c';
+  header.style.backgroundImage=`url("${imageUrl}")`;
+  header.style.backgroundSize='cover';
+  header.style.backgroundPosition='center';
+  header.style.backgroundRepeat='no-repeat';
 
-    const row=Array.isArray(data)?data[0]:data;
-
-    if(!row || !row.header_background_path){
-      throw new Error('Header image path not found');
-    }
-
-    const {data:file}=supabase.storage
-      .from('tycf-header-assets')
-      .getPublicUrl(row.header_background_path);
-
-    if(!file || !file.publicUrl){
-      throw new Error('Header image URL not found');
-    }
-
-    const img=new Image();
-
-    img.onload=()=>{
-      header.style.backgroundImage=`url("${file.publicUrl}")`;
-      header.style.backgroundSize='cover';
-      header.style.backgroundPosition='center';
-      header.style.backgroundRepeat='no-repeat';
-      header.style.backgroundColor=row.header_background_color||'#075b3c';
-      if(status) status.textContent='Header photo loaded successfully';
-    };
-
-    img.onerror=()=>{
-      if(status) status.textContent='Header photo could not load';
-      console.error('Header image failed to load');
-    };
-
-    img.src=file.publicUrl;
-
-  }catch(error){
-    console.error('Header loading error:',error);
-    if(status) status.textContent='Header photo loading failed';
+  if(status){
+    status.textContent='TYCF Food Donation';
   }
 }
 
