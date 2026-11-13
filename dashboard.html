@@ -57,6 +57,8 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <button class="light" id="logoutBtn" type="button">Logout</button>
 </div>
 <div id="message">Checking admin access...</div>
+<div id="pushStatus" role="status" style="margin:10px 0;padding:12px;border-radius:10px;background:#fff;border:1px solid #cbd5d1">Push notifications: checking...</div>
+<button id="enablePushBtn" class="light" type="button" hidden>Enable / Retry Notifications</button>
 
 <section id="app" hidden>
 <div class="grid">
@@ -227,35 +229,52 @@ function urlBase64ToUint8Array(value){
   return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));
 }
 async function enableAdminPush(){
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)) return;
+  const status=$('pushStatus');
+  const button=$('enablePushBtn');
+  const report=(message)=>{ if(status) status.textContent='Push notifications: '+message; };
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+    report('This browser or installed app does not support Web Push.'); return false;
+  }
   try{
-    const registration=await navigator.serviceWorker.register('/sw.js');
+    report('Registering service worker...');
+    const registration=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+    await registration.update().catch(()=>{});
     await navigator.serviceWorker.ready;
     let permission=Notification.permission;
     if(permission==='default') permission=await Notification.requestPermission();
-    if(permission!=='granted') return;
-    const keyResponse=await fetch(PUSH_FUNCTION_URL,{method:'GET'});
-    if(!keyResponse.ok) throw new Error('Push public key is not configured on the server.');
+    if(permission!=='granted'){
+      report('Permission is '+permission+'. Allow notifications in Android app settings.');
+      if(button) button.hidden=false;
+      return false;
+    }
+    report('Checking server push key...');
+    const keyResponse=await fetch(PUSH_FUNCTION_URL,{method:'GET',cache:'no-store'});
+    if(!keyResponse.ok) throw new Error('Push key endpoint returned HTTP '+keyResponse.status);
     const keyData=await keyResponse.json();
-    if(!keyData.publicKey) throw new Error('Push public key is missing.');
+    if(!keyData.publicKey) throw new Error('Server did not return a VAPID public key.');
+    const applicationServerKey=urlBase64ToUint8Array(keyData.publicKey);
+    if(applicationServerKey.length!==65) throw new Error('VAPID public key has invalid length.');
+    report('Creating browser subscription...');
     let subscription=await registration.pushManager.getSubscription();
     if(!subscription){
-      subscription=await registration.pushManager.subscribe({
-        userVisibleOnly:true,
-        applicationServerKey:urlBase64ToUint8Array(keyData.publicKey)
-      });
+      subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
     }
     const json=subscription.toJSON();
-    if(!json.endpoint||!json.keys?.p256dh||!json.keys?.auth) throw new Error('Incomplete browser push subscription.');
+    if(!json.endpoint||!json.keys?.p256dh||!json.keys?.auth) throw new Error('Browser returned an incomplete push subscription.');
+    report('Saving subscription securely...');
     const {error}=await supabase.from('tycf_admin_push_subscriptions').upsert({
       user_id:user.id,endpoint:json.endpoint,p256dh:json.keys.p256dh,
       auth:json.keys.auth,updated_at:new Date().toISOString()
     },{onConflict:'endpoint'});
-    if(error) throw error;
-    console.info('TYCF admin push subscription saved.');
+    if(error) throw new Error('Database save failed: '+error.message);
+    report('Enabled successfully on this device.');
+    if(button) button.hidden=true;
+    return true;
   }catch(error){
     console.error('TYCF push setup:',error);
-    say('Dashboard loaded, but push setup needs attention: '+(error.message||String(error)));
+    report(error.message||String(error));
+    if(button) button.hidden=false;
+    return false;
   }
 }
 
@@ -738,7 +757,7 @@ if(name==='header')loadHeaderSettings();
 if(name==='appicon')loadAppIconSettings();
 }
 
-document.querySelectorAll('[data-tab]').forEach(b=>
+$('enablePushBtn').addEventListener('click',enableAdminPush);\n\ndocument.querySelectorAll('[data-tab]').forEach(b=>
 b.addEventListener('click',()=>showTab(b.dataset.tab))
 );
 
