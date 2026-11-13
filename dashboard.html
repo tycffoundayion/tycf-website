@@ -325,18 +325,57 @@ async function saveAppIcon(){
 }
 
 $('saveAppIconBtn').addEventListener('click',saveAppIcon);
+
 async function init(){
-try{
-const {data:{session},error}=await supabase.auth.getSession();if(error)throw error;
-if(!session){location.href='admin.html';return;}
-const {data:admin,error:ae}=await supabase.from('tycf_admins').select('user_id').eq('user_id',session.user.id).maybeSingle();
-if(ae)throw ae;if(!admin){await supabase.auth.signOut();location.href='admin.html';return;}
-user=session.user;$('app').hidden=false;
-$('adminDisplayName').textContent=user.user_metadata?.display_name||'TYCF Admin';
-$('displayName').value=user.user_metadata?.display_name||'TYCF Admin';$('newAdminEmail').value=user.email||'';
-$('reportMonth').value=monthNow();await loadAll();
-}catch(e){say('Dashboard error: '+e.message);}
+  try {
+    say('Step 1: Checking login session...');
+
+    const { data: { session }, error } =
+      await supabase.auth.getSession();
+
+    if (error) throw error;
+
+    if (!session) {
+      say('No login session. Redirecting...');
+      location.href = 'admin.html';
+      return;
+    }
+
+    say('Step 2: Checking admin permissions...');
+
+    const { data: admin, error: ae } = await supabase
+      .from('tycf_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (ae) throw ae;
+
+    if (!admin) {
+      await supabase.auth.signOut();
+      say('Admin access not allowed.');
+      return;
+    }
+
+    user = session.user;
+    $('app').hidden = false;
+
+    $('adminDisplayName').textContent =
+      user.user_metadata?.display_name || 'TYCF Admin';
+
+    $('displayName').value =
+      user.user_metadata?.display_name || 'TYCF Admin';
+
+    $('newAdminEmail').value = user.email || '';
+    $('reportMonth').value = monthNow();
+
+    await loadAll();
+
+  } catch (e) {
+    say('Dashboard error: ' + (e.message || String(e)));
+  }
 }
+
 async function loadAll(){
 say('Loading dashboard...');
 const [a,b]=await Promise.all([
