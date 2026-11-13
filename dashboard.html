@@ -757,7 +757,9 @@ if(name==='header')loadHeaderSettings();
 if(name==='appicon')loadAppIconSettings();
 }
 
-$('enablePushBtn').addEventListener('click',enableAdminPush);\n\ndocument.querySelectorAll('[data-tab]').forEach(b=>
+$('enablePushBtn').addEventListener('click',enableAdminPush);
+
+document.querySelectorAll('[data-tab]').forEach(b=>
 b.addEventListener('click',()=>showTab(b.dataset.tab))
 );
 
