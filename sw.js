@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v3";
+const CACHE_NAME = "tycf-shell-v4";
 
 const CORE_ASSETS = [
   "/",
@@ -91,4 +91,37 @@ self.addEventListener("fetch", event => {
       }
     })());
   }
+});
+
+
+self.addEventListener("push", event => {
+  event.waitUntil((async () => {
+    let data = {};
+    try { data = event.data ? event.data.json() : {}; }
+    catch { data = { body: event.data ? event.data.text() : "A new donation order has arrived." }; }
+    await self.registration.showNotification(data.title || "TYCF Food Donation", {
+      body: data.body || "A new donation order has arrived.",
+      icon: "/tycf-app-icon-512.png",
+      badge: "/tycf-app-icon-512.png",
+      tag: data.tag || "tycf-new-order",
+      data: { url: data.url || "/dashboard.html" },
+      vibrate: [200, 100, 200]
+    });
+  })());
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "/dashboard.html", self.location.origin).href;
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const client of windows) {
+      if (client.url.startsWith(self.location.origin) && "focus" in client) {
+        await client.focus();
+        if ("navigate" in client) await client.navigate(target);
+        return;
+      }
+    }
+    await self.clients.openWindow(target);
+  })());
 });
