@@ -443,8 +443,12 @@ ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
 <p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
 <div class="wa-box"><label>Customer WhatsApp Number</label><input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15"><button data-savewa="${esc(o.id)}">Save WhatsApp Number</button></div>
 <div class="actions">${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}<select id="st-${esc(o.id)}">${opts}</select><button data-status="${esc(o.id)}">Save Status</button>
+
 ${waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Update</a>`:''}
+</div></article>`;
 }
+function renderOrders(){
+
 function renderOrders(){
 const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
 const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
