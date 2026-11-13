@@ -384,29 +384,53 @@ updateTotal();
 
 /* HEADER BACKGROUND */
 
+/* HEADER BACKGROUND */
+
 async function loadHeader(){
-try{
-const {data,error}=await supabase.rpc('get_tycf_public_header');
-if(error)throw error;
+  const header=$('siteHeader');
+  const status=$('headerBackgroundStatus');
 
-const row=Array.isArray(data)?data[0]:data;
-if(!row)return;
+  try{
+    const {data,error}=await supabase.rpc('get_tycf_public_header');
 
-const header=$('siteHeader');
-header.style.backgroundColor=row.header_background_color||'#075b3c';
+    if(error) throw error;
 
-if(row.header_background_path){
-const {data:file,error:fileError}=await supabase.storage
-.from('tycf-header-assets')
-.getPublicUrl(row.header_background_path);
+    const row=Array.isArray(data)?data[0]:data;
 
-if(!fileError&&file?.publicUrl){
-header.style.backgroundImage=`url("${file.publicUrl}")`;
-}
-}
-}catch(error){
-console.warn('Using default header:',error.message||error);
-}
+    if(!row || !row.header_background_path){
+      throw new Error('Header image path not found');
+    }
+
+    const {data:file}=supabase.storage
+      .from('tycf-header-assets')
+      .getPublicUrl(row.header_background_path);
+
+    if(!file || !file.publicUrl){
+      throw new Error('Header image URL not found');
+    }
+
+    const img=new Image();
+
+    img.onload=()=>{
+      header.style.backgroundImage=`url("${file.publicUrl}")`;
+      header.style.backgroundSize='cover';
+      header.style.backgroundPosition='center';
+      header.style.backgroundRepeat='no-repeat';
+      header.style.backgroundColor=row.header_background_color||'#075b3c';
+      if(status) status.textContent='Header photo loaded successfully';
+    };
+
+    img.onerror=()=>{
+      if(status) status.textContent='Header photo could not load';
+      console.error('Header image failed to load');
+    };
+
+    img.src=file.publicUrl;
+
+  }catch(error){
+    console.error('Header loading error:',error);
+    if(status) status.textContent='Header photo loading failed';
+  }
 }
 
 /* PHOTO DESIGN EDITOR */
