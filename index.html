@@ -275,7 +275,10 @@ try{
 
 if(error)throw error;
 
-packages=(data||[]).map(p=>({
+packages=(data||[]).sort((a,b)=>{
+const order=['Veg Meals','Egg Meals','Chicken Meals','Cake Celebration'];
+return order.indexOf(a.name)-order.indexOf(b.name);
+}).map(p=>({
 id:p.id,
 name:p.name,
 price:Number(p.price),
