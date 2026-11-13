@@ -695,8 +695,7 @@ $('bookingForm').addEventListener('submit',async e=>{
     };
 
     const {error}=await supabase
-  .from('tycf_orders')
-  .insert(order);
+  .rpc('submit_tycf_public_order',{p_order:order});
 
     if(error)throw error;
 
