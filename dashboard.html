@@ -223,10 +223,18 @@ const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
 // Admin push notifications: register only after the signed-in user is verified as TYCF admin.
 const PUSH_FUNCTION_URL='https://mswgamusywvqxscfcyff.supabase.co/functions/v1/tycf-order-push';
 function urlBase64ToUint8Array(value){
-  const padding='='.repeat((4-value.length%4)%4);
-  const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
-  const raw=atob(base64);
-  return Uint8Array.from([...raw].map(ch=>ch.charCodeAt(0)));
+  if(typeof value!=='string') throw new Error('Server VAPID public key is not text.');
+  let clean=value.trim().replace(/^["']|["']$/g,'').replace(/\\s+/g,'');
+  clean=clean.replace(/-/g,'+').replace(/_/g,'/');
+  if(!/^[A-Za-z0-9+/]*={0,2}$/.test(clean)) throw new Error('Server VAPID public key contains invalid characters. Check the VAPID_PUBLIC_KEY secret format.');
+  clean=clean.replace(/=+$/,'');
+  if(clean.length%4===1) throw new Error('Server VAPID public key has an invalid Base64 length. Replace VAPID_PUBLIC_KEY with a valid Web Push public key.');
+  const base64=clean+'='.repeat((4-clean.length%4)%4);
+  let raw;
+  try{raw=atob(base64);}catch{throw new Error('Server VAPID public key is not valid Base64URL. Check the VAPID_PUBLIC_KEY secret.');}
+  const bytes=Uint8Array.from(raw,ch=>ch.charCodeAt(0));
+  if(bytes.length!==65||bytes[0]!==4) throw new Error('VAPID_PUBLIC_KEY must be a 65-byte uncompressed P-256 public key encoded as Base64URL.');
+  return bytes;
 }
 async function enableAdminPush(){
   const status=$('pushStatus');
