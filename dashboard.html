@@ -193,8 +193,21 @@ const datePlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d
 function phone(v){let p=String(v||'').replace(/\D/g,'');if(p.length===10)p='91'+p;return p.length>=11&&p.length<=15?p:'';}
 function waLink(o){
 const p=phone(o.whatsapp_recipient||o.customer_mobile);if(!p)return '';
-const msg=`TYCF FOOD DONATION\n\nDear ${o.customer_name||'Customer'},\nYour donation booking has been confirmed.\n\nPackage: ${o.package_name||''}\nDonation Amount: Rs. ${Number(o.package_price||0).toLocaleString('en-IN')}\nDonation Date: ${o.donation_date||''}\nOccasion: ${o.occasion||''}\n\nPayment Status: PAID\nOrder Status: CONFIRMED\n\nThank you for supporting TYCF Foundation.\nSharing Happiness ❤️`;
-return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
+const msg=`TYCF FOOD DONATION
+
+Dear ${o.customer_name||'Customer'},
+Your donation booking has been confirmed.
+
+Package: ${o.package_name||''}
+Donation Amount: Rs. ${Number(o.total_amount??o.package_price??0).toLocaleString('en-IN')}
+Donation Date: ${o.donation_date||''}
+Occasion: ${o.occasion||''}
+
+Payment Status: ${(o.payment_status||'Pending').toUpperCase()}
+Order Status: ${(o.status||'Received').toUpperCase()}
+
+Thank you for supporting TYCF Foundation.
+Sharing Happiness ❤️`;return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
 }
 // TYCF APP ICON SETTINGS
 
@@ -334,7 +347,7 @@ const photo=o.stickerPhotoUrl?`<div class="order-image-card"><b>Customer Photo</
 const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
 const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
 return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
-<p><b>${esc(o.package_name)}</b> — ${money(o.package_price)}</p>
+<p><b>${esc(o.package_name)}</b> — Total Donation: ${money(o.total_amount??o.package_price)}</p>
 <p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
 <p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
 ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
