@@ -84,28 +84,50 @@ forgotBtn.hidden = false;
 msg.textContent = 'Password updated. Please log in.';
 });
 
+
 loginForm.addEventListener('submit', async (e) => {
-e.preventDefault();
-msg.textContent = 'Checking login...';
-const email = document.getElementById('email').value.trim();
-const password = document.getElementById('password').value;
-const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-if (error) {
-msg.textContent = error.message;
-return;
-}
-const { data: admin, error: adminError } = await supabase
-.from('tycf_admins')
-.select('user_id')
-.eq('user_id', data.user.id)
-.maybeSingle();
-if (adminError || !admin) {
-await supabase.auth.signOut();
-msg.textContent = 'Admin access not allowed';
-return;
-}
-window.location.href = 'dashboard.html';
+  e.preventDefault();
+
+  msg.textContent = 'Checking login...';
+
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    if (!data.user) {
+      throw new Error('User login failed. Please try again.');
+    }
+
+    msg.textContent = 'Checking admin permissions...';
+
+    const { data: admin, error: adminError } = await supabase
+      .from('tycf_admins')
+      .select('user_id')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
+
+    if (adminError) throw adminError;
+
+    if (!admin) {
+      await supabase.auth.signOut();
+      throw new Error('Admin access not allowed');
+    }
+
+    msg.textContent = 'Login successful. Opening dashboard...';
+    window.location.href = 'dashboard.html';
+
+  } catch (error) {
+    msg.textContent = 'Login Error: ' + (error.message || String(error));
+  }
 });
+
 </script>
 </body>
 </html>
