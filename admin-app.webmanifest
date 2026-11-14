@@ -1,0 +1,20 @@
+{
+  "id": "/admin-app.html",
+  "name": "TYCF Admin Orders",
+  "short_name": "TYCF Admin",
+  "description": "Private TYCF admin order management app",
+  "start_url": "/admin-app.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#edf5ef",
+  "theme_color": "#075b3c",
+  "icons": [
+    {
+      "src": "/tycf-app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
