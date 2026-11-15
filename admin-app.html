@@ -92,7 +92,7 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 </section>
 <section id="bookingsTab" class="panel">
 <h2>Donation Bookings</h2>
-<input id="search" placeholder="Search name, phone or package">
+<input id="search" placeholder="Search Reference No., name, phone or package">
 <label for="statusFilter">Filter status</label>
 <select id="statusFilter">
 <option value="">All statuses</option><option>Received</option><option>Confirmed</option>
@@ -316,6 +316,7 @@ async function enableAdminPush(){
 const say=m=>$('message').textContent=m;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+const bookingRef=o=>'TYCF-'+String(o.id).padStart(8,'0');
 const monthNow=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};
 const datePlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
 function phone(v){let p=String(v||'').replace(/\D/g,'');if(p.length===10)p='91'+p;return p.length>=11&&p.length<=15?p:'';}
@@ -337,6 +338,8 @@ function waLink(o){
   const statusMessage=messages[status]||'Your donation booking status has been updated.';
 
   const msg=`TYCF FOOD DONATION
+
+Booking Reference: ${bookingRef(o)}
 
 Dear ${o.customer_name||'Customer'},
 ${statusMessage}
@@ -540,6 +543,7 @@ const proof=o.paymentProofUrl?'<div class="order-image-card"><b>Customer Payment
 const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
 const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
 return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
+<p><b>Reference: ${esc(bookingRef(o))}</b></p>
 <p><b>${esc(o.package_name)}</b> — Total Donation: ${money(o.total_amount??o.package_price)}</p>
 <p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion==='Other'?(o.occasion_details||'Other'):o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
 <p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
@@ -555,7 +559,7 @@ ${waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">S
 
 function renderOrders(){
 const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
-const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
+const list=orders.filter(o=>(!f||o.status===f)&&[bookingRef(o),o.id,o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
 $('ordersList').innerHTML=list.length?list.map(orderHtml).join(''):'<p>No matching bookings.</p>';
 if(list.length)loadDeliveryMediaForOrders(list);
 }
@@ -650,7 +654,7 @@ $('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b
 function exportReportCsv(){
  const month=$('reportMonth').value;
  const rows=orders.filter(o=>reportMonth(o)===month);
- const cols=['id','customer_name','customer_mobile','occasion','occasion_details','package_name','total_amount','payment_status','status','donation_date','created_at'];
+ const cols=['id','booking_reference','customer_name','customer_mobile','occasion','occasion_details','package_name','total_amount','payment_status','status','donation_date','created_at'];
  const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
  const csv=[cols.join(','),...rows.map(o=>cols.map(k=>quote(o[k])).join(','))].join('\r\n');
  const blob=new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
