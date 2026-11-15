@@ -416,10 +416,17 @@ async function loadHeader(){
   }
 }
 async function loadPaymentDetails(){
-  const {data,error}=await supabase.rpc('get_tycf_public_payment_details');
-  if(error)throw error;
-  paymentDetails=Array.isArray(data)?(data[0]||{}):(data||{});
-  UPI_ID=paymentDetails.upi_id||'';
+  // Public TYCF UPI fallback is used only if the settings RPC returns no value.
+  const VERIFIED_TYCF_UPI='9177681777-2@ybl';
+  try{
+    const {data,error}=await supabase.rpc('get_tycf_public_payment_details');
+    if(error)throw error;
+    paymentDetails=Array.isArray(data)?(data[0]||{}):(data||{});
+  }catch(error){
+    console.warn('Public payment settings unavailable; using verified UPI fallback:',error.message);
+    paymentDetails={upi_id:VERIFIED_TYCF_UPI,gpay_number:'',phonepe_number:''};
+  }
+  UPI_ID=paymentDetails.upi_id||VERIFIED_TYCF_UPI;
 }
 /* PHOTO DESIGN EDITOR */
 
