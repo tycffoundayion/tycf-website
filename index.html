@@ -397,16 +397,21 @@ async function loadHeader(){
   if(oldHeaderImage)oldHeaderImage.remove();
   if(h?.header_background_path){
     const {data:url}=supabase.storage.from('tycf-header-assets').getPublicUrl(h.header_background_path);
-    const headerImageUrl=url.publicUrl+(url.publicUrl.includes('?')?'&':'?')+'v='+encodeURIComponent(h.header_background_path);
+    const headerImageUrl=url.publicUrl+(url.publicUrl.includes('?')?'&':'?')+'v='+Date.now();
+    header.style.backgroundImage=`url("${headerImageUrl}")`;
+    header.style.backgroundSize='cover';
+    header.style.backgroundPosition='center center';
+    header.style.backgroundRepeat='no-repeat';
+    header.style.minHeight='190px';
     const bg=document.createElement('img');
     bg.className='header-bg-image';
     bg.alt='';
     bg.setAttribute('aria-hidden','true');
-    bg.src=headerImageUrl;
+    bg.style.opacity='0';
+    bg.onload=()=>{bg.style.opacity='1';$('headerBackgroundStatus').textContent='';};
     bg.onerror=()=>{console.warn('TYCF header background image failed to load:',headerImageUrl);$('headerBackgroundStatus').textContent='Header image could not load';};
-    bg.onload=()=>{$('headerBackgroundStatus').textContent='';};
+    bg.src=headerImageUrl;
     header.prepend(bg);
-    header.style.minHeight='190px';
   }
   const {data:iconPath}=await supabase.rpc('get_tycf_public_app_icon');
   if(iconPath){
