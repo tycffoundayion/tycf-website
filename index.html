@@ -176,7 +176,7 @@ Your celebration can bring happiness to someone.</p>
 <label for="bestWishesFrom">Best Wishes From</label>
 <input id="bestWishesFrom" maxlength="80" placeholder="Enter your name">
 
-<label for="birthdayFont">Happy Birthday Font Style</label>
+<label for="birthdayFont">Sticker Font Style</label>
 <select id="birthdayFont">
 <option value="Dancing Script">Style 1 - Elegant Script</option>
 <option value="Lobster">Style 2 - Bold Stylish</option>
@@ -449,7 +449,13 @@ c.textAlign='center';
 const f=fonts[$('birthdayFont').value];
 c.fillStyle=f.color;
 c.font=`bold ${f.size}px "${f.font}"`;
-c.fillText('Happy Birthday',825,145,710);
+const selectedOccasion=$('occasion').value;
+const occasionHeading=selectedOccasion==='Birthday'
+  ? 'Happy Birthday'
+  : selectedOccasion==='Anniversary'
+    ? 'Happy Anniversary'
+    : 'Best Wishes';
+c.fillText(occasionHeading,825,145,710);
 
 c.strokeStyle='#d49a00';
 c.lineWidth=5;
@@ -563,6 +569,7 @@ zoom=Number(e.target.value);
 drawDesign();
 });
 
+$('occasion').addEventListener('change',drawDesign);
 $('stickerName').addEventListener('input',drawDesign);
 $('bestWishesFrom').addEventListener('input',drawDesign);
 
