@@ -121,7 +121,7 @@ loginForm.addEventListener('submit', async (e) => {
     }
 
     msg.textContent = 'Login successful. Opening dashboard...';
-    window.location.href = new URLSearchParams(window.location.search).get('next')==='admin-app' ? 'admin-app.html' : 'dashboard.html';
+    window.location.href = 'admin-app.html';
 
   } catch (error) {
     msg.textContent = 'Login Error: ' + (error.message || String(error));
