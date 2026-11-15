@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v15";
+const CACHE_NAME = "tycf-shell-v16";
 
 const CORE_ASSETS = [
   "/",
