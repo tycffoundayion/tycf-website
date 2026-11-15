@@ -23,7 +23,7 @@ body{margin:0;font-family:Arial,sans-serif;background:#f7faf7;color:#173c2d}
 button,.btn{border:0;border-radius:8px;padding:13px 20px;background:#e9ad36;color:#222;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}
 button:disabled{opacity:.6;cursor:not-allowed}
 header{position:relative;background:#075b3c;color:white;min-height:170px;padding:24px 5%;display:flex;align-items:center;gap:22px;background-size:cover;background-position:center;isolation:isolate}
-header:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,48,29,.42),rgba(0,65,39,.22));z-index:0;pointer-events:none}header>*{position:relative;z-index:1}
+header{overflow:hidden}header:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,48,29,.48),rgba(0,65,39,.28));z-index:1;pointer-events:none}header .header-bg-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:0;pointer-events:none}header>*:not(.header-bg-image){position:relative;z-index:2}
 .logo{width:105px;height:105px;object-fit:contain;background:#fff;border-radius:14px;padding:5px;flex-shrink:0}
 .header-text h1{font-size:clamp(22px,4vw,34px);margin:0 0 8px}
 .header-text p{margin:0;color:#e5f4e9}
@@ -393,16 +393,20 @@ async function loadHeader(){
   const h=Array.isArray(data)?data[0]:data;
   const header=$('siteHeader');
   header.style.backgroundColor=h?.header_background_color||'#075b3c';
+  const oldHeaderImage=header.querySelector('.header-bg-image');
+  if(oldHeaderImage)oldHeaderImage.remove();
   if(h?.header_background_path){
     const {data:url}=supabase.storage.from('tycf-header-assets').getPublicUrl(h.header_background_path);
     const headerImageUrl=url.publicUrl+(url.publicUrl.includes('?')?'&':'?')+'v='+encodeURIComponent(h.header_background_path);
-    header.style.backgroundImage=`url("${headerImageUrl}")`;
-    header.style.backgroundSize='cover';
-    header.style.backgroundPosition='center center';
-    header.style.backgroundRepeat='no-repeat';
+    const bg=document.createElement('img');
+    bg.className='header-bg-image';
+    bg.alt='';
+    bg.setAttribute('aria-hidden','true');
+    bg.src=headerImageUrl;
+    bg.onerror=()=>{console.warn('TYCF header background image failed to load:',headerImageUrl);$('headerBackgroundStatus').textContent='Header image could not load';};
+    bg.onload=()=>{$('headerBackgroundStatus').textContent='';};
+    header.prepend(bg);
     header.style.minHeight='190px';
-  }else{
-    header.style.backgroundImage='none';
   }
   const {data:iconPath}=await supabase.rpc('get_tycf_public_app_icon');
   if(iconPath){
