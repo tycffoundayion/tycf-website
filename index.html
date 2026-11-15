@@ -227,6 +227,13 @@ Your celebration can bring happiness to someone.</p>
 <button id="uploadPaymentProofBtn" type="button" class="btn" style="background:#075b3c;color:white;width:100%">Submit Payment Screenshot</button>
 <p id="paymentProofMsg" role="status"></p>
 </div>
+<div id="paymentThankYou" hidden style="margin-top:18px;padding:22px 16px;background:#eaf6ee;border-radius:14px;text-align:center">
+<h3 style="color:#075b3c;margin:0 0 12px">❤️ Thank You for Supporting TYCF!</h3>
+<p style="margin:8px 0">మీ విరాళానికి హృదయపూర్వక ధన్యవాదాలు.</p>
+<p style="margin:8px 0">మీ Payment Screenshot మాకు అందింది. TYCF బృందం Payment‌ను పరిశీలించి Booking‌ను నిర్ధారిస్తుంది.</p>
+<p style="margin:8px 0"><b>మీ Donation Booking‌కు సంబంధించిన తదుపరి Updates కోసం TYCF బృందం మీ WhatsApp నంబర్ ద్వారా సంప్రదిస్తుంది.</b></p>
+<p style="margin:8px 0">ధన్యవాదాలు! Sharing Happiness Through Food ❤️</p>
+</div>
 <p>Please verify the recipient name and amount in your UPI app before paying. TYCF will verify the payment separately.</p>
 </div>
 </section>
@@ -680,8 +687,12 @@ async function uploadPaymentProof(){
       p_order_id:currentOrderId,p_mobile:currentOrderMobile,p_path:path
     });
     if(saveErr)throw saveErr;
-    $('paymentProofMsg').textContent='Payment screenshot submitted. TYCF will verify it.';
+    $('paymentProofMsg').textContent='Payment screenshot submitted successfully.';
     $('paymentProofFile').value='';
+    $('paymentProofWrap').hidden=true;
+    $('payNowBtn').style.display='none';
+    $('paymentThankYou').hidden=false;
+    $('paymentThankYou').scrollIntoView({behavior:'smooth',block:'center'});
   }catch(err){
     $('paymentProofMsg').textContent='Upload failed: '+err.message;
   }finally{$('uploadPaymentProofBtn').disabled=false;}
