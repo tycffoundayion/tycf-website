@@ -172,7 +172,7 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <div class="stat">Cancelled Orders<strong id="reportCancelled">0</strong></div>
 </div>
 <h3>Booking Status</h3><div id="reportStatusCards" class="report-grid"></div>
-<div class="actions"><button class="light" id="clearReportStatus" type="button">Show All Orders</button></div>
+<div class="actions"><button class="light" id="clearReportStatus" type="button">Show All Orders</button><button class="light" id="exportReportBtn" type="button">Download CSV Report</button></div>
 <div id="reportOrders"></div>
 </section>
 </section>
@@ -477,12 +477,18 @@ async function init(){
 
 async function loadAll(){
 say('Loading dashboard...');
-const [a,b]=await Promise.all([
-supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).range(0,999),
-supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
-]);
-if(a.error){say('Bookings error: '+a.error.message);return;}if(b.error){say('Settings error: '+b.error.message);return;}
-orders=a.data||[];settings=b.data;if(!settings){say('No settings row found in tycf_settings.');return;}
+const {data:settingData,error:settingsError}=await supabase.from('tycf_settings').select('*').limit(1).maybeSingle();
+if(settingsError){say('Settings error: '+settingsError.message);return;}
+settings=settingData;
+if(!settings){say('No settings row found in tycf_settings.');return;}
+const allOrders=[];
+for(let from=0;;from+=1000){
+  const {data,error}=await supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).range(from,from+999);
+  if(error){say('Bookings error: '+error.message);return;}
+  allOrders.push(...(data||[]));
+  if(!data||data.length<1000)break;
+}
+orders=allOrders;
 await Promise.all(orders.map(async o=>{
 o.stickerPhotoUrl=null;o.stickerDesignUrl=null;
 for(const [field,target,bucket] of [['sticker_photo_path','stickerPhotoUrl','tycf-sticker-photos'],['sticker_design_path','stickerDesignUrl','tycf-sticker-photos'],['payment_proof_path','paymentProofUrl','tycf-payment-proofs']]){
@@ -610,6 +616,17 @@ $('reportCancelled').textContent=list.filter(o=>o.status==='Cancelled').length;
 $('reportStatusCards').innerHTML=statuses.map(s=>`<button class="report-card ${reportStatusFilter===s?'active':''}" data-rstatus="${s}">${s}<strong>${list.filter(o=>o.status===s).length}</strong></button>`).join('');
 const shown=list.filter(o=>!reportStatusFilter||o.status===reportStatusFilter);
 $('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p>${money(o.total_amount??o.package_price)} · ${esc(o.status)} · ${esc(o.payment_status)}</p><p class="muted">Booked: ${esc(String(o.created_at||'').slice(0,10))} · Donation: ${esc(o.donation_date)}</p></article>`).join(''):'<p>No bookings for this report.</p>';
+}
+function exportReportCsv(){
+ const month=$('reportMonth').value;
+ const rows=orders.filter(o=>reportMonth(o)===month);
+ const cols=['id','customer_name','customer_mobile','occasion','occasion_details','package_name','total_amount','payment_status','status','donation_date','created_at'];
+ const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const csv=[cols.join(','),...rows.map(o=>cols.map(k=>quote(o[k])).join(','))].join('\r\n');
+ const blob=new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='TYCF-Donation-Report-'+(month||'all')+'.csv';a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 function fillSettings(){
 const s=settings;$('waNumber').value=s.whatsapp_number||'';$('vegPrice').value=s.veg_price??1500;$('eggPrice').value=s.egg_price??1800;
@@ -855,6 +872,7 @@ renderReport();
 }
 });
 
+$('exportReportBtn').addEventListener('click',exportReportCsv);
 $('reportMonth').addEventListener('change',renderReport);
 $('reportDateType').addEventListener('change',renderReport);
 
