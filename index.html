@@ -277,7 +277,6 @@ return String(value??'').replace(/[&<>"']/g,c=>({
 /* LOAD ACTIVE PACKAGES FROM SUPABASE */
 
 async function loadPackages(){
-const cards=$('packageCards');
 const booking=$('bookingPackages');
 
 try{
@@ -305,7 +304,6 @@ qty:0
 }));
 
 if(!packages.length){
-cards.innerHTML='<p class="empty-packages">Donation packages are currently unavailable. Please contact TYCF Foundation.</p>';
 booking.innerHTML='<p class="empty-packages">No active packages available.</p>';
 return;
 }
@@ -324,22 +322,11 @@ renderPackages();
 
 }catch(error){
 console.error('Package loading error:',error);
-cards.innerHTML='<p class="empty-packages">Unable to load packages. Please try again later.</p>';
 booking.innerHTML='<p class="empty-packages">Packages could not be loaded. Please refresh the page.</p>';
 }
 }
 
 function renderPackages(){
-$('packageCards').innerHTML=packages.map(p=>`
-<article class="card">
-${p.image_url?`<img class="package-photo" src="${safeText(p.image_url)}" alt="${safeText(p.name)}">`:''}
-<h3>${safeText(p.name)}</h3>
-<div class="price"><span class="price-label">${format(p.price)}</span></div>
-${p.people_count>0?`<p>${p.people_count} People</p>`:''}
-<p>${safeText(p.description)}</p>
-</article>
-`).join('');
-
 $('bookingPackages').innerHTML=packages.map((p,i)=>`
 <div class="qty-card">
 <div class="qty-info">
