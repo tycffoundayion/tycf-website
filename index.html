@@ -51,7 +51,7 @@ input,select,textarea{width:100%;padding:12px;margin:8px 0 16px;border:1px solid
 label{display:block;font-weight:bold;font-size:14px}
 textarea{min-height:90px;resize:vertical}
 .qty-card{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0;padding:14px;background:#f4f9f5;border:1px solid #dce9df;border-radius:10px}
-.qty-info{flex:1;text-align:left}
+.qty-info{flex:1;min-width:0;text-align:left;display:flex;align-items:center;gap:12px}.qty-thumb{width:86px;height:68px;flex:0 0 86px;object-fit:cover;border-radius:8px;background:#e4f4e8}.qty-info-text{min-width:0}.qty-info-text strong{display:block;color:#174b34}.qty-info-text small{display:block;color:#657568;margin-top:5px}
 .qty-info strong{display:block;color:#174b34}
 .qty-info small{display:block;color:#657568;margin-top:5px}
 .qty-controls{display:flex;align-items:center;gap:9px}
@@ -351,8 +351,11 @@ ${p.people_count>0?`<p>${p.people_count} People</p>`:''}
 $('bookingPackages').innerHTML=packages.map((p,i)=>`
 <div class="qty-card">
 <div class="qty-info">
+${p.image_url?`<img class="qty-thumb" src="${safeText(p.image_url)}" alt="${safeText(p.name)} package">`:''}
+<div class="qty-info-text">
 <strong>${safeText(p.name)}</strong>
 <small>${format(p.price)}${p.people_count>0?' · '+p.people_count+' People':''}</small>
+</div>
 </div>
 <div class="qty-controls">
 <button type="button" data-package-index="${i}" data-step="-1" aria-label="Decrease ${safeText(p.name)}">−</button>
