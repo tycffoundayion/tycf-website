@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lobster&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -64,7 +63,6 @@ textarea{min-height:90px;resize:vertical}
 #submitBtn{width:100%;background:#075b3c;color:white}
 #formMsg{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
 .payment-card{max-width:550px;margin:auto;background:white;padding:24px;border-radius:15px;box-shadow:0 3px 16px #00000010}
-#paymentQr{display:none;width:280px;height:280px;margin:15px auto;background:white}
 .editor{margin:15px auto;background:#f1f8f2;padding:12px;border-radius:10px;text-align:center}
 .editor canvas{width:100%;height:auto;border:1px solid #ccc;background:white;touch-action:none}
 .editor-note{font-size:13px;color:#526b5d}
@@ -105,7 +103,7 @@ form{padding:17px}
 <a href="#home">Home</a>
 <a href="#packages">Packages</a>
 <a href="#booking">Book Donation</a>
-<a href="#payment">UPI Payment</a>
+<a href="#payment">Pay Donation</a>
 <a href="admin.html">Admin Login</a>
 </nav>
 
@@ -214,16 +212,22 @@ Your celebration can bring happiness to someone.</p>
 </section>
 
 <section id="payment">
-<h2 class="section-title">UPI Donation Payment</h2>
+<h2 class="section-title">Direct UPI Payment</h2>
 <div class="package-divider"></div>
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
-<div id="paymentQr"></div>
+<p id="paymentIntro">After submitting your booking, use the button below to pay directly in your UPI app.</p>
 <a id="payNowBtn" class="btn" href="#" style="display:none;background:#075b3c;color:white;width:100%;text-align:center;margin:12px 0" rel="noopener">Pay Now with UPI</a>
-<p id="qrMsg">Your payment QR will appear here after your booking is submitted.</p>
 <p id="paymentAmount"></p>
-<p id="paymentReference">UPI ID: 9177681777-2@ybl</p>
-<p>Please verify the recipient name and amount in your UPI app before paying. Payment is verified separately by TYCF.</p>
+<p id="paymentReference">UPI details will appear after booking.</p>
+<p id="paymentPhones"></p>
+<div id="paymentProofWrap" hidden>
+<label for="paymentProofFile">Upload Payment Screenshot (JPG / PNG / WebP, max 5 MB)</label>
+<input id="paymentProofFile" type="file" accept="image/jpeg,image/png,image/webp">
+<button id="uploadPaymentProofBtn" type="button" class="btn" style="background:#075b3c;color:white;width:100%">Submit Payment Screenshot</button>
+<p id="paymentProofMsg" role="status"></p>
+</div>
+<p>Please verify the recipient name and amount in your UPI app before paying. TYCF will verify the payment separately.</p>
 </div>
 </section>
 
@@ -247,7 +251,10 @@ const supabase=createClient(
 );
 
 const $=id=>document.getElementById(id);
-const UPI_ID='9177681777-2@ybl';
+let UPI_ID='';
+let paymentDetails={upi_id:'',gpay_number:'',phonepe_number:''};
+let currentOrderId=null;
+let currentOrderMobile='';
 const format=n=>'₹'+Number(n).toLocaleString('en-IN');
 
 let packages=[];
@@ -389,29 +396,26 @@ p.qty=Math.max(0,Math.min(100,p.qty+Number(button.dataset.step)));
 updateTotal();
 });
 
-/* HEADER BACKGROUND */
-
-/* HEADER BACKGROUND */
-
-/* HEADER BACKGROUND */
-
+/* LOAD HEADER SETTINGS FROM ADMIN */
 async function loadHeader(){
+  const {data,error}=await supabase.rpc('get_tycf_public_header');
+  if(error){console.warn('Header settings unavailable:',error.message);return;}
+  const h=Array.isArray(data)?data[0]:data;
   const header=$('siteHeader');
-  const status=$('headerBackgroundStatus');
-
-  const imageUrl='https://mswgamusywvqxscfcyff.supabase.co/storage/v1/object/public/tycf-header-assets/header/header-1794503381608';
-
-  header.style.backgroundColor='#075b3c';
-  header.style.backgroundImage=`url("${imageUrl}")`;
-  header.style.backgroundSize='cover';
-  header.style.backgroundPosition='center';
-  header.style.backgroundRepeat='no-repeat';
-
-  if(status){
-    status.textContent='TYCF Food Donation';
+  header.style.backgroundColor=h?.header_background_color||'#075b3c';
+  if(h?.header_background_path){
+    const {data:url}=supabase.storage.from('tycf-header-assets').getPublicUrl(h.header_background_path);
+    header.style.backgroundImage=`url("${url.publicUrl}")`;
+  }else{
+    header.style.backgroundImage='none';
   }
 }
-
+async function loadPaymentDetails(){
+  const {data,error}=await supabase.rpc('get_tycf_public_payment_details');
+  if(error)throw error;
+  paymentDetails=Array.isArray(data)?(data[0]||{}):(data||{});
+  UPI_ID=paymentDetails.upi_id||'';
+}
 /* PHOTO DESIGN EDITOR */
 
 const logoImage=new Image();
@@ -626,35 +630,50 @@ if(error)throw error;
 return path;
 }
 
-/* UPI PAYMENT QR */
-
-function showPaymentQR(amount){
-  const box=$('paymentQr');
-  box.innerHTML='';
-  box.style.display='block';
-
-  const uri=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Food Donation')}`;
-
-  const payNow=$('payNowBtn');
-  payNow.href=uri;
-  payNow.style.display='block';
-  payNow.textContent='Pay Now · '+format(amount);
-
-  if(typeof QRCode!=='undefined'){
-    new QRCode(box,{
-      text:uri,
-      width:260,
-      height:260,
-      correctLevel:QRCode.CorrectLevel.M
-    });
-    $('qrMsg').textContent='Scan this QR using your UPI app.';
-  }else{
-    $('qrMsg').textContent='QR could not load. Please use the UPI ID shown below.';
+/* DIRECT UPI PAYMENT */
+function showPaymentOptions(amount,orderId,mobile){
+  currentOrderId=orderId;
+  currentOrderMobile=mobile;
+  const upi=UPI_ID;
+  $('payNowBtn').style.display=upi?'block':'none';
+  if(upi){
+    const uri=`upi://pay?pa=${encodeURIComponent(upi)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Donation Order '+orderId)}`;
+    $('payNowBtn').href=uri;
+    $('payNowBtn').textContent='Pay Now · '+format(amount);
   }
-
-  $('paymentAmount').textContent='Donation Amount: '+format(amount);
+  $('paymentAmount').textContent='Donation Amount: '+format(amount)+' · Booking #'+orderId;
+  $('paymentReference').textContent='UPI ID: '+(upi||'Please contact TYCF Foundation');
+  const nums=[];
+  if(paymentDetails.gpay_number)nums.push('Google Pay: '+paymentDetails.gpay_number);
+  if(paymentDetails.phonepe_number)nums.push('PhonePe: '+paymentDetails.phonepe_number);
+  $('paymentPhones').textContent=nums.join(' | ');
+  $('paymentProofWrap').hidden=false;
   $('payment').scrollIntoView({behavior:'smooth'});
 }
+async function uploadPaymentProof(){
+  const file=$('paymentProofFile').files[0];
+  if(!currentOrderId||!file){$('paymentProofMsg').textContent='Choose your payment screenshot first.';return;}
+  if(file.size>5*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type)){
+    $('paymentProofMsg').textContent='Choose JPG, PNG or WebP under 5 MB.';return;
+  }
+  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  const path='payment-proofs/'+currentOrderId+'/'+crypto.randomUUID()+'.'+ext;
+  $('uploadPaymentProofBtn').disabled=true;
+  $('paymentProofMsg').textContent='Uploading screenshot...';
+  try{
+    const {error:upErr}=await supabase.storage.from('tycf-payment-proofs').upload(path,file,{contentType:file.type,upsert:false});
+    if(upErr)throw upErr;
+    const {error:saveErr}=await supabase.rpc('submit_tycf_payment_proof',{
+      p_order_id:currentOrderId,p_mobile:currentOrderMobile,p_path:path
+    });
+    if(saveErr)throw saveErr;
+    $('paymentProofMsg').textContent='Payment screenshot submitted. TYCF will verify it.';
+    $('paymentProofFile').value='';
+  }catch(err){
+    $('paymentProofMsg').textContent='Upload failed: '+err.message;
+  }finally{$('uploadPaymentProofBtn').disabled=false;}
+}
+$('uploadPaymentProofBtn').addEventListener('click',uploadPaymentProof);
 
 /* DONATION BOOKING */
 
@@ -705,6 +724,7 @@ $('bookingForm').addEventListener('submit',async e=>{
       customer_name:$('customerName').value.trim(),
       customer_mobile:$('mobile').value.trim(),
       occasion:$('occasion').value,
+      occasion_details:$('occasion').value==='Other'?$('otherOccasion').value.trim():'',
       donation_date:$('donationDate').value,
       package_name:items.map(x=>x.name+' x '+x.quantity).join(', '),
       package_price:first.unit_price,
@@ -719,15 +739,13 @@ $('bookingForm').addEventListener('submit',async e=>{
       consent:$('consent').checked
     };
 
-    const {error}=await supabase
-  .rpc('submit_tycf_public_order',{p_order:order});
-
+    const {data:orderId,error}=await supabase
+      .rpc('submit_tycf_public_order',{p_order:order});
     if(error)throw error;
-
-    msg.textContent='Your donation request has been submitted successfully. Please complete the UPI payment.';
-    showPaymentQR(total);
-
-    $('paymentReference').textContent='UPI ID: '+UPI_ID;
+    if(!orderId)throw new Error('Booking reference was not returned.');
+    msg.textContent='Your donation request has been submitted successfully. Booking #'+orderId+'. Please complete the UPI payment.';
+    await loadPaymentDetails();
+    showPaymentOptions(total,orderId,order.customer_mobile);
     $('bookingForm').reset();
 
     packages.forEach(p=>p.qty=0);
@@ -829,6 +847,7 @@ if(dateInput){
 
 loadPackages();
 loadHeader();
+loadPaymentDetails().catch(e=>console.warn('Payment details:',e.message));
 
 </script>
 </body>
