@@ -587,6 +587,7 @@ drawDesign();
 $('occasion').addEventListener('change',()=>{
   const isOther=$('occasion').value==='Other';
   $('otherOccasionWrap').hidden=!isOther;
+  $('otherOccasion').required=isOther;
   drawDesign();
 });
 $('otherOccasion').addEventListener('input',drawDesign);
@@ -749,7 +750,7 @@ $('bookingForm').addEventListener('submit',async e=>{
     if(error)throw error;
     if(!orderId)throw new Error('Booking reference was not returned.');
     msg.textContent='Your donation request has been submitted successfully. Booking #'+orderId+'. Please complete the UPI payment.';
-    await loadPaymentDetails();
+    await loadPaymentDetails().catch(err=>console.warn('Payment details unavailable:',err.message));
     showPaymentOptions(total,orderId,order.customer_mobile);
     $('bookingForm').reset();
 
@@ -853,6 +854,7 @@ if(dateInput){
 loadPackages();
 loadHeader();
 loadPaymentDetails().catch(e=>console.warn('Payment details:',e.message));
+$('otherOccasion').required=$('occasion').value==='Other';
 
 </script>
 </body>
