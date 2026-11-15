@@ -151,6 +151,12 @@ Your celebration can bring happiness to someone.</p>
 <option>Other</option>
 </select>
 
+<div id="otherOccasionWrap" hidden>
+<label for="otherOccasion">Enter Your Occasion</label>
+<input id="otherOccasion" maxlength="30" placeholder="Example: Congratulations, Get Well Soon">
+<p class="editor-note">This text will appear as the main heading on your sticker.</p>
+</div>
+
 <label>Select Donation Packages</label>
 <div id="bookingPackages">
 <p class="empty-packages">Loading packages...</p>
@@ -454,7 +460,7 @@ const occasionHeading=selectedOccasion==='Birthday'
   ? 'Happy Birthday'
   : selectedOccasion==='Anniversary'
     ? 'Happy Anniversary'
-    : 'Best Wishes';
+    : ($('otherOccasion').value.trim() || 'Best Wishes');
 c.fillText(occasionHeading,825,145,710);
 
 c.strokeStyle='#d49a00';
@@ -569,7 +575,12 @@ zoom=Number(e.target.value);
 drawDesign();
 });
 
-$('occasion').addEventListener('change',drawDesign);
+$('occasion').addEventListener('change',()=>{
+  const isOther=$('occasion').value==='Other';
+  $('otherOccasionWrap').hidden=!isOther;
+  drawDesign();
+});
+$('otherOccasion').addEventListener('input',drawDesign);
 $('stickerName').addEventListener('input',drawDesign);
 $('bestWishesFrom').addEventListener('input',drawDesign);
 
