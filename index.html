@@ -213,6 +213,7 @@ Your celebration can bring happiness to someone.</p>
 <div class="payment-card">
 <p>Thank you for supporting TYCF Food Donation.</p>
 <div id="paymentQr"></div>
+<a id="payNowBtn" class="btn" href="#" style="display:none;background:#075b3c;color:white;width:100%;text-align:center;margin:12px 0" rel="noopener">Pay Now with UPI</a>
 <p id="qrMsg">Your payment QR will appear here after your booking is submitted.</p>
 <p id="paymentAmount"></p>
 <p id="paymentReference">UPI ID: 9177681777-2@ybl</p>
@@ -615,6 +616,11 @@ function showPaymentQR(amount){
   box.style.display='block';
 
   const uri=`upi://pay?pa=${encodeURIComponent(UPI_ID)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Food Donation')}`;
+
+  const payNow=$('payNowBtn');
+  payNow.href=uri;
+  payNow.style.display='block';
+  payNow.textContent='Pay Now · '+format(amount);
 
   if(typeof QRCode!=='undefined'){
     new QRCode(box,{
