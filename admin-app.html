@@ -73,7 +73,6 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <button data-tab="packages" type="button">Donation Packages</button>
 <button data-tab="header" type="button">Header Design</button>
 <button data-tab="settings" type="button">Settings</button>
-<button data-tab="qr" type="button">UPI QR</button>
 <button data-tab="reports" type="button">Reports</button>
  <button data-tab="appicon" type="button">App Icon</button>
 </nav>
@@ -152,14 +151,12 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <div><label for="cakePrice">Cake Celebration Price</label><input id="cakePrice" type="number" min="1" required></div>
 </div>
 <label for="reminderDays">Reminder Days Before Donation</label><input id="reminderDays" type="number" min="1" max="30" value="1">
+<hr><h3>Direct UPI Payment Details (QR not used)</h3>
+<label for="upiId">UPI ID</label><input id="upiId" maxlength="120" placeholder="yourname@bank">
+<label for="gpayNumber">Google Pay Number (optional)</label><input id="gpayNumber" maxlength="15" placeholder="91XXXXXXXXXX">
+<label for="phonepeNumber">PhonePe Number (optional)</label><input id="phonepeNumber" maxlength="15" placeholder="91XXXXXXXXXX">
 <button type="submit">Save Settings</button>
 </form>
-</section>
-
-<section id="qrTab" class="panel" hidden>
-<h2>UPI Payment QR Settings</h2><div id="qrPreviewWrap">Loading QR preview...</div>
-<form id="qrForm"><label for="qrFile">Choose QR image (JPG, PNG or WebP; max 5 MB)</label><input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required><button type="submit">Upload / Replace QR</button></form>
-<button class="warn" id="deleteQrBtn" type="button">Delete Current QR</button>
 </section>
 
 <section id="reportsTab" class="panel" hidden>
@@ -438,7 +435,7 @@ async function init(){
 
     if (!session) {
       say('No login session. Redirecting...');
-      location.href = 'admin.html';
+      location.href = 'admin.html?next=admin-app';
       return;
     }
 
@@ -488,12 +485,12 @@ if(a.error){say('Bookings error: '+a.error.message);return;}if(b.error){say('Set
 orders=a.data||[];settings=b.data;if(!settings){say('No settings row found in tycf_settings.');return;}
 await Promise.all(orders.map(async o=>{
 o.stickerPhotoUrl=null;o.stickerDesignUrl=null;
-for(const [field,target] of [['sticker_photo_path','stickerPhotoUrl'],['sticker_design_path','stickerDesignUrl']]){
-if(o[field]){const r=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(o[field],3600);if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;}
+for(const [field,target,bucket] of [['sticker_photo_path','stickerPhotoUrl','tycf-sticker-photos'],['sticker_design_path','stickerDesignUrl','tycf-sticker-photos'],['payment_proof_path','paymentProofUrl','tycf-payment-proofs']]){
+if(o[field]){const r=await supabase.storage.from(bucket).createSignedUrl(o[field],3600);if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;}
 }
 }));
 renderStats();renderOrders();renderReminders();fillSettings();
-await Promise.all([loadPackageList(),renderQr(),loadHeaderSettings()]);
+await Promise.all([loadPackageList(),loadHeaderSettings()]);
 if(!$('reportsTab').hidden)renderReport();say('Dashboard loaded.');
 }
 function renderStats(){
@@ -503,13 +500,14 @@ $('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;$('de
 function orderHtml(o){
 const paid=o.payment_status==='Paid';
 const photo=o.stickerPhotoUrl?`<div class="order-image-card"><b>Customer Photo</b><a href="${esc(o.stickerPhotoUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerPhotoUrl)}" alt="Customer photo"></a><button data-downloadphoto="${esc(o.id)}">Download Customer Photo</button></div>`:'';
+const proof=o.paymentProofUrl?'<div class="order-image-card"><b>Customer Payment Screenshot</b><a href="'+esc(o.paymentProofUrl)+'" target="_blank" rel="noopener"><img src="'+esc(o.paymentProofUrl)+'" alt="Payment proof screenshot"></a></div>':'<p class="muted">Payment screenshot not uploaded.</p>';
 const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
 const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
 return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
 <p><b>${esc(o.package_name)}</b> — Total Donation: ${money(o.total_amount??o.package_price)}</p>
 <p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
 <p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
-${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
+${photo||design?`<div class="order-images">${photo}${design}</div>`:''}<div class="order-images">${proof}</div>
 <p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
 <div class="wa-box"><b>Donation / Delivery Media</b><label for="delivery-${esc(o.id)}">Upload delivery photo or video (max 50 MB)</label><input id="delivery-${esc(o.id)}" type="file" accept="video/mp4,video/webm,image/jpeg,image/png,image/webp"><input id="delivery-caption-${esc(o.id)}" placeholder="Caption (optional)"><button type="button" data-uploadmedia="${esc(o.id)}">Upload Media</button><div id="delivery-list-${esc(o.id)}" class="muted">Loading media...</div></div>
 <div class="wa-box"><label>Customer WhatsApp Number</label><input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15"><button data-savewa="${esc(o.id)}">Save WhatsApp Number</button></div>
@@ -615,10 +613,10 @@ $('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b
 }
 function fillSettings(){
 const s=settings;$('waNumber').value=s.whatsapp_number||'';$('vegPrice').value=s.veg_price??1500;$('eggPrice').value=s.egg_price??1800;
-$('chickenPrice').value=s.chicken_price??2500;$('cakePrice').value=s.cake_price??1500;$('reminderDays').value=s.reminder_days??1;
+$('chickenPrice').value=s.chicken_price??2500;$('cakePrice').value=s.cake_price??1500;$('reminderDays').value=s.reminder_days??1;$('upiId').value=s.upi_id||'';$('gpayNumber').value=s.gpay_number||'';$('phonepeNumber').value=s.phonepe_number||'';
 }
 async function saveSettings(e){
-e.preventDefault();const p={whatsapp_number:$('waNumber').value.trim(),veg_price:Number($('vegPrice').value),egg_price:Number($('eggPrice').value),chicken_price:Number($('chickenPrice').value),cake_price:Number($('cakePrice').value),reminder_days:Number($('reminderDays').value),updated_at:new Date().toISOString()};
+e.preventDefault();const p={whatsapp_number:$('waNumber').value.trim(),veg_price:Number($('vegPrice').value),egg_price:Number($('eggPrice').value),chicken_price:Number($('chickenPrice').value),cake_price:Number($('cakePrice').value),reminder_days:Number($('reminderDays').value),upi_id:$('upiId').value.trim(),gpay_number:$('gpayNumber').value.trim(),phonepe_number:$('phonepeNumber').value.trim(),updated_at:new Date().toISOString()};
 const {error}=await supabase.from('tycf_settings').update(p).eq('id',settings.id);if(error){say('Settings save failed: '+error.message);return;}
 await loadAll();
 say('Settings saved.');
@@ -636,43 +634,6 @@ data:{display_name:name}
 if(error){say('Profile update failed: '+error.message);return;}
 $('adminDisplayName').textContent=name;
 say('Profile updated. If email confirmation is required, check your inbox.');
-}
-
-async function renderQr(){
-const path='current/payment-qr';
-const {data,error}=await supabase.storage.from('tycf-payment-qr').list('current',{limit:100});
-if(error){$('qrPreviewWrap').textContent='QR list error: '+error.message;return;}
-const found=(data||[]).some(x=>x.name==='payment-qr');
-if(!found){
-$('qrPreviewWrap').innerHTML='<p>No QR image uploaded yet. Upload your UPI QR below.</p>';
-return;
-}
-const {data:urlData}=supabase.storage.from('tycf-payment-qr').getPublicUrl(path);
-$('qrPreviewWrap').innerHTML=`<img src="${esc(urlData.publicUrl+'?t='+Date.now())}" alt="Current UPI QR"><p class="muted">Current UPI QR image</p>`;
-}
-
-async function saveQr(e){
-e.preventDefault();
-const file=$('qrFile').files[0];
-if(!file)return;
-if(file.size>5*1024*1024){say('QR image must be under 5 MB.');return;}
-if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
-say('Choose JPG, PNG or WebP.');return;
-}
-say('Uploading QR...');
-const {error}=await supabase.storage.from('tycf-payment-qr').upload('current/payment-qr',file,{upsert:true,contentType:file.type});
-if(error){say('QR upload failed: '+error.message);return;}
-$('qrFile').value='';
-await renderQr();
-say('UPI QR uploaded.');
-}
-
-async function deleteQr(){
-if(!confirm('Delete the current UPI QR image?'))return;
-const {error}=await supabase.storage.from('tycf-payment-qr').remove(['current/payment-qr']);
-if(error){say('QR delete failed: '+error.message);return;}
-await renderQr();
-say('QR image deleted.');
 }
 
 async function loadHeaderSettings(){
@@ -814,7 +775,6 @@ const target=$(name+'Tab');
 if(target)target.hidden=false;
 if(name==='reports')renderReport();
 if(name==='packages')loadPackageList();
-if(name==='qr')renderQr();
 if(name==='header')loadHeaderSettings();
 if(name==='appicon')loadAppIconSettings();
 }
@@ -829,15 +789,13 @@ $('refreshBtn').addEventListener('click',loadAll);
 
 $('logoutBtn').addEventListener('click',async()=>{
 await supabase.auth.signOut();
-location.href='admin.html';
+location.href='admin.html?next=admin-app';
 });
 
 $('search').addEventListener('input',renderOrders);
 $('statusFilter').addEventListener('change',renderOrders);
 $('settingsForm').addEventListener('submit',saveSettings);
 $('profileForm').addEventListener('submit',saveProfile);
-$('qrForm').addEventListener('submit',saveQr);
-$('deleteQrBtn').addEventListener('click',deleteQr);
 $('packageForm').addEventListener('submit',savePackage);
 $('packageCancelBtn').addEventListener('click',clearPackageForm);
 
