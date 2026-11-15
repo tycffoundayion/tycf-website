@@ -478,7 +478,7 @@ async function init(){
 async function loadAll(){
 say('Loading dashboard...');
 const [a,b]=await Promise.all([
-supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
+supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).range(0,999),
 supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
 ]);
 if(a.error){say('Bookings error: '+a.error.message);return;}if(b.error){say('Settings error: '+b.error.message);return;}
@@ -505,7 +505,7 @@ const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker 
 const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
 return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
 <p><b>${esc(o.package_name)}</b> — Total Donation: ${money(o.total_amount??o.package_price)}</p>
-<p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
+<p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion==='Other'?(o.occasion_details||'Other'):o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
 <p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
 ${photo||design?`<div class="order-images">${photo}${design}</div>`:''}<div class="order-images">${proof}</div>
 <p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
