@@ -409,6 +409,11 @@ async function loadHeader(){
   }else{
     header.style.backgroundImage='none';
   }
+  const {data:iconPath}=await supabase.rpc('get_tycf_public_app_icon');
+  if(iconPath){
+    const {data:iconUrl}=supabase.storage.from('tycf-header-assets').getPublicUrl(iconPath);
+    document.querySelectorAll('link[rel="icon"],link[rel="apple-touch-icon"]').forEach(el=>el.href=iconUrl.publicUrl+'?v='+Date.now());
+  }
 }
 async function loadPaymentDetails(){
   const {data,error}=await supabase.rpc('get_tycf_public_payment_details');
