@@ -54,7 +54,7 @@ return;
 }
 msg.textContent = 'Sending reset link...';
 const { error } = await supabase.auth.resetPasswordForEmail(email, {
-redirectTo: 'https://tycf-food-donation.pages.dev/admin.html'
+redirectTo: 'https://tycf-food-donation.pages.dev/admin.html?next=admin-app'
 });
 msg.textContent = error ? error.message : 'Reset link sent. Check your email.';
 });
@@ -121,7 +121,7 @@ loginForm.addEventListener('submit', async (e) => {
     }
 
     msg.textContent = 'Login successful. Opening dashboard...';
-    window.location.href = 'dashboard.html';
+    window.location.href = new URLSearchParams(window.location.search).get('next')==='admin-app' ? 'admin-app.html' : 'dashboard.html';
 
   } catch (error) {
     msg.textContent = 'Login Error: ' + (error.message || String(error));
