@@ -229,6 +229,7 @@ Your celebration can bring happiness to someone.</p>
 </div>
 <div id="paymentThankYou" hidden style="margin-top:18px;padding:22px 16px;background:#eaf6ee;border-radius:14px;text-align:center">
 <h3 style="color:#075b3c;margin:0 0 12px">❤️ Thank You for Supporting TYCF!</h3>
+<p data-booking-reference style="font-weight:bold;color:#075b3c;font-size:18px">Booking Reference Number: --</p>
 <p style="margin:8px 0">మీ విరాళానికి హృదయపూర్వక ధన్యవాదాలు.</p>
 <p style="margin:8px 0">మీ Payment Screenshot మాకు అందింది. TYCF బృందం Payment‌ను పరిశీలించి Booking‌ను నిర్ధారిస్తుంది.</p>
 <p style="margin:8px 0"><b>మీ Donation Booking‌కు సంబంధించిన తదుపరి Updates కోసం TYCF బృందం మీ WhatsApp నంబర్ ద్వారా సంప్రదిస్తుంది.</b></p>
@@ -657,11 +658,12 @@ function showPaymentOptions(amount,orderId,mobile){
   const upi=UPI_ID;
   $('payNowBtn').style.display=upi?'block':'none';
   if(upi){
-    const uri=`upi://pay?pa=${encodeURIComponent(upi)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF Donation Order '+orderId)}`;
+    const bookingRef='TYCF-'+String(orderId).padStart(8,'0');
+    const uri=`upi://pay?pa=${encodeURIComponent(upi)}&am=${Number(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('TYCF '+bookingRef)}`;
     $('payNowBtn').href=uri;
     $('payNowBtn').textContent='Pay Now · '+format(amount);
   }
-  $('paymentAmount').textContent='Donation Amount: '+format(amount)+' · Booking #'+orderId;
+  $('paymentAmount').textContent='Donation Amount: '+format(amount)+' · Booking Reference: TYCF-'+String(orderId).padStart(8,'0');
   $('paymentReference').textContent='UPI ID: '+(upi||'Please contact TYCF Foundation');
   const nums=[];
   if(paymentDetails.gpay_number)nums.push('Google Pay: '+paymentDetails.gpay_number);
@@ -767,7 +769,9 @@ $('bookingForm').addEventListener('submit',async e=>{
       .rpc('submit_tycf_public_order',{p_order:order});
     if(error)throw error;
     if(!orderId)throw new Error('Booking reference was not returned.');
-    msg.textContent='Your donation request has been submitted successfully. Booking #'+orderId+'. Please complete the UPI payment.';
+    const bookingRef='TYCF-'+String(orderId).padStart(8,'0');
+    msg.textContent='Your donation request has been submitted successfully. Reference Number: '+bookingRef+'. Please complete the UPI payment.';
+    $('paymentThankYou').querySelector('[data-booking-reference]').textContent='Booking Reference Number: '+bookingRef;
     await loadPaymentDetails().catch(err=>console.warn('Payment details unavailable:',err.message));
     showPaymentOptions(total,orderId,order.customer_mobile);
     $('bookingForm').reset();
