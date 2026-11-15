@@ -1,33 +1,911 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#075b3c"><link rel="manifest" href="/admin-app.webmanifest"><title>TYCF Admin Orders</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#075b3c">
+<link rel="manifest" href="/admin-app.webmanifest"><title>TYCF Admin App</title>
 <style>
-:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#edf5ef;color:#173b2d;font:15px Arial,sans-serif}header{background:#075b3c;color:white;padding:18px 16px;position:sticky;top:0;z-index:2}header h1{font-size:20px;margin:0 0 5px}header p{margin:0;font-size:12px;opacity:.85}main{max-width:900px;margin:auto;padding:14px}.panel,.order,.stat{background:white;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 10px #1231}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat span{font-size:12px;color:#557064}.stat strong{display:block;font-size:24px;margin-top:5px}button,input,select{font:inherit;border-radius:9px;padding:11px;border:1px solid #bfd2c5}button{background:#075b3c;color:white;border:0;font-weight:600}button.secondary{background:white;color:#075b3c;border:1px solid #b8d4c2}.bar{display:flex;gap:8px;flex-wrap:wrap}.bar>*{flex:1}input,select{width:100%;margin:6px 0 10px}.order h3{margin:0}.muted{color:#60776b;font-size:13px}.tag{display:inline-block;padding:4px 9px;border-radius:20px;background:#e3f3e8;font-size:12px}.detail{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.detail div{background:#f4f8f5;padding:9px;border-radius:8px;overflow-wrap:anywhere}.detail small{display:block;color:#60776b;margin-bottom:3px}.photos{display:flex;gap:10px;flex-wrap:wrap}.photos img{width:min(100%,220px);max-height:230px;object-fit:contain;background:#f4f8f5;border-radius:8px}.hidden{display:none!important}#msg{padding:10px;background:#fff;border-radius:8px;margin:8px 0}.order select{margin:8px 0}.order button{margin:3px 0}.order label{font-size:13px;font-weight:bold}@media(min-width:650px){.grid{grid-template-columns:repeat(4,1fr)}}
-</style></head><body>
-<header><h1>TYCF Admin Orders</h1><p>Admin-only · Orders management · No customer booking</p></header>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#e8f5ec;color:#173b2d}
+header{background:#075b3c;color:white;padding:20px}
+main{max-width:1100px;margin:auto;padding:14px}
+button,.btn{border:0;border-radius:8px;padding:11px 14px;background:#075b3c;color:white;cursor:pointer;text-decoration:none;display:inline-block}
+button.light{background:white;color:#075b3c;border:1px solid #b7d4c3}
+button.warn{background:#9a382b}
+button:disabled{opacity:.5;cursor:not-allowed}
+.actions,nav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.panel,.stat{background:white;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #0000000a}
+.grid,.row,.report-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.stat strong{display:block;font-size:24px;margin-top:7px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #b8c9bf;border-radius:7px;margin:5px 0 12px;background:white}
+label{font-weight:bold;font-size:13px;display:block}
+.order{border:1px solid #dce9e0;border-radius:10px;padding:13px;margin:10px 0}
+.muted{color:#557064;font-size:13px}
+.tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
+.paid{background:#d8f4df}
+.pending{background:#fff0ce}
+#message{padding:10px;overflow-wrap:anywhere}
+.order-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.order-image-card{background:#f5faf6;padding:10px;border:1px solid #dce9e0;border-radius:9px}
+.order-image-card img{width:100%;max-height:250px;object-fit:contain;background:white}
+.order-image-card button{width:100%;margin-top:8px}
+.wa-box{background:#f2f8f3;padding:10px;border-radius:8px;margin:10px 0}
+#qrPreviewWrap img{max-width:280px;width:100%;display:block}
+.report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}
+.report-card{background:#f5faf6;color:#173b2d;border:1px solid #dce9e0;text-align:left;width:100%}
+.report-card strong{display:block;font-size:22px}
+.report-card.active{border:2px solid #075b3c}
+.package-admin{border:1px solid #dce9e0;padding:14px;border-radius:10px;margin:10px 0}
+.package-admin img{width:100%;max-width:180px;max-height:130px;object-fit:cover;border-radius:8px}
+.preview-header{padding:25px;color:white;border-radius:10px;background:#075b3c;background-size:cover;background-position:center;margin:12px 0}
+.preview-header img{width:65px;height:65px;object-fit:contain;background:white;border-radius:8px}
+[hidden]{display:none!important}
+hr{border:0;border-top:1px solid #ddd;margin:20px 0}
+@media(max-width:600px){header{padding:15px}main{padding:8px}nav button{flex:1 1 42%}}
+</style>
+</head>
+<body>
+<header>
+<h2>TYCF Food Donation — Admin</h2>
+<p>Bookings, packages, header design, payment and reports</p>
+<b id="adminDisplayName">TYCF Admin</b>
+</header>
 <main>
-<section id="login" class="panel"><h2>Admin Login</h2><form id="loginForm"><input id="email" type="email" placeholder="Admin email" required><input id="password" type="password" placeholder="Password" required><button type="submit">Login</button></form></section>
-<section id="app" class="hidden">
-<div class="bar"><button id="refresh" type="button">Refresh Orders</button><button class="secondary" id="push" type="button">Enable Notifications</button><button class="secondary" id="logout" type="button">Logout</button></div>
-<div id="msg" role="status">Loading orders…</div>
-<div class="grid"><div class="stat"><span>Total Orders</span><strong id="total">0</strong></div><div class="stat"><span>New / Received</span><strong id="new">0</strong></div><div class="stat"><span>Confirmed</span><strong id="confirmed">0</strong></div><div class="stat"><span>Delivered</span><strong id="delivered">0</strong></div></div>
-<div class="panel"><input id="search" placeholder="Search customer, phone, package"><select id="filter"><option value="">All orders</option><option>Received</option><option>Confirmed</option><option>Preparing</option><option>Delivered</option><option>Cancelled</option></select><div id="orders"></div></div>
-</section></main>
+<div class="actions">
+<button class="light" id="refreshBtn" type="button">Refresh</button>
+<button class="light" id="logoutBtn" type="button">Logout</button>
+</div>
+<div id="message">Checking admin access...</div>
+<div id="pushStatus" role="status" style="margin:10px 0;padding:12px;border-radius:10px;background:#fff;border:1px solid #cbd5d1">Push notifications: checking...</div>
+<button id="enablePushBtn" class="light" type="button" hidden>Enable / Retry Notifications</button>
+
+<section id="app" hidden>
+<div class="grid">
+<div class="stat">Total bookings<strong id="total">0</strong></div>
+<div class="stat">Received<strong id="received">0</strong></div>
+<div class="stat">Confirmed<strong id="confirmed">0</strong></div>
+<div class="stat">Delivered<strong id="delivered">0</strong></div>
+</div>
+<nav>
+<button data-tab="bookings" type="button">Bookings</button>
+<button data-tab="reminders" type="button">Reminders</button>
+<button data-tab="packages" type="button">Donation Packages</button>
+<button data-tab="header" type="button">Header Design</button>
+<button data-tab="settings" type="button">Settings</button>
+<button data-tab="qr" type="button">UPI QR</button>
+<button data-tab="reports" type="button">Reports</button>
+ <button data-tab="appicon" type="button">App Icon</button>
+</nav>
+<section id="appiconTab" class="panel" hidden>
+  <h2>Website App Icon Settings</h2>
+  <p class="muted">Change the TYCF website app icon.</p>
+
+  <div id="appIconPreview">
+    No app icon uploaded yet.
+  </div>
+
+  <label for="appIconFile">Choose New App Icon (PNG, 512x512)</label>
+  <input id="appIconFile" type="file" accept="image/png">
+
+  <button id="saveAppIconBtn" type="button">Save App Icon</button>
+</section>
+<section id="bookingsTab" class="panel">
+<h2>Donation Bookings</h2>
+<input id="search" placeholder="Search name, phone or package">
+<label for="statusFilter">Filter status</label>
+<select id="statusFilter">
+<option value="">All statuses</option><option>Received</option><option>Confirmed</option>
+<option>Preparing</option><option>Delivered</option><option>Cancelled</option>
+</select>
+<div id="ordersList"></div>
+</section>
+
+<section id="remindersTab" class="panel" hidden>
+<h2>Upcoming Donation Reminders</h2>
+<p class="muted">Reminder list only. WhatsApp messages are not sent automatically.</p>
+<div id="reminderList"></div>
+</section>
+
+<section id="packagesTab" class="panel" hidden>
+<h2>Donation Package Management</h2>
+<p class="muted">Add, edit, activate, deactivate or delete packages. Active packages appear on the public website.</p>
+<form id="packageForm">
+<input type="hidden" id="packageId">
+<label for="packageName">Package Name</label><input id="packageName" maxlength="100" required placeholder="Example: Veg Meals">
+<label for="packagePrice">Price (₹)</label><input id="packagePrice" type="number" min="1" max="1000000" required>
+<label for="packagePeople">Number of People</label><input id="packagePeople" type="number" min="0" max="100000" value="25" required>
+<label for="packageDescription">Description</label><textarea id="packageDescription" maxlength="1000" placeholder="Package details"></textarea>
+<label for="packageImage">Package Photo (optional)</label><input id="packageImage" type="file" accept="image/jpeg,image/png,image/webp">
+<div id="packageImagePreview"></div>
+<div class="actions"><button type="submit" id="packageSaveBtn">Save Package</button><button type="button" class="light" id="packageCancelBtn">Clear Form</button></div>
+</form>
+<hr><h3>Existing Packages</h3><div id="packageList">Loading packages...</div>
+</section>
+
+<section id="headerTab" class="panel" hidden>
+<h2>Website Header Design</h2>
+<p class="muted">Upload a background photo, preview it and save it as the website header background.</p>
+<label for="headerPhoto">Header Background Photo (JPG, PNG or WebP, max 5 MB)</label>
+<input id="headerPhoto" type="file" accept="image/jpeg,image/png,image/webp">
+<label for="headerColor">Header Background Colour</label><input id="headerColor" type="color" value="#075b3c">
+<div class="preview-header" id="headerPreview"><img src="tycf-logo-cropped-1.png" alt="TYCF Logo"><h2>TYCF FOOD DONATION</h2><p>Telangana Yuva Chaithanya Foundation</p></div>
+<div class="actions"><button type="button" id="headerPreviewBtn">Live Preview</button><button type="button" id="headerSaveBtn">Save Header Design</button><button type="button" class="light" id="headerResetBtn">Reset Preview</button></div>
+<p class="muted">The existing logo and organization name remain unchanged.</p>
+</section>
+
+<section id="settingsTab" class="panel" hidden>
+<h2>Admin Profile</h2>
+<form id="profileForm">
+<label for="displayName">Display Name</label><input id="displayName" required maxlength="60">
+<label for="newAdminEmail">Login Email</label><input id="newAdminEmail" type="email" required>
+<button type="submit">Save Profile</button>
+</form>
+<p class="muted">Email changes may require confirmation from your inbox.</p>
+<hr><h2>Package & WhatsApp Settings</h2>
+<form id="settingsForm">
+<label for="waNumber">Foundation WhatsApp Number (country code + number)</label><input id="waNumber" placeholder="919876543210" required>
+<div class="row">
+<div><label for="vegPrice">Veg Meals Price</label><input id="vegPrice" type="number" min="1" required></div>
+<div><label for="eggPrice">Egg Meals Price</label><input id="eggPrice" type="number" min="1" required></div>
+<div><label for="chickenPrice">Chicken Meals Price</label><input id="chickenPrice" type="number" min="1" required></div>
+<div><label for="cakePrice">Cake Celebration Price</label><input id="cakePrice" type="number" min="1" required></div>
+</div>
+<label for="reminderDays">Reminder Days Before Donation</label><input id="reminderDays" type="number" min="1" max="30" value="1">
+<button type="submit">Save Settings</button>
+</form>
+</section>
+
+<section id="qrTab" class="panel" hidden>
+<h2>UPI Payment QR Settings</h2><div id="qrPreviewWrap">Loading QR preview...</div>
+<form id="qrForm"><label for="qrFile">Choose QR image (JPG, PNG or WebP; max 5 MB)</label><input id="qrFile" type="file" accept="image/jpeg,image/png,image/webp" required><button type="submit">Upload / Replace QR</button></form>
+<button class="warn" id="deleteQrBtn" type="button">Delete Current QR</button>
+</section>
+
+<section id="reportsTab" class="panel" hidden>
+<h2>Monthly Donation Reports</h2><p class="muted">Cancelled bookings are excluded from paid and pending donation totals.</p>
+<div class="report-controls">
+<div><label for="reportMonth">Month</label><input id="reportMonth" type="month"></div>
+<div><label for="reportDateType">Report Type</label><select id="reportDateType"><option value="booking">Booking Date Report</option><option value="donation">Donation Date Report</option></select></div>
+</div>
+<div class="grid">
+<div class="stat">Total Bookings<strong id="reportTotal">0</strong></div>
+<div class="stat">Paid Donations<strong id="reportPaid">₹0</strong></div>
+<div class="stat">Pending Donations<strong id="reportPending">₹0</strong></div>
+<div class="stat">Cancelled Orders<strong id="reportCancelled">0</strong></div>
+</div>
+<h3>Booking Status</h3><div id="reportStatusCards" class="report-grid"></div>
+<div class="actions"><button class="light" id="clearReportStatus" type="button">Show All Orders</button></div>
+<div id="reportOrders"></div>
+</section>
+</section>
+</main>
+
+
 <script type="module">
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-const sb=createClient('https://mswgamusywvqxscfcyff.supabase.co','sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u');
-const $=id=>document.getElementById(id);let rows=[],currentUser=null;
-function say(t){$('msg').textContent=t}
-async function checkAdmin(){const{data:{user},error}=await sb.auth.getUser();if(error||!user)return false;const{data,error:e}=await sb.from('tycf_admins').select('user_id').eq('user_id',user.id).maybeSingle();if(e)throw e;if(!data){await sb.auth.signOut();throw Error('Admin access not allowed')}currentUser=user;return true}
-async function start(){if(await checkAdmin()){$('login').classList.add('hidden');$('app').classList.remove('hidden');await load()}}
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();say('Checking admin login…');const{error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){alert(error.message);return}try{await start()}catch(x){alert(x.message)}});
-async function signedPhoto(path,download=false){if(!path)return null;const{data,error}=await sb.storage.from('tycf-sticker-photos').createSignedUrl(path,300,download?{download:true}:{});return error?null:data?.signedUrl}
-function waNumber(raw){let n=String(raw||'').replace(/\D/g,'');if(n.length===10)n='91'+n;else if(n.length===11&&n.startsWith('0'))n='91'+n.slice(1);return n}
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function money(v){return '₹'+Number(v||0).toLocaleString('en-IN')}
-async function load(){say('Loading orders…');const{data,error}=await sb.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(250);if(error){say('Could not load orders: '+error.message);return}rows=data||[];$('total').textContent=rows.length;$('new').textContent=rows.filter(x=>x.status==='Received').length;$('confirmed').textContent=rows.filter(x=>x.status==='Confirmed').length;$('delivered').textContent=rows.filter(x=>x.status==='Delivered').length;await render();say('Orders updated.')}
-async function render(){const q=$('search').value.toLowerCase(),f=$('filter').value;const list=rows.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));if(!list.length){$('orders').innerHTML='<p class="muted">No matching orders.</p>';return}let out='';for(const o of list){const photo=await signedPhoto(o.sticker_photo_path),design=await signedPhoto(o.sticker_design_path),photoDownload=await signedPhoto(o.sticker_photo_path,true),designDownload=await signedPhoto(o.sticker_design_path,true);out+=`<article class="order"><div class="bar"><h3>Order #${esc(o.id)}</h3><span class="tag">${esc(o.status)}</span></div><div class="detail"><div><small>Customer</small>${esc(o.customer_name)}</div><div><small>WhatsApp / Mobile</small>${esc(o.whatsapp_recipient||o.customer_mobile)}</div><div><small>Package</small>${esc(o.package_name)}</div><div><small>Total Amount</small>${money(o.total_amount??o.package_price)}</div><div><small>Donation Date</small>${esc(o.donation_date)}</div><div><small>Payment</small>${esc(o.payment_status)}</div><div><small>Occasion</small>${esc(o.occasion)}</div><div><small>Sticker Name</small>${esc(o.sticker_name)}</div></div><p><b>Customer Message:</b> ${esc(o.customer_message||'—')}</p><div class="photos">${photo?`<div><img src="${photo}" alt="Customer uploaded photo"><p><a href="${photoDownload||photo}" target="_blank" rel="noopener" download>Download Customer Photo</a></p></div>`:''}${design?`<div><img src="${design}" alt="Sticker design"><p><a href="${designDownload||design}" target="_blank" rel="noopener" download>Download Sticker Design</a></p></div>`:''}</div><div class="panel"><label>Upload donation / delivery video (max 50 MB)</label><input type="file" accept="video/mp4,video/webm,image/jpeg,image/png,image/webp" id="media-${o.id}"><input id="caption-${o.id}" placeholder="Thank-you note / caption (optional)"><button data-upload="${o.id}" type="button">Upload Media</button><div id="media-list-${o.id}" class="muted">Loading uploaded media…</div></div><label>Update order status</label><select id="s-${o.id}">${['Received','Confirmed','Preparing','Delivered','Cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select><button data-save="${o.id}">Save Status</button> <a href="https://wa.me/${esc(waNumber(o.whatsapp_recipient||o.customer_mobile||''))}" target="_blank" rel="noopener"><button type="button" class="secondary">Open WhatsApp</button></a> <button type="button" class="secondary" data-wa="${esc(o.id)}">Send WhatsApp Update</button></article>`} $('orders').innerHTML=out;for(const o of list){const{data:media}=await sb.from('tycf_order_delivery_media').select('*').eq('order_id',o.id).order('created_at',{ascending:false});const el=$('media-list-'+o.id);if(el&&media?.length){let links=[];for(const m of media){const{data}=await sb.storage.from('tycf-delivery-media').createSignedUrl(m.media_path,300);if(data?.signedUrl)links.push('<div style="margin:8px 0"><a target="_blank" rel="noopener" href="'+data.signedUrl+'">Open '+esc(m.media_type)+' · '+esc(new Date(m.created_at).toLocaleString())+'</a> <button type="button" data-share="'+esc(m.id)+'" data-order="'+esc(o.id)+'">Send via WhatsApp</button></div>')}el.innerHTML=links.join('<br>')||'No media uploaded'}else if(el)el.textContent='No media uploaded'}}
-$('refresh').onclick=load;$('search').oninput=render;$('filter').onchange=render;$('logout').onclick=async()=>{await sb.auth.signOut();location.reload()};
-$('orders').addEventListener('click',async e=>{const wa=e.target.closest('[data-wa]');if(wa){const o=rows.find(x=>String(x.id)===String(wa.dataset.wa));if(!o)return;const number=waNumber(o.whatsapp_recipient||o.customer_mobile);if(!number){say('Customer mobile number is missing.');return}const message='నమస్కారం '+(o.customer_name||'గారికి')+'! ❤️\n\nTYCF FOOD DONATION – మీ Order #'+o.id+' వివరాలు:\nPackage: '+(o.package_name||'')+'\nDonation Date: '+(o.donation_date||'')+'\nCurrent Status: '+(o.status||'')+'\n\nసంప్రదించండి: +91 83408 34108\nWebsite: https://tycf-food-donation.pages.dev/\nInstagram: https://www.instagram.com/tycf_foundation\n\nధన్యవాదాలు,\nTYCF FOUNDATION';window.open('https://wa.me/'+number+'?text='+encodeURIComponent(message),'_blank','noopener');return}const share=e.target.closest('[data-share]');if(share){const mediaId=share.dataset.share,orderId=share.dataset.order,order=rows.find(x=>String(x.id)===String(orderId));share.disabled=true;share.textContent='Preparing…';try{const{data:media,error}=await sb.from('tycf_order_delivery_media').select('*').eq('id',mediaId).single();if(error)throw error;const{data:signed,error:signError}=await sb.storage.from('tycf-delivery-media').createSignedUrl(media.media_path,300);if(signError)throw signError;const response=await fetch(signed.signedUrl);if(!response.ok)throw Error('Could not download uploaded media');const blob=await response.blob();const filename=media.media_path.split('/').pop()||('TYCF-order-'+orderId);const file=new File([blob],filename,{type:blob.type|| (media.media_type==='video'?'video/mp4':'image/jpeg')});const message='❤️ TYCF FOOD DONATION కార్యక్రమంలో భాగమైనందుకు హృదయపూర్వక ధన్యవాదాలు!\n\nమీరు అందించిన విరాళంతో అవసరమైన వారికి ఆహారం అందించి వారి ముఖాల్లో ఆనందం నింపగలిగాము. ఈ సేవా కార్యక్రమానికి సంబంధించిన వీడియోను మీతో పంచుకుంటున్నాము.\n\n📞 సంప్రదించండి: +91 83408 34108\n🌐 వెబ్‌సైట్: https://tycf-food-donation.pages.dev/\n📸 TYCF Foundation Instagram: https://www.instagram.com/tycf_foundation\n❤️ TYCF Food Donation Instagram: https://www.instagram.com/tycf_fooddonation\n\nకృతజ్ఞతలతో,\nTYCF FOUNDATION';if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]}))throw Error('This browser cannot share video files. Open this app in Chrome on Android.');await navigator.share({files:[file],text:message,title:'TYCF Food Donation - Thank You'});say('WhatsApp share sheet opened. Select WhatsApp and tap Send to deliver the video with thank-you message.')}catch(err){if(err.name!=='AbortError')say('WhatsApp sharing error: '+err.message)}finally{share.disabled=false;share.textContent='Send via WhatsApp'}return}const up=e.target.closest('[data-upload]');if(up){const id=up.dataset.upload,file=$('media-'+id).files[0];if(!file){alert('Select a video or image first.');return}if(file.size>50*1024*1024){alert('File must be 50 MB or smaller.');return}const type=file.type.startsWith('video/')?'video':'image';if(!['video/mp4','video/webm','image/jpeg','image/png','image/webp'].includes(file.type)){alert('Supported: MP4, WebM, JPG, PNG, WebP.');return}up.disabled=true;up.textContent='Uploading…';try{const ext=(file.name.split('.').pop()||'bin').replace(/[^a-z0-9]/gi,'').toLowerCase();const path='order-'+id+'/'+crypto.randomUUID()+'.'+ext;const{error:se}=await sb.storage.from('tycf-delivery-media').upload(path,file,{contentType:file.type,upsert:false});if(se)throw se;const{error:de}=await sb.from('tycf_order_delivery_media').insert({order_id:Number(id),media_path:path,media_type:type,caption:$('caption-'+id).value.trim()});if(de)throw de;await render();say('Media uploaded and saved to order #'+id+'. Automatic WhatsApp delivery is not configured yet.')}catch(err){say('Upload failed: '+err.message)}finally{up.disabled=false;up.textContent='Upload Media'}return}const b=e.target.closest('[data-save]');if(!b)return;const id=b.dataset.save,st=$('s-'+id).value,o=rows.find(x=>String(x.id)===String(id));if(st==='Confirmed'&&o?.payment_status!=='Paid'){alert('Verify payment before confirming in the main dashboard.');return}const{error}=await sb.from('tycf_orders').update({status:st}).eq('id',id);if(error){alert(error.message);return}await load()});
-$('push').onclick=async()=>{try{if(!('serviceWorker'in navigator)||!('PushManager'in window))throw Error('Push is not supported in this browser');const reg=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});await navigator.serviceWorker.ready;let perm=Notification.permission;if(perm==='default')perm=await Notification.requestPermission();if(perm!=='granted')throw Error('Allow notifications in Android settings');const r=await fetch('https://mswgamusywvqxscfcyff.supabase.co/functions/v1/tycf-order-push',{cache:'no-store'});if(!r.ok)throw Error('Could not read VAPID public key');const j=await r.json();const decode=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'=')),c=>c.charCodeAt(0));let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decode(j.publicKey||j.VAPID_PUBLIC_KEY)});const subscriptionData=sub.toJSON();const{error}=await sb.from('tycf_admin_push_subscriptions').upsert({user_id:currentUser.id,endpoint:subscriptionData.endpoint,p256dh:subscriptionData.keys.p256dh,auth:subscriptionData.keys.auth},{onConflict:'endpoint'});if(error)throw error;say('Push notifications enabled on this admin app')}catch(e){say('Push setup error: '+e.message)}};
-try{await start()}catch(e){say(e.message)}
-</script></body></html>
+window.addEventListener('error', (event) => {
+  const box = document.getElementById('message');
+  if (box) box.textContent =
+    'Dashboard script error: ' + event.message;
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const box = document.getElementById('message');
+  if (box) box.textContent =
+    'Dashboard request error: ' +
+    (event.reason?.message || String(event.reason));
+});
+
+let createClient;
+
+try {
+  ({ createClient } = await import(
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  ));
+} catch (error) {
+  document.getElementById('message').textContent =
+    'Dashboard startup error: ' + error.message;
+  throw error;
+}
+
+const supabase = createClient(
+  'https://mswgamusywvqxscfcyff.supabase.co',
+  'sb_publishable_gxRXwlD9V6Nfg-6g10Bzig_mJwivK9u'
+);
+
+document.getElementById('message').textContent =
+  'Dashboard script loaded. Starting admin check...';
+
+const $=id=>document.getElementById(id);
+let orders=[],settings=null,user=null,reportStatusFilter='',packageRows=[],headerFile=null,headerObjectUrl=null;
+const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
+
+// Admin push notifications: register only after the signed-in user is verified as TYCF admin.
+const PUSH_FUNCTION_URL='https://mswgamusywvqxscfcyff.supabase.co/functions/v1/tycf-order-push';
+function urlBase64ToUint8Array(value){
+  if(typeof value!=='string') throw new Error('Server VAPID public key is not text.');
+  let clean=value.trim().replace(/^["']|["']$/g,'').replace(/\\s+/g,'');
+  clean=clean.replace(/-/g,'+').replace(/_/g,'/');
+  if(!/^[A-Za-z0-9+/]*={0,2}$/.test(clean)) throw new Error('Server VAPID public key contains invalid characters. Check the VAPID_PUBLIC_KEY secret format.');
+  clean=clean.replace(/=+$/,'');
+  if(clean.length%4===1) throw new Error('Server VAPID public key has an invalid Base64 length. Replace VAPID_PUBLIC_KEY with a valid Web Push public key.');
+  const base64=clean+'='.repeat((4-clean.length%4)%4);
+  let raw;
+  try{raw=atob(base64);}catch{throw new Error('Server VAPID public key is not valid Base64URL. Check the VAPID_PUBLIC_KEY secret.');}
+  const bytes=Uint8Array.from(raw,ch=>ch.charCodeAt(0));
+  if(bytes.length!==65||bytes[0]!==4) throw new Error('VAPID_PUBLIC_KEY must be a 65-byte uncompressed P-256 public key encoded as Base64URL.');
+  return bytes;
+}
+async function enableAdminPush(){
+  const status=$('pushStatus');
+  const button=$('enablePushBtn');
+  const report=(message)=>{ if(status) status.textContent='Push notifications: '+message; };
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+    report('This browser or installed app does not support Web Push.'); return false;
+  }
+  try{
+    report('Registering service worker...');
+    const registration=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+    await registration.update().catch(()=>{});
+    await navigator.serviceWorker.ready;
+    let permission=Notification.permission;
+    if(permission==='default') permission=await Notification.requestPermission();
+    if(permission!=='granted'){
+      report('Permission is '+permission+'. Allow notifications in Android app settings.');
+      if(button) button.hidden=false;
+      return false;
+    }
+    report('Checking server push key...');
+    const keyResponse=await fetch(PUSH_FUNCTION_URL,{method:'GET',cache:'no-store'});
+    if(!keyResponse.ok) throw new Error('Push key endpoint returned HTTP '+keyResponse.status);
+    const keyData=await keyResponse.json();
+    if(!keyData.publicKey) throw new Error('Server did not return a VAPID public key.');
+    const applicationServerKey=urlBase64ToUint8Array(keyData.publicKey);
+    if(applicationServerKey.length!==65) throw new Error('VAPID public key has invalid length.');
+    report('Creating browser subscription...');
+    let subscription=await registration.pushManager.getSubscription();
+    if(!subscription){
+      subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
+    }
+    const json=subscription.toJSON();
+    if(!json.endpoint||!json.keys?.p256dh||!json.keys?.auth) throw new Error('Browser returned an incomplete push subscription.');
+    report('Saving subscription securely...');
+    const {error}=await supabase.from('tycf_admin_push_subscriptions').upsert({
+      user_id:user.id,endpoint:json.endpoint,p256dh:json.keys.p256dh,
+      auth:json.keys.auth,updated_at:new Date().toISOString()
+    },{onConflict:'endpoint'});
+    if(error) throw new Error('Database save failed: '+error.message);
+    report('Enabled successfully on this device.');
+    if(button) button.hidden=true;
+    return true;
+  }catch(error){
+    console.error('TYCF push setup:',error);
+    report(error.message||String(error));
+    if(button) button.hidden=false;
+    return false;
+  }
+}
+
+const say=m=>$('message').textContent=m;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+const monthNow=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');};
+const datePlus=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+function phone(v){let p=String(v||'').replace(/\D/g,'');if(p.length===10)p='91'+p;return p.length>=11&&p.length<=15?p:'';}
+
+function waLink(o){
+  const p=phone(o.whatsapp_recipient||o.customer_mobile);
+  if(!p)return '';
+
+  const status=(o.status||'Received').toLowerCase();
+
+  const messages={
+    received:'We have received your donation booking request.',
+    confirmed:'Your donation booking has been confirmed.',
+    preparing:'Your food donation is being prepared.',
+    delivered:'Your food donation has been successfully delivered. Thank you for sharing happiness!',
+    cancelled:'Your donation booking has been cancelled. Please contact TYCF Foundation for assistance.'
+  };
+
+  const statusMessage=messages[status]||'Your donation booking status has been updated.';
+
+  const msg=`TYCF FOOD DONATION
+
+Dear ${o.customer_name||'Customer'},
+${statusMessage}
+
+Package: ${o.package_name||''}
+Donation Amount: Rs. ${Number(o.total_amount??o.package_price??0).toLocaleString('en-IN')}
+Donation Date: ${o.donation_date||''}
+Occasion: ${o.occasion||''}
+
+Payment Status: ${(o.payment_status||'Pending').toUpperCase()}
+Order Status: ${(o.status||'Received').toUpperCase()}
+
+Thank you for supporting TYCF Foundation.
+Sharing Happiness ❤️`;
+
+  return 'https://wa.me/'+p+'?text='+encodeURIComponent(msg);
+}
+
+// TYCF APP ICON SETTINGS
+
+async function loadAppIconSettings(){
+  const {data,error}=await supabase.rpc('get_tycf_public_app_icon');
+
+  if(error){
+    say('App icon loading failed: '+error.message);
+    return;
+  }
+
+  const preview=$('appIconPreview');
+
+  if(data){
+    const {data:u}=supabase.storage
+      .from('tycf-header-assets')
+      .getPublicUrl(data);
+
+    preview.innerHTML=
+      `<img src="${esc(u.publicUrl)}?t=${Date.now()}"
+      alt="TYCF App Icon"
+      style="width:120px;height:120px;object-fit:contain">`;
+  }else{
+    preview.textContent='No app icon uploaded yet.';
+  }
+}
+
+$('appIconFile').addEventListener('change',()=>{
+  const file=$('appIconFile').files[0];
+  if(!file)return;
+
+  if(file.type!=='image/png'){
+    say('Please select a PNG image.');
+    $('appIconFile').value='';
+    return;
+  }
+
+  if(file.size>5*1024*1024){
+    say('Image must be under 5 MB.');
+    $('appIconFile').value='';
+    return;
+  }
+
+  const url=URL.createObjectURL(file);
+
+  $('appIconPreview').innerHTML=
+    `<img src="${url}" alt="New App Icon Preview"
+    style="width:120px;height:120px;object-fit:contain">`;
+});
+
+async function saveAppIcon(){
+  const file=$('appIconFile').files[0];
+
+  if(!file){
+    say('Please choose a PNG app icon first.');
+    return;
+  }
+
+  if(!settings?.id){
+    say('Settings are not loaded. Refresh and try again.');
+    return;
+  }
+
+  say('Uploading app icon...');
+
+  const path='app-icons/current.png';
+
+  const {error:uploadError}=await supabase.storage
+    .from('tycf-header-assets')
+    .upload(path,file,{
+      upsert:true,
+      contentType:'image/png',
+      cacheControl:'0'
+    });
+
+  if(uploadError){
+    say('App icon upload failed: '+uploadError.message);
+    return;
+  }
+
+  const {error:updateError}=await supabase
+    .from('tycf_settings')
+    .update({
+      app_icon_path:path,
+      updated_at:new Date().toISOString()
+    })
+    .eq('id',settings.id);
+
+  if(updateError){
+    say('App icon save failed: '+updateError.message);
+    return;
+  }
+
+  $('appIconFile').value='';
+  await loadAppIconSettings();
+  say('TYCF App Icon saved successfully.');
+}
+
+$('saveAppIconBtn').addEventListener('click',saveAppIcon);
+
+async function init(){
+  try {
+    say('Step 1: Checking login session...');
+
+    const { data: { session }, error } =
+      await supabase.auth.getSession();
+
+    if (error) throw error;
+
+    if (!session) {
+      say('No login session. Redirecting...');
+      location.href = 'admin.html';
+      return;
+    }
+
+    say('Step 2: Checking admin permissions...');
+
+    const { data: admin, error: ae } = await supabase
+      .from('tycf_admins')
+      .select('user_id')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (ae) throw ae;
+
+    if (!admin) {
+      await supabase.auth.signOut();
+      say('Admin access not allowed.');
+      return;
+    }
+
+    user = session.user;
+    $('app').hidden = false;
+    await enableAdminPush();
+
+    $('adminDisplayName').textContent =
+      user.user_metadata?.display_name || 'TYCF Admin';
+
+    $('displayName').value =
+      user.user_metadata?.display_name || 'TYCF Admin';
+
+    $('newAdminEmail').value = user.email || '';
+    $('reportMonth').value = monthNow();
+
+    await loadAll();
+
+  } catch (e) {
+    say('Dashboard error: ' + (e.message || String(e)));
+  }
+}
+
+async function loadAll(){
+say('Loading dashboard...');
+const [a,b]=await Promise.all([
+supabase.from('tycf_orders').select('*').order('created_at',{ascending:false}).limit(500),
+supabase.from('tycf_settings').select('*').limit(1).maybeSingle()
+]);
+if(a.error){say('Bookings error: '+a.error.message);return;}if(b.error){say('Settings error: '+b.error.message);return;}
+orders=a.data||[];settings=b.data;if(!settings){say('No settings row found in tycf_settings.');return;}
+await Promise.all(orders.map(async o=>{
+o.stickerPhotoUrl=null;o.stickerDesignUrl=null;
+for(const [field,target] of [['sticker_photo_path','stickerPhotoUrl'],['sticker_design_path','stickerDesignUrl']]){
+if(o[field]){const r=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(o[field],3600);if(!r.error&&r.data?.signedUrl)o[target]=r.data.signedUrl;}
+}
+}));
+renderStats();renderOrders();renderReminders();fillSettings();
+await Promise.all([loadPackageList(),renderQr(),loadHeaderSettings()]);
+if(!$('reportsTab').hidden)renderReport();say('Dashboard loaded.');
+}
+function renderStats(){
+$('total').textContent=orders.length;$('received').textContent=orders.filter(o=>o.status==='Received').length;
+$('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
+}
+function orderHtml(o){
+const paid=o.payment_status==='Paid';
+const photo=o.stickerPhotoUrl?`<div class="order-image-card"><b>Customer Photo</b><a href="${esc(o.stickerPhotoUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerPhotoUrl)}" alt="Customer photo"></a><button data-downloadphoto="${esc(o.id)}">Download Customer Photo</button></div>`:'';
+const design=o.stickerDesignUrl?`<div class="order-image-card"><b>Final Sticker Design</b><a href="${esc(o.stickerDesignUrl)}" target="_blank" rel="noopener"><img src="${esc(o.stickerDesignUrl)}" alt="Sticker design"></a><button data-download="${esc(o.id)}">Download Sticker</button></div>`:'';
+const opts=statuses.map(s=>`<option value="${s}" ${o.status===s?'selected':''} ${s==='Confirmed'&&!paid?'disabled':''}>${s}</option>`).join('');
+return `<article class="order"><h3>${esc(o.customer_name)} <span class="tag">${esc(o.status)}</span></h3>
+<p><b>${esc(o.package_name)}</b> — Total Donation: ${money(o.total_amount??o.package_price)}</p>
+<p class="muted">Mobile: ${esc(o.customer_mobile)} · Occasion: ${esc(o.occasion)} · Donation date: ${esc(o.donation_date)}</p>
+<p class="muted">Sticker name: ${esc(o.sticker_name)} · Message: ${esc(o.customer_message)}</p>
+${photo||design?`<div class="order-images">${photo}${design}</div>`:''}
+<p>Payment: <span class="tag ${paid?'paid':'pending'}">${paid?'Paid':'Pending'}</span></p>
+<div class="wa-box"><b>Donation / Delivery Media</b><label for="delivery-${esc(o.id)}">Upload delivery photo or video (max 50 MB)</label><input id="delivery-${esc(o.id)}" type="file" accept="video/mp4,video/webm,image/jpeg,image/png,image/webp"><input id="delivery-caption-${esc(o.id)}" placeholder="Caption (optional)"><button type="button" data-uploadmedia="${esc(o.id)}">Upload Media</button><div id="delivery-list-${esc(o.id)}" class="muted">Loading media...</div></div>
+<div class="wa-box"><label>Customer WhatsApp Number</label><input id="wa-${esc(o.id)}" value="${esc(o.whatsapp_recipient||o.customer_mobile||'')}" maxlength="15"><button data-savewa="${esc(o.id)}">Save WhatsApp Number</button></div>
+<div class="actions">${!paid?`<button data-verify="${esc(o.id)}">Verify Payment / Mark Paid</button>`:''}<select id="st-${esc(o.id)}">${opts}</select><button data-status="${esc(o.id)}">Save Status</button>
+
+${waLink(o)?`<a class="btn" href="${waLink(o)}" target="_blank" rel="noopener">Send WhatsApp Update</a>`:''}
+</div></article>`;
+}
+
+function renderOrders(){
+const q=$('search').value.toLowerCase(),f=$('statusFilter').value;
+const list=orders.filter(o=>(!f||o.status===f)&&[o.customer_name,o.customer_mobile,o.package_name,o.whatsapp_recipient].some(v=>String(v||'').toLowerCase().includes(q)));
+$('ordersList').innerHTML=list.length?list.map(orderHtml).join(''):'<p>No matching bookings.</p>';
+if(list.length)loadDeliveryMediaForOrders(list);
+}
+
+async function downloadPrivateImage(path,name){
+ const {data,error}=await supabase.storage.from('tycf-sticker-photos').createSignedUrl(path,300);
+ if(error||!data?.signedUrl){say('Image download link failed: '+(error?.message||'Unavailable'));return;}
+ try{const r=await fetch(data.signedUrl);if(!r.ok)throw Error('Download failed');const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);say('Image downloaded.');}catch(e){say('Download failed: '+e.message);}
+}
+async function loadDeliveryMediaForOrders(list){
+ for(const o of list){
+  const box=$('delivery-list-'+o.id);if(!box)continue;
+  const {data,error}=await supabase.from('tycf_order_delivery_media').select('*').eq('order_id',o.id).order('created_at',{ascending:false});
+  if(error){box.textContent='Media loading failed: '+error.message;continue;}
+  if(!data?.length){box.textContent='No delivery media uploaded yet.';continue;}
+  const items=[];
+  for(const m of data){
+   const {data:signed,error:se}=await supabase.storage.from('tycf-delivery-media').createSignedUrl(m.media_path,300,{download:true});
+   if(se||!signed?.signedUrl)continue;
+   items.push('<div style="margin:8px 0"><a href="'+esc(signed.signedUrl)+'" target="_blank" rel="noopener">Download '+esc(m.media_type)+' · '+esc(new Date(m.created_at).toLocaleString())+'</a> <button type="button" data-sharemedia="'+esc(m.id)+'" data-order="'+esc(o.id)+'">Share via WhatsApp</button></div>');
+  }
+  box.innerHTML=items.join('')||'No media links available.';
+ }
+}
+async function uploadDeliveryMedia(id,button){
+ const input=$('delivery-'+id),file=input?.files?.[0];if(!file){say('Choose a photo or video first.');return;}
+ if(file.size>50*1024*1024){say('File must be 50 MB or smaller.');return;}
+ if(!['video/mp4','video/webm','image/jpeg','image/png','image/webp'].includes(file.type)){say('Supported: MP4, WebM, JPG, PNG, WebP.');return;}
+ button.disabled=true;button.textContent='Uploading...';
+ try{
+  const ext=(file.name.split('.').pop()||'bin').replace(/[^a-z0-9]/gi,'').toLowerCase();
+  const path='order-'+id+'/'+crypto.randomUUID()+'.'+ext;
+  const {error:upErr}=await supabase.storage.from('tycf-delivery-media').upload(path,file,{contentType:file.type,upsert:false});
+  if(upErr)throw upErr;
+  const {error:dbErr}=await supabase.from('tycf_order_delivery_media').insert({order_id:Number(id),media_path:path,media_type:file.type.startsWith('video/')?'video':'image',caption:$('delivery-caption-'+id).value.trim()});
+  if(dbErr)throw dbErr;
+  say('Delivery media uploaded for order #'+id+'.');
+  renderOrders();
+ }catch(e){say('Media upload failed: '+e.message);}
+ finally{button.disabled=false;button.textContent='Upload Media';}
+}
+async function shareDeliveryMedia(mediaId,orderId,button){
+ const order=orders.find(x=>String(x.id)===String(orderId));button.disabled=true;button.textContent='Preparing...';
+ try{
+  const {data:m,error}=await supabase.from('tycf_order_delivery_media').select('*').eq('id',mediaId).single();if(error)throw error;
+  const {data:signed,error:se}=await supabase.storage.from('tycf-delivery-media').createSignedUrl(m.media_path,300);if(se)throw se;
+  const response=await fetch(signed.signedUrl);if(!response.ok)throw Error('Could not fetch media');
+  const blob=await response.blob(),filename=m.media_path.split('/').pop()||('TYCF-order-'+orderId),file=new File([blob],filename,{type:blob.type||(m.media_type==='video'?'video/mp4':'image/jpeg')});
+  const msg='❤️ TYCF FOOD DONATION కార్యక్రమంలో భాగమైనందుకు హృదయపూర్వక ధన్యవాదాలు!\n\nమీ విరాళంతో అవసరమైన వారికి ఆహారం అందించగలిగాము. ఈ సేవా కార్యక్రమానికి సంబంధించిన వీడియోను మీతో పంచుకుంటున్నాము.\n\n📞 +91 83408 34108\n🌐 https://tycf-food-donation.pages.dev/\n📸 https://www.instagram.com/tycf_foundation\n❤️ https://www.instagram.com/tycf_fooddonation\n\nకృతజ్ఞతలతో, TYCF FOUNDATION';
+  if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]}))throw Error('Video sharing is not supported here. Open the Admin App in Chrome on Android.');
+  await navigator.share({files:[file],text:msg,title:'TYCF Food Donation'});
+  say('Share sheet opened. Select WhatsApp, choose customer and tap Send.');
+ }catch(e){if(e.name!=='AbortError')say('Share failed: '+e.message);}
+ finally{button.disabled=false;button.textContent='Share via WhatsApp';}
+}
+async function downloadSticker(id){
+const o=orders.find(x=>String(x.id)===String(id));if(!o?.stickerDesignUrl){say('Sticker design unavailable.');return;}
+try{const r=await fetch(o.stickerDesignUrl);if(!r.ok)throw Error('Could not fetch design');const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='TYCF-'+String(o.sticker_name||o.customer_name||'Sticker').replace(/[^a-z0-9_-]/gi,'-')+'.jpg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);say('Sticker downloaded.');}catch(e){say('Download failed: '+e.message);}
+}
+async function saveWA(id){
+const p=phone($('wa-'+id).value);if(!p){say('Enter valid WhatsApp number with country code.');return;}
+const {error}=await supabase.from('tycf_orders').update({whatsapp_recipient:p}).eq('id',id);
+if(error){say('WhatsApp number save failed: '+error.message);return;}await loadAll();say('WhatsApp number saved.');
+}
+async function verify(id){
+const o=orders.find(x=>String(x.id)===String(id));if(!o||o.payment_status==='Paid')return;
+if(!confirm('Only continue if payment has actually reached the TYCF Foundation account. Mark this payment as Paid?'))return;
+const {error}=await supabase.from('tycf_orders').update({payment_status:'Paid',status:'Confirmed'}).eq('id',id);
+if(error){say('Payment update failed: '+error.message);return;}await loadAll();say('Payment marked Paid and booking Confirmed.');
+}
+async function saveStatus(id){
+const st=$('st-'+id).value,o=orders.find(x=>String(x.id)===String(id));
+if(st==='Confirmed'&&o?.payment_status!=='Paid'){say('Verify payment before confirming.');return;}
+const {error}=await supabase.from('tycf_orders').update({status:st}).eq('id',id);
+if(error){say('Status update failed: '+error.message);return;}await loadAll();say('Booking status updated.');
+}
+function renderReminders(){
+const n=Number(settings.reminder_days||1),list=orders.filter(o=>o.donation_date===datePlus(n)&&!['Delivered','Cancelled'].includes(o.status));
+$('reminderList').innerHTML=list.length?list.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p class="muted">${esc(o.customer_mobile)} · ${esc(o.donation_date)} · ${esc(o.status)}</p></article>`).join(''):'<p>No donations due on reminder day.</p>';
+}
+function reportMonth(o){return $('reportDateType').value==='donation'?String(o.donation_date||'').slice(0,7):String(o.created_at||'').slice(0,7);}
+function renderReport(){
+const m=$('reportMonth').value,list=orders.filter(o=>reportMonth(o)===m),active=list.filter(o=>o.status!=='Cancelled');
+$('reportTotal').textContent=list.length;
+$('reportPaid').textContent=money(active.filter(o=>o.payment_status==='Paid').reduce((s,o)=>s+Number(o.total_amount??o.package_price??0),0));
+$('reportPending').textContent=money(active.filter(o=>o.payment_status!=='Paid').reduce((s,o)=>s+Number(o.total_amount??o.package_price??0),0));
+$('reportCancelled').textContent=list.filter(o=>o.status==='Cancelled').length;
+$('reportStatusCards').innerHTML=statuses.map(s=>`<button class="report-card ${reportStatusFilter===s?'active':''}" data-rstatus="${s}">${s}<strong>${list.filter(o=>o.status===s).length}</strong></button>`).join('');
+const shown=list.filter(o=>!reportStatusFilter||o.status===reportStatusFilter);
+$('reportOrders').innerHTML=shown.length?shown.map(o=>`<article class="order"><b>${esc(o.customer_name)}</b> — ${esc(o.package_name)}<p>${money(o.total_amount??o.package_price)} · ${esc(o.status)} · ${esc(o.payment_status)}</p><p class="muted">Booked: ${esc(String(o.created_at||'').slice(0,10))} · Donation: ${esc(o.donation_date)}</p></article>`).join(''):'<p>No bookings for this report.</p>';
+}
+function fillSettings(){
+const s=settings;$('waNumber').value=s.whatsapp_number||'';$('vegPrice').value=s.veg_price??1500;$('eggPrice').value=s.egg_price??1800;
+$('chickenPrice').value=s.chicken_price??2500;$('cakePrice').value=s.cake_price??1500;$('reminderDays').value=s.reminder_days??1;
+}
+async function saveSettings(e){
+e.preventDefault();const p={whatsapp_number:$('waNumber').value.trim(),veg_price:Number($('vegPrice').value),egg_price:Number($('eggPrice').value),chicken_price:Number($('chickenPrice').value),cake_price:Number($('cakePrice').value),reminder_days:Number($('reminderDays').value),updated_at:new Date().toISOString()};
+const {error}=await supabase.from('tycf_settings').update(p).eq('id',settings.id);if(error){say('Settings save failed: '+error.message);return;}
+await loadAll();
+say('Settings saved.');
+}
+
+async function saveProfile(e){
+e.preventDefault();
+const name=$('displayName').value.trim();
+const email=$('newAdminEmail').value.trim();
+if(!name||!email){say('Enter display name and email.');return;}
+const {error}=await supabase.auth.updateUser({
+email,
+data:{display_name:name}
+});
+if(error){say('Profile update failed: '+error.message);return;}
+$('adminDisplayName').textContent=name;
+say('Profile updated. If email confirmation is required, check your inbox.');
+}
+
+async function renderQr(){
+const path='current/payment-qr';
+const {data,error}=await supabase.storage.from('tycf-payment-qr').list('current',{limit:100});
+if(error){$('qrPreviewWrap').textContent='QR list error: '+error.message;return;}
+const found=(data||[]).some(x=>x.name==='payment-qr');
+if(!found){
+$('qrPreviewWrap').innerHTML='<p>No QR image uploaded yet. Upload your UPI QR below.</p>';
+return;
+}
+const {data:urlData}=supabase.storage.from('tycf-payment-qr').getPublicUrl(path);
+$('qrPreviewWrap').innerHTML=`<img src="${esc(urlData.publicUrl+'?t='+Date.now())}" alt="Current UPI QR"><p class="muted">Current UPI QR image</p>`;
+}
+
+async function saveQr(e){
+e.preventDefault();
+const file=$('qrFile').files[0];
+if(!file)return;
+if(file.size>5*1024*1024){say('QR image must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+say('Uploading QR...');
+const {error}=await supabase.storage.from('tycf-payment-qr').upload('current/payment-qr',file,{upsert:true,contentType:file.type});
+if(error){say('QR upload failed: '+error.message);return;}
+$('qrFile').value='';
+await renderQr();
+say('UPI QR uploaded.');
+}
+
+async function deleteQr(){
+if(!confirm('Delete the current UPI QR image?'))return;
+const {error}=await supabase.storage.from('tycf-payment-qr').remove(['current/payment-qr']);
+if(error){say('QR delete failed: '+error.message);return;}
+await renderQr();
+say('QR image deleted.');
+}
+
+async function loadHeaderSettings(){
+const {data,error}=await supabase.rpc('get_tycf_public_header');
+if(error){say('Header settings load failed: '+error.message);return;}
+const h=Array.isArray(data)?data[0]:data;
+if(h?.header_background_color)$('headerColor').value=h.header_background_color;
+const preview=$('headerPreview');
+preview.style.backgroundColor=$('headerColor').value;
+if(h?.header_background_path){
+const {data:u}=supabase.storage.from('tycf-header-assets').getPublicUrl(h.header_background_path);
+preview.style.backgroundImage=`url("${u.publicUrl}")`;
+}else{
+preview.style.backgroundImage='none';
+}
+}
+
+function previewHeader(){
+$('headerPreview').style.backgroundColor=$('headerColor').value;
+$('headerPreview').style.backgroundImage=headerObjectUrl?`url("${headerObjectUrl}")`:'none';
+}
+
+async function saveHeader(){
+const color=$('headerColor').value;
+let path=settings.header_background_path||null;
+if(headerFile){
+if(headerFile.size>5*1024*1024){say('Header photo must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(headerFile.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+path='header/header-'+Date.now();
+const {error}=await supabase.storage.from('tycf-header-assets').upload(path,headerFile,{upsert:true,contentType:headerFile.type});
+if(error){say('Header upload failed: '+error.message);return;}
+}
+const {error}=await supabase.from('tycf_settings').update({
+header_background_path:path,
+header_background_color:color,
+updated_at:new Date().toISOString()
+}).eq('id',settings.id);
+if(error){say('Header save failed: '+error.message);return;}
+headerFile=null;
+$('headerPhoto').value='';
+await loadHeaderSettings();
+say('Header design saved.');
+       }async function loadPackageList(){
+const {data,error}=await supabase.from('tycf_packages').select('*').order('created_at',{ascending:true});
+if(error){$('packageList').textContent='Package loading failed: '+error.message;return;}
+packageRows=data||[];
+$('packageList').innerHTML=packageRows.length?packageRows.map(p=>{
+const img=p.image_path?supabase.storage.from('tycf-package-images').getPublicUrl(p.image_path).data.publicUrl:'';
+return `<article class="package-admin">
+<h3>${esc(p.name)} ${p.is_active?'<span class="tag paid">Active</span>':'<span class="tag">Inactive</span>'}</h3>
+<p><b>${money(p.price)}</b> · ${Number(p.people_count||0)} people</p>
+<p>${esc(p.description||'')}</p>
+${img?`<img src="${esc(img)}" alt="Package photo">`:''}
+<div class="actions">
+<button type="button" data-editpackage="${esc(p.id)}">Edit</button>
+<button type="button" class="light" data-togglepackage="${esc(p.id)}">${p.is_active?'Deactivate':'Activate'}</button>
+<button type="button" class="warn" data-deletepackage="${esc(p.id)}">Delete</button>
+</div></article>`;
+}).join(''):'<p>No packages found.</p>';
+}
+
+function clearPackageForm(){
+$('packageForm').reset();
+$('packageId').value='';
+$('packageImagePreview').innerHTML='';
+$('packagePeople').value=25;
+$('packageSaveBtn').textContent='Save Package';
+}
+
+async function savePackage(e){
+e.preventDefault();
+const id=$('packageId').value;
+const name=$('packageName').value.trim();
+const price=Number($('packagePrice').value);
+const people=Number($('packagePeople').value);
+if(!name||price<=0||people<0){say('Enter valid package details.');return;}
+const payload={
+name,price,people_count:people,
+description:$('packageDescription').value.trim(),
+updated_at:new Date().toISOString()
+};
+const file=$('packageImage').files[0];
+if(file){
+if(file.size>5*1024*1024){say('Package image must be under 5 MB.');return;}
+if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+say('Choose JPG, PNG or WebP.');return;
+}
+const path='packages/'+Date.now()+'-'+file.name.replace(/[^a-z0-9._-]/gi,'-');
+const {error}=await supabase.storage.from('tycf-package-images').upload(path,file,{upsert:true,contentType:file.type});
+if(error){say('Image upload failed: '+error.message);return;}
+payload.image_path=path;
+}
+const result=id?
+await supabase.from('tycf_packages').update(payload).eq('id',id):
+await supabase.from('tycf_packages').insert({...payload,is_active:true});
+if(result.error){say('Package save failed: '+result.error.message);return;}
+clearPackageForm();
+await loadPackageList();
+say('Package saved.');
+}
+
+function editPackage(id){
+const p=packageRows.find(x=>String(x.id)===String(id));
+if(!p)return;
+$('packageId').value=p.id;
+$('packageName').value=p.name||'';
+$('packagePrice').value=p.price||'';
+$('packagePeople').value=p.people_count??25;
+$('packageDescription').value=p.description||'';
+$('packageSaveBtn').textContent='Update Package';
+$('packageImagePreview').innerHTML=p.image_path?
+'<p class="muted">Current image retained unless a new one is selected.</p>':'';
+window.scrollTo({top:$('packageForm').getBoundingClientRect().top+window.scrollY-20,behavior:'smooth'});
+}
+
+async function togglePackage(id){
+const p=packageRows.find(x=>String(x.id)===String(id));
+if(!p)return;
+const {error}=await supabase.from('tycf_packages').update({
+is_active:!p.is_active,updated_at:new Date().toISOString()
+}).eq('id',id);
+if(error){say('Package update failed: '+error.message);return;}
+await loadPackageList();
+say('Package status updated.');
+}
+
+async function deletePackage(id){
+if(!confirm('Delete this package?'))return;
+const {error}=await supabase.from('tycf_packages').delete().eq('id',id);
+if(error){say('Package delete failed: '+error.message);return;}
+await loadPackageList();
+say('Package deleted.');
+  }
+  function showTab(name){
+document.querySelectorAll('main section[id$="Tab"]').forEach(s=>s.hidden=true);
+const target=$(name+'Tab');
+if(target)target.hidden=false;
+if(name==='reports')renderReport();
+if(name==='packages')loadPackageList();
+if(name==='qr')renderQr();
+if(name==='header')loadHeaderSettings();
+if(name==='appicon')loadAppIconSettings();
+}
+
+$('enablePushBtn').addEventListener('click',enableAdminPush);
+
+document.querySelectorAll('[data-tab]').forEach(b=>
+b.addEventListener('click',()=>showTab(b.dataset.tab))
+);
+
+$('refreshBtn').addEventListener('click',loadAll);
+
+$('logoutBtn').addEventListener('click',async()=>{
+await supabase.auth.signOut();
+location.href='admin.html';
+});
+
+$('search').addEventListener('input',renderOrders);
+$('statusFilter').addEventListener('change',renderOrders);
+$('settingsForm').addEventListener('submit',saveSettings);
+$('profileForm').addEventListener('submit',saveProfile);
+$('qrForm').addEventListener('submit',saveQr);
+$('deleteQrBtn').addEventListener('click',deleteQr);
+$('packageForm').addEventListener('submit',savePackage);
+$('packageCancelBtn').addEventListener('click',clearPackageForm);
+
+$('headerPreviewBtn').addEventListener('click',previewHeader);
+$('headerSaveBtn').addEventListener('click',saveHeader);
+
+$('headerResetBtn').addEventListener('click',async()=>{
+headerFile=null;
+if(headerObjectUrl)URL.revokeObjectURL(headerObjectUrl);
+headerObjectUrl=null;
+$('headerPhoto').value='';
+await loadHeaderSettings();
+});
+
+$('headerPhoto').addEventListener('change',()=>{
+const f=$('headerPhoto').files[0];
+if(!f)return;
+if(headerObjectUrl)URL.revokeObjectURL(headerObjectUrl);
+headerFile=f;
+headerObjectUrl=URL.createObjectURL(f);
+previewHeader();
+});
+
+$('headerColor').addEventListener('input',()=>{
+$('headerPreview').style.backgroundColor=$('headerColor').value;
+});
+
+$('packageImage').addEventListener('change',()=>{
+const f=$('packageImage').files[0];
+if(!f)return;
+if(f.size>5*1024*1024){
+say('Image must be under 5 MB.');
+$('packageImage').value='';
+return;
+}
+const url=URL.createObjectURL(f);
+$('packageImagePreview').innerHTML=
+`<img src="${url}" alt="Package preview" style="max-width:180px">`;
+});
+
+document.addEventListener('click',e=>{
+const b=e.target.closest('button');
+if(!b)return;
+if(b.dataset.verify)verify(b.dataset.verify);
+if(b.dataset.status)saveStatus(b.dataset.status);
+if(b.dataset.savewa)saveWA(b.dataset.savewa);
+if(b.dataset.download)downloadSticker(b.dataset.download);
+if(b.dataset.downloadphoto){const o=orders.find(x=>String(x.id)===String(b.dataset.downloadphoto));if(o?.sticker_photo_path)downloadPrivateImage(o.sticker_photo_path,'TYCF-customer-photo-'+o.id+'.jpg');else say('Customer photo unavailable.');}
+if(b.dataset.uploadmedia)uploadDeliveryMedia(b.dataset.uploadmedia,b);
+if(b.dataset.sharemedia)shareDeliveryMedia(b.dataset.sharemedia,b.dataset.order,b);
+if(b.dataset.editpackage)editPackage(b.dataset.editpackage);
+if(b.dataset.togglepackage)togglePackage(b.dataset.togglepackage);
+if(b.dataset.deletepackage)deletePackage(b.dataset.deletepackage);
+if(b.dataset.rstatus){
+reportStatusFilter=reportStatusFilter===b.dataset.rstatus?'':b.dataset.rstatus;
+renderReport();
+}
+});
+
+$('reportMonth').addEventListener('change',renderReport);
+$('reportDateType').addEventListener('change',renderReport);
+
+$('clearReportStatus').addEventListener('click',()=>{
+reportStatusFilter='';
+renderReport();
+});
+
+init();
+</script>
+</body>
+</html>
