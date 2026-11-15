@@ -1,8 +1,8 @@
 {
   "id": "/admin-app.html",
-  "name": "TYCF Admin Orders",
+  "name": "TYCF Admin App",
   "short_name": "TYCF Admin",
-  "description": "Private TYCF admin order management app",
+  "description": "Complete TYCF admin dashboard and order management",
   "start_url": "/admin-app.html",
   "scope": "/",
   "display": "standalone",
