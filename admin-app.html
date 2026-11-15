@@ -53,6 +53,7 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 </header>
 <main>
 <div class="actions">
+<button class="light" id="installAdminAppBtn" type="button" hidden>Install Admin App</button>
 <button class="light" id="refreshBtn" type="button">Refresh</button>
 <button class="light" id="logoutBtn" type="button">Logout</button>
 </div>
@@ -214,6 +215,35 @@ document.getElementById('message').textContent =
   'Dashboard script loaded. Starting admin check...';
 
 const $=id=>document.getElementById(id);
+let deferredAdminInstallPrompt=null;
+const installAdminAppBtn=document.getElementById('installAdminAppBtn');
+const isAdminAppInstalled=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+if(isAdminAppInstalled()){installAdminAppBtn.hidden=true;}
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  deferredAdminInstallPrompt=event;
+  installAdminAppBtn.hidden=false;
+});
+window.addEventListener('appinstalled',()=>{
+  deferredAdminInstallPrompt=null;
+  installAdminAppBtn.hidden=true;
+  say('TYCF Admin App installed successfully.');
+});
+installAdminAppBtn.addEventListener('click',async()=>{
+  if(!deferredAdminInstallPrompt){
+    say('Install option is not available yet. Open this page in Chrome and use the browser menu > Install app.');
+    return;
+  }
+  deferredAdminInstallPrompt.prompt();
+  const choice=await deferredAdminInstallPrompt.userChoice;
+  deferredAdminInstallPrompt=null;
+  installAdminAppBtn.hidden=true;
+  say(choice.outcome==='accepted'?'Installing TYCF Admin App...':'Installation cancelled.');
+});
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(error=>console.warn('Service worker registration failed:',error)));
+}
+
 let orders=[],settings=null,user=null,reportStatusFilter='',packageRows=[],headerFile=null,headerObjectUrl=null;
 const statuses=['Received','Confirmed','Preparing','Delivered','Cancelled'];
 
