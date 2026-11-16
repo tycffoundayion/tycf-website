@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v19";
+const CACHE_NAME = "tycf-shell-v20";
 
 const CORE_ASSETS = [
   "/",
@@ -102,7 +102,12 @@ self.addEventListener("push", event => {
     let data = {};
     try { data = event.data ? event.data.json() : {}; }
     catch { data = { body: event.data ? event.data.text() : "A new donation order has arrived." }; }
-    await self.registration.setAppBadge(1).catch(() => {});
+    // App Badging is optional. Never let an unsupported badge API block notifications.
+    if (typeof self.registration.setAppBadge === "function") {
+      try { await self.registration.setAppBadge(1); } catch (error) {
+        console.warn("TYCF app badge could not be set:", error);
+      }
+    }
     await self.registration.showNotification(data.title || "TYCF Food Donation", {
       body: data.body || "A new donation order has arrived.",
       icon: "/tycf-app-icon-512.png",
@@ -116,9 +121,13 @@ self.addEventListener("push", event => {
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
-  event.waitUntil(self.registration.clearAppBadge().catch(() => {}));
-  const target = new URL(event.notification.data?.url || "/dashboard.html", self.location.origin).href;
+  const target = new URL(event.notification.data?.url || "/admin-app.html", self.location.origin).href;
   event.waitUntil((async () => {
+    if (typeof self.registration.clearAppBadge === "function") {
+      try { await self.registration.clearAppBadge(); } catch (error) {
+        console.warn("TYCF app badge could not be cleared:", error);
+      }
+    }
     const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const client of windows) {
       if (client.url.startsWith(self.location.origin) && "focus" in client) {
