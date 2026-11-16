@@ -533,16 +533,32 @@ renderStats();renderOrders();renderReminders();fillSettings();
 await Promise.all([loadPackageList(),loadHeaderSettings()]);
 if(!$('reportsTab').hidden)renderReport();say('Dashboard loaded.');
 }
+
+async function updateAdminAppIconBadge(count){
+  const badgeCount=Math.max(0,Number(count)||0);
+  try{
+    if(!('serviceWorker' in navigator)) return;
+    const registration=await navigator.serviceWorker.ready;
+    if(typeof registration.setAppBadge==='function' || typeof registration.clearAppBadge==='function'){
+      if(badgeCount>0 && typeof registration.setAppBadge==='function') await registration.setAppBadge(badgeCount);
+      else if(badgeCount===0 && typeof registration.clearAppBadge==='function') await registration.clearAppBadge();
+      return;
+    }
+    const worker=registration.active;
+    if(worker) worker.postMessage({type:'TYCF_UPDATE_APP_BADGE',count:badgeCount});
+  }catch(error){
+    console.warn('TYCF Admin app icon badge is not supported or could not be updated:',error);
+  }
+}
+
 function renderStats(){
 const receivedCount=orders.filter(o=>o.status==='Received').length;
 $('total').textContent=orders.length;$('received').textContent=receivedCount;
 $('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
 const counter=$('newBookingCount');
 if(counter){counter.textContent=receivedCount+' New';counter.hidden=receivedCount===0;}
-// Android/Chrome displays this badge only where the installed PWA and launcher support the Web App Badge API.
-if('setAppBadge' in navigator){
-  (receivedCount>0?navigator.setAppBadge(receivedCount):navigator.clearAppBadge?.()).catch?.(()=>{});
-}
+// Update the installed TYCF Admin app icon badge with the live Received count.
+updateAdminAppIconBadge(receivedCount);
 }
 function orderHtml(o){
 const paid=o.payment_status==='Paid';
