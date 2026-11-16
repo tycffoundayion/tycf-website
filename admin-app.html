@@ -69,7 +69,7 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <div class="stat">Delivered<strong id="delivered">0</strong></div>
 </div>
 <nav>
-<button data-tab="bookings" type="button">Bookings</button>
+<button data-tab="bookings" type="button">Bookings <span id="newBookingCount" class="tag pending" style="margin-left:5px">0 New</span></button>
 <button data-tab="reminders" type="button">Reminders</button>
 <button data-tab="packages" type="button">Donation Packages</button>
 <button data-tab="header" type="button">Header Design</button>
@@ -533,8 +533,15 @@ await Promise.all([loadPackageList(),loadHeaderSettings()]);
 if(!$('reportsTab').hidden)renderReport();say('Dashboard loaded.');
 }
 function renderStats(){
-$('total').textContent=orders.length;$('received').textContent=orders.filter(o=>o.status==='Received').length;
+const receivedCount=orders.filter(o=>o.status==='Received').length;
+$('total').textContent=orders.length;$('received').textContent=receivedCount;
 $('confirmed').textContent=orders.filter(o=>o.status==='Confirmed').length;$('delivered').textContent=orders.filter(o=>o.status==='Delivered').length;
+const counter=$('newBookingCount');
+if(counter){counter.textContent=receivedCount+' New';counter.hidden=receivedCount===0;}
+// Android/Chrome displays this badge only where the installed PWA and launcher support the Web App Badge API.
+if('setAppBadge' in navigator){
+  (receivedCount>0?navigator.setAppBadge(receivedCount):navigator.clearAppBadge?.()).catch?.(()=>{});
+}
 }
 function orderHtml(o){
 const paid=o.payment_status==='Paid';
