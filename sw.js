@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v18";
+const CACHE_NAME = "tycf-shell-v19";
 
 const CORE_ASSETS = [
   "/",
@@ -102,6 +102,7 @@ self.addEventListener("push", event => {
     let data = {};
     try { data = event.data ? event.data.json() : {}; }
     catch { data = { body: event.data ? event.data.text() : "A new donation order has arrived." }; }
+    await self.registration.setAppBadge(1).catch(() => {});
     await self.registration.showNotification(data.title || "TYCF Food Donation", {
       body: data.body || "A new donation order has arrived.",
       icon: "/tycf-app-icon-512.png",
@@ -115,6 +116,7 @@ self.addEventListener("push", event => {
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
+  event.waitUntil(self.registration.clearAppBadge().catch(() => {}));
   const target = new URL(event.notification.data?.url || "/dashboard.html", self.location.origin).href;
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
