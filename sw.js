@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v20";
+const CACHE_NAME = "tycf-shell-v21";
 
 const CORE_ASSETS = [
   "/",
@@ -96,6 +96,24 @@ self.addEventListener("fetch", event => {
   }
 });
 
+
+
+self.addEventListener("message", event => {
+  const data = event.data || {};
+  if (data.type !== "TYCF_UPDATE_APP_BADGE") return;
+  const count = Math.max(0, Number(data.count) || 0);
+  event.waitUntil((async () => {
+    try {
+      if (count > 0 && typeof self.registration.setAppBadge === "function") {
+        await self.registration.setAppBadge(count);
+      } else if (count === 0 && typeof self.registration.clearAppBadge === "function") {
+        await self.registration.clearAppBadge();
+      }
+    } catch (error) {
+      console.warn("TYCF app icon badge update failed:", error);
+    }
+  })());
+});
 
 self.addEventListener("push", event => {
   event.waitUntil((async () => {
