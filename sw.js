@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "tycf-shell-v21";
+const CACHE_NAME = "tycf-shell-v22";
 
 const CORE_ASSETS = [
   "/",
@@ -131,7 +131,7 @@ self.addEventListener("push", event => {
       icon: "/tycf-app-icon-512.png",
       badge: "/tycf-app-icon-512.png",
       tag: data.tag || "tycf-new-order",
-      data: { url: data.url || "/dashboard.html" },
+      data: { url: data.url || "/admin-app.html" },
       vibrate: [200, 100, 200]
     });
   })());
