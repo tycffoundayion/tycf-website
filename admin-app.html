@@ -25,6 +25,7 @@ label{font-weight:bold;font-size:13px;display:block}
 .tag{display:inline-block;background:#e8f5ec;border-radius:20px;padding:4px 9px;font-size:12px}
 .paid{background:#d8f4df}
 .pending{background:#fff0ce}
+.new-booking-count{background:#e53935;color:#fff;font-weight:700;border:1px solid #c62828;box-shadow:0 1px 3px #0002}
 #message{padding:10px;overflow-wrap:anywhere}
 .order-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
 .order-image-card{background:#f5faf6;padding:10px;border:1px solid #dce9e0;border-radius:9px}
@@ -69,7 +70,7 @@ hr{border:0;border-top:1px solid #ddd;margin:20px 0}
 <div class="stat">Delivered<strong id="delivered">0</strong></div>
 </div>
 <nav>
-<button data-tab="bookings" type="button">Bookings <span id="newBookingCount" class="tag pending" style="margin-left:5px">0 New</span></button>
+<button data-tab="bookings" type="button">Bookings <span id="newBookingCount" class="tag new-booking-count" style="margin-left:5px">0 New</span></button>
 <button data-tab="reminders" type="button">Reminders</button>
 <button data-tab="packages" type="button">Donation Packages</button>
 <button data-tab="header" type="button">Header Design</button>
